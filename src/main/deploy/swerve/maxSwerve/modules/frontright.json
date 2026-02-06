@@ -1,6 +1,6 @@
 {
   "drive": {
-    "type": "krakenx60",
+    "type": "sparkflex_vortex",
     "id": 4,
     "canbus": null
   },
@@ -21,7 +21,7 @@
   "absoluteEncoderInverted": true,
   "absoluteEncoderOffset": 0,
   "location": {
-    "front": 13.25,
-    "left": -13.25
+    "front": 12,
+    "left": -12
   }
 }
