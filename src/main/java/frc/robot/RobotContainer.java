@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.drivebase.DriveToTargetV0_1;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.Shooter.*;
+import frc.robot.commands.shooter.tele.*;
 import java.io.File;
 
 import swervelib.SwerveDrive;
@@ -42,6 +44,7 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
+  private final ShooterSubsystem Shooter = new ShooterSubsystem();
   private final SendableChooser<Command> autoChooser;
   
   /**
@@ -176,8 +179,8 @@ public class RobotContainer
 //       driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 //       driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
          driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-         driverXbox.a().whileTrue(new DriveToTargetV0_1(drivebase));
-
+         //driverXbox.a().whileTrue(new DriveToTargetV0_1(drivebase));
+        driverXbox.a().whileTrue(new CmdT_ShootTillEmpty(Shooter));
          // Pre-match calibration routine - Back + Start buttons together
          // This ensures accidental activation is avoided during matches
          driverXbox.x().onTrue(drivebase.getPreMatchCalibrationCommand());
