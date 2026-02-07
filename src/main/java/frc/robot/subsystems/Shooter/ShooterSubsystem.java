@@ -9,7 +9,11 @@ import static edu.wpi.first.units.Units.Newton;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-
+import com.revrobotics.servohub.ServoChannel;
+import com.revrobotics.servohub.ServoHub;
+import com.revrobotics.servohub.ServoChannel.ChannelId;
+import com.revrobotics.servohub.config.ServoHubConfig;
+import com.revrobotics.servohub.config.ServoChannelConfig.BehaviorWhenDisabled;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.EncoderConfig;
@@ -53,7 +57,13 @@ public class ShooterSubsystem extends SubsystemBase {
   double  JamAugerTime = 0;
   double JamFdderTimer = 0;
     
-  
+  //Servo
+  ServoHub Servos = new ServoHub(14);
+  ServoHubConfig cfg_Servos = new ServoHubConfig();
+  ServoChannel Hood1 = Servos.getServoChannel(ChannelId.kChannelId0);
+  ServoChannel Hood2 = Servos.getServoChannel(ChannelId.kChannelId1);
+
+
   
 
   //PIDs
@@ -83,6 +93,14 @@ public class ShooterSubsystem extends SubsystemBase {
     PID_Shooter1.setTolerance(100);
     PID_Shooter2.setTolerance(100);
 
+    //setup Servohub
+    cfg_Servos.channel0.pulseRange(500,1500,2500);
+    cfg_Servos.channel1.pulseRange(500,1500,2500);
+    cfg_Servos.channel0.disableBehavior(BehaviorWhenDisabled.kSupplyPower);
+    cfg_Servos.channel1.disableBehavior(BehaviorWhenDisabled.kSupplyPower); 
+    Servos.configure(cfg_Servos,ResetMode.kResetSafeParameters);
+
+
   }
   public void SetShooterSpeeds(double speed)
   {
@@ -107,7 +125,15 @@ public class ShooterSubsystem extends SubsystemBase {
   {
     return PID_Shooter2.atSetpoint();
   }
-
+public void SetHood(int HoodAngle)
+{
+  Hood1.setEnabled(true);
+  Hood2.setEnabled(true);
+int PulseWidth = (HoodAngle / 270) * (2500-500) + 500;
+PulseWidth = PulseWidth *1000; // convert to microseconds
+  Hood1.setPulseWidth(PulseWidth);
+  Hood2.setPulseWidth(PulseWidth);
+}
 
   @Override
   public void periodic() {
