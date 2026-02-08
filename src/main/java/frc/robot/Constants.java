@@ -15,7 +15,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import frc.robot.resources.customapriltagfield;
 import swervelib.math.Matter;
 import edu.wpi.first.math.Matrix;
 
@@ -118,10 +117,11 @@ public static final class DriveConstants {
   public static final Transform3d ROBOT_TO_CAMERA_Right = kRobotToRedReefCam .inverse();
   public static final Transform3d ROBOT_TO_CAMERA_Left = kRobotToRedGeneralCam.inverse();
   public static final Transform3d ROBOT_TO_CAMERA_Center = kRobotToCenterCam.inverse();
-public static final customapriltagfield atag = new customapriltagfield();
+
     
-    public static final AprilTagFieldLayout kTagLayout = new AprilTagFieldLayout(atag.getTags(), 17.548, 8.052);  
-        // public static final AprilTagFieldLayout kTagLayout =
+    //public static final AprilTagFieldLayout kTagLayout = new AprilTagFieldLayout(atag.getTags(), 17.548, 8.052);  
+    public static final   AprilTagFieldLayout kTagLayout = AprilTagFields.k2026RebuiltWelded.loadAprilTagLayoutField(); 
+    // public static final AprilTagFieldLayout kTagLayout =
         //         AprilTagFields.k2025ReefscapeWelded.loadAprilTagLayoutField();
    
 

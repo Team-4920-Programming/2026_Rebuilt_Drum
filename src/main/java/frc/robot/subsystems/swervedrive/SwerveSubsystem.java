@@ -41,7 +41,6 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -243,32 +242,16 @@ private       Vision4920      RightCamera;
       poseEstimator.update(GetGyroAngle(), getModulePositions());
       DogLog.log("SwerveSS/Pose/Pose4920", poseEstimator.getEstimatedPosition());
       DogLog.log("SwerveSS/Pose/YASGLRobotPose", swerveDrive.getPose());
-      DogLog.log("APRILTAG 18", Constants.Vision4920.kTagLayout.getTagPose(18).get());
-      DogLog.log("APRILTAG 21", Constants.Vision4920.kTagLayout.getTagPose(21).get());
-      DogLog.log("APRILTAG 22", Constants.Vision4920.kTagLayout.getTagPose(22).get());
-      DogLog.log("APRILTAG 12", Constants.Vision4920.kTagLayout.getTagPose(12).get());
-      DogLog.log("APRILTAG 1", Constants.Vision4920.kTagLayout.getTagPose(1).get());    
-      //swerveDrive.field.setRobotPose(getPose());
-     // SmartDashboard.("Pose",swerveDrive.getPose());
-    /* vision.updatePoseEstimation(swerveDrive);
-     var visionEst = vision.getEstimatedGlobalPose();
-     Pose3d CenterCameraPose3d = new Pose3d();
-     DogLog.log("SwerveSS/Vision/CenterCameraPresent", visionEst.isPresent());
-     
-      if (visionEst.isPresent()){
-          CenterCameraPose3d = visionEst.get().estimatedPose;
-
-          
-          DogLog.log("SwerveSS/Vision/CenterCameraPose", CenterCameraPose3d);
-      }
-      vision.updatePoseEstimation(swerveDrive);
-
-
-      //      DogLog.log("CameraPose", vision.getEstimatedGlobalPose(Vision.Cameras.CENTER_CAM));
-    */
+ 
+      UpdateDataHighway();
       
   }
+  public void UpdateDataHighway()
+  {
+    //Set Variables from Datahighway
 
+    //Set Variable to DataHighway
+  }
   @Override
   public void simulationPeriodic()
   {
@@ -352,24 +335,7 @@ private       Vision4920      RightCamera;
    *
    * @return A {@link Command} which will run the alignment.
    */
-  public Command aimAtTarget(Cameras camera)
-  {
-
-    return run(() -> {
-      Optional<PhotonPipelineResult> resultO = camera.getBestResult();
-      if (resultO.isPresent())
-      {
-        var result = resultO.get();
-        if (result.hasTargets())
-        {
-          drive(getTargetSpeeds(0,
-                                0,
-                                Rotation2d.fromDegrees(result.getBestTarget()
-                                                             .getYaw()))); // Not sure if this will work, more math may be required.
-        }
-      }
-    });
-  }
+  
 
   /**
    * Get the path follower with events.

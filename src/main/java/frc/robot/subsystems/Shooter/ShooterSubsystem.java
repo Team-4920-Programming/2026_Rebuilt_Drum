@@ -67,8 +67,8 @@ public class ShooterSubsystem extends SubsystemBase {
   
 
   //PIDs
-  PIDController PID_Shooter1 = new PIDController(.1, 0, .1);
-  PIDController PID_Shooter2 = new PIDController(.1, 0, .1);
+  PIDController PID_Shooter1 = new PIDController(.001, 0, .001);
+  PIDController PID_Shooter2 = new PIDController(.001, 0, .001);
 
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
@@ -169,5 +169,12 @@ PulseWidth = PulseWidth *1000; // convert to microseconds
 
     
     // This method will be called once per scheduler run
+    UpdateDataHighway();
+  }
+    public void UpdateDataHighway()
+  {
+    //Set Variables from Datahighway
+
+    //Set Variable to DataHighway
   }
 }
