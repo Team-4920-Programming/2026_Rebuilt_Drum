@@ -77,11 +77,27 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * PhotonVision class to keep an accurate odometry.
    */
-  private       Vision4920      CenterCamera;
-  public Pose3d CenterCameraPose3d = new Pose3d();
+  private       Vision4920      FrontCamera;
+  public Pose3d FrontCameraPose3d = new Pose3d();
 
-private       Vision4920      RightCamera;
+  private       Vision4920      RightCamera;
   public Pose3d RightCameraPose3d = new Pose3d();
+  
+  private       Vision4920      LeftCamera;
+  public Pose3d LeftCameraPose3d = new Pose3d();
+
+  private       Vision4920      RearCamera;
+  public Pose3d RearCameraPose3d = new Pose3d();
+
+// Datahighway variables
+//Outputs from this Subsystem
+  public boolean DHOut_InNeutralZone = false;
+  public boolean DHOut_InAllianceZone = false;
+  public boolean DHOut_InBumpZone = false;
+  
+
+//variables
+  private boolean AutoAimEnabled = false;
 
   private final SwerveDrivePoseEstimator poseEstimator;
   /**
@@ -170,34 +186,43 @@ private       Vision4920      RightCamera;
   public void setupPhotonVision()
   {
     //vision = new Vision(swerveDrive::getPose, swerveDrive.field);
-    CenterCamera = new Vision4920(Constants.Vision4920.kCenterCam, Constants.Vision4920.kRobotToCenterCam );
+    FrontCamera = new Vision4920(Constants.Vision4920.kFrontCam, Constants.Vision4920.kRobotToFrontCam );
     RightCamera = new Vision4920(Constants.Vision4920.kRightCam, Constants.Vision4920.kRobotToRightCam );
+    LeftCamera = new Vision4920(Constants.Vision4920.kLeftCam, Constants.Vision4920.kRobotToLeftCam );
+    RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.kRobotToRearCam );
+
   }
   private void ProcessVision4920()
   {
     //Process Vision
-    Pose2d CenterCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
-    double CenterCamVisionTimestamp;
+    Pose2d FrontCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+    double FrontCamVisionTimestamp;
     Pose2d RightCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
     double RightCamVisionTimestamp;
+    Pose2d LeftCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+    double LeftCamVisionTimestamp;
+    Pose2d RearCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+    double RearCamVisionTimestamp;
+    
+    
     //System.out.println("driver statio"+DriverStation.isDSAttached());
     //System.out.println("CeneterCAm"+(CenterCamera != null));
 
 
-    if ( DriverStation.isDSAttached() && CenterCamera != null)
+    if ( DriverStation.isDSAttached() && FrontCamera != null)
     {
-       var visionEst = CenterCamera.getEstimatedGlobalPose();
-       DogLog.log("SwerveSS/Vision/CenterCameraPresent", CenterCamera.isConnected());
+       var visionEst = FrontCamera.getEstimatedGlobalPose();
+       DogLog.log("SwerveSS/Vision/FrontCameraPresent", FrontCamera.isConnected());
        
         if (visionEst.isPresent()){
-            CenterCamPose = visionEst.get().estimatedPose.toPose2d();
-            CenterCameraPose3d = visionEst.get().estimatedPose;
+            FrontCamPose = visionEst.get().estimatedPose.toPose2d();
+            FrontCameraPose3d = visionEst.get().estimatedPose;
   
             
-            CenterCamVisionTimestamp = visionEst.get().timestampSeconds;
-            DogLog.log("SwerveSS/Vision/CeneterCameraPose", CenterCameraPose3d);
-            DogLog.log("SwerveSS/Vision/CeneterTimeStamp",CenterCamVisionTimestamp);
-            VisionReading(CenterCamPose, CenterCamVisionTimestamp, CenterCamera.confidenceCalculator(visionEst.get()));
+            FrontCamVisionTimestamp = visionEst.get().timestampSeconds;
+            DogLog.log("SwerveSS/Vision/FrontCameraPose", FrontCameraPose3d);
+            DogLog.log("SwerveSS/Vision/FrontTimeStamp",FrontCamVisionTimestamp);
+            VisionReading(FrontCamPose, FrontCamVisionTimestamp, FrontCamera.confidenceCalculator(visionEst.get()));
         }
     
     }
@@ -216,6 +241,40 @@ private       Vision4920      RightCamera;
             DogLog.log("SwerveSS/Vision/RightCameraPose", RightCameraPose3d);
             DogLog.log("SwerveSS/Vision/RightTimeStamp",RightCamVisionTimestamp);
             VisionReading(RightCamPose, RightCamVisionTimestamp, RightCamera.confidenceCalculator(visionEst.get()));
+        }
+    
+    }
+    if ( DriverStation.isDSAttached() && LeftCamera != null)
+    {
+       var visionEst = LeftCamera.getEstimatedGlobalPose();
+       DogLog.log("SwerveSS/Vision/LeftCameraPresent", LeftCamera.isConnected());
+       
+        if (visionEst.isPresent()){
+            LeftCamPose = visionEst.get().estimatedPose.toPose2d();
+            LeftCameraPose3d = visionEst.get().estimatedPose;
+  
+            
+            LeftCamVisionTimestamp = visionEst.get().timestampSeconds;
+            DogLog.log("SwerveSS/Vision/LeftCameraPose", LeftCameraPose3d);
+            DogLog.log("SwerveSS/Vision/LeftTimeStamp", LeftCamVisionTimestamp);
+            VisionReading(LeftCamPose, LeftCamVisionTimestamp, LeftCamera.confidenceCalculator(visionEst.get()));
+        }
+    
+    }
+    if ( DriverStation.isDSAttached() && RearCamera != null)
+    {
+       var visionEst = RearCamera.getEstimatedGlobalPose();
+       DogLog.log("SwerveSS/Vision/RearCameraPresent", RearCamera.isConnected());
+       
+        if (visionEst.isPresent()){
+            RearCamPose = visionEst.get().estimatedPose.toPose2d();
+            RearCameraPose3d = visionEst.get().estimatedPose;
+  
+            
+            RearCamVisionTimestamp = visionEst.get().timestampSeconds;
+            DogLog.log("SwerveSS/Vision/RearCameraPose", RearCameraPose3d);
+            DogLog.log("SwerveSS/Vision/RearTimeStamp", RearCamVisionTimestamp);
+            VisionReading(RearCamPose, RearCamVisionTimestamp, RearCamera.confidenceCalculator(visionEst.get()));
         }
     
     }
@@ -348,6 +407,21 @@ private       Vision4920      RightCamera;
     // Create a path following command using AutoBuilder. This will also trigger event markers.
     return new PathPlannerAuto(pathName);
   }
+
+  public void EnableAutoAim()
+  {
+    AutoAimEnabled = true;
+  }
+  public void DisableAutoAim()
+  {
+    AutoAimEnabled = false;
+  }
+  public boolean isAutoAim()
+  {
+    return AutoAimEnabled;
+  }
+
+
 
   /**
    * Use PathPlanner Path finding to go to a point on the field.

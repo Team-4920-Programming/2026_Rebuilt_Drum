@@ -52,9 +52,9 @@ public final class Constants
 public static final class DriveConstants {
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(26.5);
+    public static final double kTrackWidth = Units.inchesToMeters(24);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(26.5);
+    public static final double kWheelBase = Units.inchesToMeters(24);  //27.5 less 3.5
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
         new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
@@ -71,19 +71,15 @@ public static final class DriveConstants {
     public static final double TURN_CONSTANT    = 6;
   }
   public static class Vision4920 {
-    public static final String kGreyFeederCam = "GreyFeederCam";
-    public static final String kGreyReefCam = "GreyReefCam";
-    public static final String kRedReefCam = "RedReefCam";
-    public static final String kRedGeneralCam = "RedGeneralCam";
-    public static final String kBlueGeneralCam = "BlueGeneralCam";
-    public static final String kBlueFrontCam = "BlueFrontCam";
-    public static final String kCenterCam = "CenterCam";
-    public static final String kRightCam = "RightCam";
+    public static final String kFrontCam = "FrontCam";  //Intake Camera
+    public static final String kRearCam = "RearCam"; //Shooter Camera
+    public static final String kLeftCam = "LeftCam";  //Climber Camera
+    public static final String kRightCam = "RightCam"; //Right Camera
     // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
 
 
-    // positive x to the left, positive y up
-    public static final Transform3d kRobotToCenterCam =
+    // positive x to the left, positive up
+    public static final Transform3d kRobotToFrontCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(14), Units.inchesToMeters(-1.375), Units.inchesToMeters(19)), 
             new Rotation3d(Units.degreesToRadians(359), Units.degreesToRadians(8), Units.degreesToRadians(2))); //
 
@@ -91,33 +87,18 @@ public static final class DriveConstants {
             new Transform3d(new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(-9.5), Units.inchesToMeters(19)), 
             new Rotation3d(Units.degreesToRadians(1), Units.degreesToRadians(7), Units.degreesToRadians(4))); //
 
-    public static final Transform3d kRobotToGreyFeederCam =
+    public static final Transform3d kRobotToLeftCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(-3.25), Units.inchesToMeters(-10.75), Units.inchesToMeters(38.25)), 
             new Rotation3d(0, Units.degreesToRadians(309), Units.degreesToRadians(180))); //
-  public static final Transform3d kRobotToGreyReefCam =
+  public static final Transform3d kRobotToRearCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(14.75), Units.inchesToMeters(-5.5), Units.inchesToMeters(7.5)), 
             new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-13), Units.degreesToRadians(0))); // 0.48
-  public static final Transform3d kRobotToRedReefCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(14.75), Units.inchesToMeters(5.5), Units.inchesToMeters(7.5)), 
-            new Rotation3d(0, Units.degreesToRadians(-13.0), 0)); // 0.48
-  public static final Transform3d kRobotToRedGeneralCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(-3.25), Units.inchesToMeters(10.75), Units.inchesToMeters(37.75)), 
-            new Rotation3d(0, Units.degreesToRadians(12), Units.degreesToRadians(180))); // 0.48
   
-  public static final Transform3d kRobotToBlueGeneralCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(0.75), Units.inchesToMeters(-14.25), Units.inchesToMeters(40.25)), 
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-48), Units.degreesToRadians(270))); // 0.48
-   
-            public static final Transform3d kRobotToBlueFrontCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(12.5), Units.inchesToMeters(-13), Units.inchesToMeters(34.5)), 
-            new Rotation3d(0, Units.degreesToRadians(346), 0)); // 0.48
+  public static final Transform3d ROBOT_TO_CAMERA_Front = kRobotToFrontCam.inverse();
+  public static final Transform3d ROBOT_TO_CAMERA_Rear = kRobotToRearCam.inverse();
+  public static final Transform3d ROBOT_TO_CAMERA_Right = kRobotToRightCam .inverse();
+  public static final Transform3d ROBOT_TO_CAMERA_Left = kRobotToLeftCam.inverse();
   
-  public static final Transform3d ROBOT_TO_CAMERA_Front = kRobotToGreyFeederCam.inverse();
-  public static final Transform3d ROBOT_TO_CAMERA_Rear = kRobotToGreyReefCam.inverse();
-  public static final Transform3d ROBOT_TO_CAMERA_Right = kRobotToRedReefCam .inverse();
-  public static final Transform3d ROBOT_TO_CAMERA_Left = kRobotToRedGeneralCam.inverse();
-  public static final Transform3d ROBOT_TO_CAMERA_Center = kRobotToCenterCam.inverse();
-
     
     //public static final AprilTagFieldLayout kTagLayout = new AprilTagFieldLayout(atag.getTags(), 17.548, 8.052);  
     public static final   AprilTagFieldLayout kTagLayout = AprilTagFields.k2026RebuiltWelded.loadAprilTagLayoutField(); 
