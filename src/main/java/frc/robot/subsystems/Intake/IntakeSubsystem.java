@@ -4,12 +4,19 @@
 
 package frc.robot.subsystems.Intake;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
+
+import dev.doglog.DogLog;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -26,8 +33,18 @@ public class IntakeSubsystem extends SubsystemBase {
   
   //PID Controllers
   PIDController PID_IntakeAngle = new PIDController(0.001, 0, 0);
+   ArmFeedforward FF_IntakeAngle= new ArmFeedforward(0, 0, 0);
+
+  DoubleSupplier IntakeAngKP = DogLog.tunable("Intake/Angle_kp", 0.1);
+  DoubleSupplier IntakeAngKD = DogLog.tunable("Intake/Angle_kD", 0.0);
+   DoubleSupplier IntakeAngKs = DogLog.tunable("Intake/Angle_ks", 0.0);
+    DoubleSupplier IntakeAngKg = DogLog.tunable("Intake/Angle_kg", 0.0);
+   DoubleSupplier IntakeAngKv = DogLog.tunable("Intake/Angle_kv", 0.0);
 
   //Variables
+
+  //Datahighway
+  DHOut_IntakeOut = false;
   
 
   /** Creates a new IntakeSubsystem. */

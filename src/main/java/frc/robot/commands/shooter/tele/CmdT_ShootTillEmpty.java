@@ -4,6 +4,8 @@
 
 package frc.robot.commands.shooter.tele;
 
+import dev.doglog.DogLog;
+import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
 
@@ -24,11 +26,17 @@ public class CmdT_ShootTillEmpty extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.SetShooterSpeeds(3500);
+    DoubleSubscriber ShooterSpeed = DogLog.tunable("Shooter/ShooterSpeed", 3500.0,"rpm");
+    DoubleSubscriber FeederSpeed = DogLog.tunable("Shooter/FeederSpeed", 0.5);
+    DoubleSubscriber AugerSpeed = DogLog.tunable("Shooter/AugerSpeed",0.5);
+
+
+
+    m_shooter.SetShooterSpeeds(ShooterSpeed.get());
     if (m_shooter.Shooter2AtSpeed() && m_shooter.Shooter1AtSpeed())
     {
-      m_shooter.SetFeederSpeed(.5);
-      m_shooter.SetAugerSpeed(.5);
+      m_shooter.SetFeederSpeed(FeederSpeed.get());
+      m_shooter.SetAugerSpeed(AugerSpeed.get());
     }
   }
 

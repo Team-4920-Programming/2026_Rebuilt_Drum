@@ -6,6 +6,8 @@ package frc.robot.subsystems.Shooter;
 
 import static edu.wpi.first.units.Units.Newton;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -20,8 +22,9 @@ import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-
+import dev.doglog.DogLog;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.RobotController;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -42,6 +45,8 @@ public class ShooterSubsystem extends SubsystemBase {
   //Encoders
   RelativeEncoder enc_Shooter1 = Mtr_Shooter1.getEncoder();
   RelativeEncoder enc_Shooter2 = Mtr_Shooter2.getEncoder();
+    RelativeEncoder enc_Auger = Mtr_Auger.getEncoder();
+  RelativeEncoder enc_Feeder = Mtr_Feeder.getEncoder();
 
   //Other Speeds
   double AugerSpeed = 0;
@@ -50,6 +55,8 @@ public class ShooterSubsystem extends SubsystemBase {
   //Critical Motor Currents
   double AugerCurrent =0;
   double FeederCurrent = 0;
+  double Shooter1Current = 0;
+  double Shooter2Current = 0;
   double AugerJammedCurrent = 20;
   double FeederJammedCurrent = 20;
   boolean unJamAuger = false;
@@ -67,9 +74,14 @@ public class ShooterSubsystem extends SubsystemBase {
   
 
   //PIDs
-  PIDController PID_Shooter1 = new PIDController(.001, 0, .001);
-  PIDController PID_Shooter2 = new PIDController(.001, 0, .001);
+  PIDController PID_Shooter1 = new PIDController(.1, 0, 0);
+  PIDController PID_Shooter2 = new PIDController(.1, 0, 0);
+  SimpleMotorFeedforward FF_Shooter1 = new SimpleMotorFeedforward(0, 0.0075);
+    SimpleMotorFeedforward FF_Shooter2 = new SimpleMotorFeedforward(0, 0.0075);
 
+  DoubleSupplier ShooterKP = DogLog.tunable("Shooter/kp", 0.1);
+  DoubleSupplier ShooterKD = DogLog.tunable("Shooter/kD", 0.0);
+   DoubleSupplier ShooterKv = DogLog.tunable("Shooter/kv", 0.0);
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
     //Setup Motors
@@ -99,6 +111,7 @@ public class ShooterSubsystem extends SubsystemBase {
     cfg_Servos.channel0.disableBehavior(BehaviorWhenDisabled.kSupplyPower);
     cfg_Servos.channel1.disableBehavior(BehaviorWhenDisabled.kSupplyPower); 
     Servos.configure(cfg_Servos,ResetMode.kResetSafeParameters);
+    
 
 
   }
@@ -137,12 +150,35 @@ PulseWidth = PulseWidth *1000; // convert to microseconds
 
   @Override
   public void periodic() {
+    PID_Shooter1.setD(ShooterKD.getAsDouble());
+    PID_Shooter2.setD(ShooterKD.getAsDouble());
+    PID_Shooter1.setP(ShooterKP.getAsDouble());
+    PID_Shooter2.setP(ShooterKP.getAsDouble());
+    FF_Shooter1.setKv(ShooterKv.getAsDouble());
+    FF_Shooter2.setKv(ShooterKv.getAsDouble());
+    AugerCurrent = Mtr_Auger.getOutputCurrent();
+    FeederCurrent = Mtr_Feeder.getOutputCurrent();
+    Shooter1Current = Mtr_Shooter1.getOutputCurrent();
+    Shooter2Current = Mtr_Shooter2.getOutputCurrent();
+    DogLog.log("Shooter/Shooter1Speed",enc_Shooter1.getVelocity(),"rpm");
+    DogLog.log("Shooter/Shooter2Speed",enc_Shooter2.getVelocity(),"rpm");
+    DogLog.log("Shooter/AugerSpeed",enc_Auger.getVelocity(),"rpm");
+    DogLog.log("Shooter/FeederSpeed",enc_Feeder.getVelocity(),"rpm");
+
+    DogLog.log("Shooter/Shooter1Amps", Shooter1Current,"amps");
+    DogLog.log("Shooter/Shooter2Amps", Shooter2Current,"amps");
+    DogLog.log("Shooter/FeederAmps", FeederCurrent,"amps");
+    DogLog.log("Shooter/AugerAmps", AugerCurrent,"amps");
+    
+
+
+
     if (PID_Shooter1.getSetpoint() > 500)
-      Mtr_Shooter1.set(PID_Shooter1.calculate(enc_Shooter1.getVelocity()));
+      Mtr_Shooter1.set(PID_Shooter1.calculate(enc_Shooter1.getVelocity()) + FF_Shooter1.calculate(PID_Shooter1.getSetpoint()));
     else 
       Mtr_Shooter1.set(0);
     if (PID_Shooter2.getSetpoint() > 500)
-        Mtr_Shooter2.set(PID_Shooter1.calculate(enc_Shooter2.getVelocity()));
+        Mtr_Shooter2.set(PID_Shooter1.calculate(enc_Shooter2.getVelocity()+ FF_Shooter2.calculate(PID_Shooter2.getSetpoint())));
     else 
       Mtr_Shooter2.set(0);
 
@@ -150,8 +186,7 @@ PulseWidth = PulseWidth *1000; // convert to microseconds
     Mtr_Auger.set(AugerSpeed);
     Mtr_Feeder.set(FeederSpeed);
 
-    AugerCurrent = Mtr_Auger.getOutputCurrent();
-    FeederCurrent = Mtr_Feeder.getOutputCurrent();
+
 
     if (AugerCurrent > AugerJammedCurrent && unJamAuger == false)
     {
