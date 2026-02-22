@@ -17,6 +17,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -35,20 +36,23 @@ public class IntakeSubsystem extends SubsystemBase {
   PIDController PID_IntakeAngle = new PIDController(0.001, 0, 0);
    ArmFeedforward FF_IntakeAngle= new ArmFeedforward(0, 0, 0);
 
-  DoubleSupplier IntakeAngKP = DogLog.tunable("Intake/Angle_kp", 0.1);
+  DoubleSupplier IntakeAngKP = DogLog.tunable("Intake/Angle_kp", 0.001);
   DoubleSupplier IntakeAngKD = DogLog.tunable("Intake/Angle_kD", 0.0);
    DoubleSupplier IntakeAngKs = DogLog.tunable("Intake/Angle_ks", 0.0);
-    DoubleSupplier IntakeAngKg = DogLog.tunable("Intake/Angle_kg", 0.0);
+   DoubleSupplier IntakeAngKg = DogLog.tunable("Intake/Angle_kg", 0.0);
    DoubleSupplier IntakeAngKv = DogLog.tunable("Intake/Angle_kv", 0.0);
 
   //Variables
 
   //Datahighway
-  DHOut_IntakeOut = false;
+  boolean DHOut_IntakeOut = false;
+
   
 
   /** Creates a new IntakeSubsystem. */
-  public IntakeSubsystem() {}
+  public IntakeSubsystem() {
+    PID_IntakeAngle.setSetpoint(absEnc_IntakeAngle.getPosition());
+  }
 
   public void SetIntakeAngle(Double Angle)
   {
@@ -62,6 +66,19 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    PID_IntakeAngle.setD(IntakeAngKD.getAsDouble());
+    PID_IntakeAngle.setP(IntakeAngKP.getAsDouble());
+    FF_IntakeAngle.setKg(IntakeAngKg.getAsDouble());
+    FF_IntakeAngle.setKv(IntakeAngKv.getAsDouble());
+    FF_IntakeAngle.setKs(IntakeAngKs.getAsDouble());
+    
+    double IntakePosRad = Units.degreesToRadians(PID_IntakeAngle.getSetpoint());
+    double IntakePosDeg = absEnc_IntakeAngle.getPosition();
+    Mtr_IntakeAngle.set(PID_IntakeAngle.calculate(IntakePosDeg)+FF_IntakeAngle.calculate(IntakePosRad, 0));
+
+
+
+
     // This method will be called once per scheduler run
   }
     public void UpdateDataHighway()

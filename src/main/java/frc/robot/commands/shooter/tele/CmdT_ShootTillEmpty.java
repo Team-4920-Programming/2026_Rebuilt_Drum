@@ -27,8 +27,8 @@ public class CmdT_ShootTillEmpty extends Command {
   @Override
   public void execute() {
     DoubleSubscriber ShooterSpeed = DogLog.tunable("Shooter/ShooterSpeed", 3500.0,"rpm");
-    DoubleSubscriber FeederSpeed = DogLog.tunable("Shooter/FeederSpeed", 0.5);
-    DoubleSubscriber AugerSpeed = DogLog.tunable("Shooter/AugerSpeed",0.5);
+    DoubleSubscriber FeederSpeed = DogLog.tunable("Shooter/FeederSpeed", 1.0);
+    DoubleSubscriber AugerSpeed = DogLog.tunable("Shooter/AugerSpeed",0.75);
 
 
 

@@ -29,8 +29,15 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.drivebase.DriveToTargetV0_1;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.Shooter.*;
+import frc.robot.subsystems.Intake.*;
+import frc.robot.subsystems.Climber.*;
 import frc.robot.subsystems.DataHighway.*;
 import frc.robot.commands.shooter.tele.*;
+import frc.robot.commands.shooter.Auto.*;
+import frc.robot.commands.Climber.Auto.*;
+import frc.robot.commands.Climber.Tele.*;
+import frc.robot.commands.Intake.Auto.*;
+import frc.robot.commands.Intake.Tele.*;
 import java.io.File;
 
 import swervelib.SwerveDrive;
@@ -52,7 +59,10 @@ public class RobotContainer
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
   private final ShooterSubsystem Shooter = new ShooterSubsystem();
-  private final DataHighway DH = new DataHighway();
+  private final IntakeSubsystem Intake = new IntakeSubsystem();
+  private final ClimberSubsystem Climber =  new ClimberSubsystem();
+
+  private final DataHighway DH = new DataHighway(drivebase,Shooter,Climber,Intake);
 
   private final SendableChooser<Command> autoChooser;
   
@@ -181,8 +191,8 @@ public class RobotContainer
         //      new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
         //                      );
 
-        driverXbox.b().whileTrue(
-            drivebase.driveToDistanceCommand(drivebase.getPose(),4.572, 2));
+//        driverXbox.b().whileTrue(
+//            drivebase.driveToDistanceCommand(drivebase.getPose(),4.572, 2));
 
 //     }
 //     if (DriverStation.isTest())
@@ -195,9 +205,16 @@ public class RobotContainer
          driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
          //driverXbox.a().whileTrue(new DriveToTargetV0_1(drivebase));
         driverXbox.a().whileTrue(new CmdT_ShootTillEmpty(Shooter));
+        driverXbox.x().whileTrue(new CmdT_SetIntakeAngle(Intake, 20));
+        driverXbox.x().whileFalse(new CmdT_SetIntakeAngle(Intake, 5));
+        driverXbox.y().onTrue(new CmdT_RunIntake(Intake, 1));
+        driverXbox.b().onTrue(new CmdT_RunIntake(Intake, 0));
+        
          // Pre-match calibration routine - Back + Start buttons together
          // This ensures accidental activation is avoided during matches
-         driverXbox.x().onTrue(drivebase.getPreMatchCalibrationCommand());
+         //driverXbox.x().onTrue(drivebase.getPreMatchCalibrationCommand());
+
+
 //       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
 //       driverXbox.leftBumper().onTrue(Commands.none());
 //       driverXbox.rightBumper().onTrue(Commands.none());

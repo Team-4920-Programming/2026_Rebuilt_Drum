@@ -188,19 +188,6 @@ PulseWidth = PulseWidth *1000; // convert to microseconds
 
 
 
-    if (AugerCurrent > AugerJammedCurrent && unJamAuger == false)
-    {
-      unJamAuger = true;
-      JamAugerTime = RobotController.getTime();
-      Mtr_Auger.set(-.25);
-
-    }
-    if (unJamAuger == true && (RobotController.getTime() - JamAugerTime) > 500000)
-    {
-      unJamAuger = false;
-      Mtr_Auger.set(AugerSpeed);
-
-    }
 
     
     // This method will be called once per scheduler run

@@ -12,20 +12,27 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Shooter.*;
 import frc.robot.subsystems.swervedrive.*;
+import frc.robot.subsystems.Climber.*;
+import frc.robot.subsystems.Intake.*;
+
 public class DataHighway extends SubsystemBase {
   String AllianceColor = "None";
 
   //Subsystems
   ShooterSubsystem SS_Shooter;
   SwerveSubsystem SS_Swerve;
-
+  IntakeSubsystem SS_Intake;
+  ClimberSubsystem SS_Climber;
 
   //DH Data from Subsystems
 
   /** Creates a new DataHighway. */
-    public DataHighway(SwerveSubsystem SwerveSS, ShooterSubsystem ShooterSS) {
+    public DataHighway(SwerveSubsystem SwerveSS, ShooterSubsystem ShooterSS, ClimberSubsystem ClimberSS, IntakeSubsystem IntakeSS) {
       SS_Shooter = ShooterSS;
       SS_Swerve = SwerveSS;
+      SS_Intake = IntakeSS;
+      SS_Climber = ClimberSS;
+
     }
 
   @Override
