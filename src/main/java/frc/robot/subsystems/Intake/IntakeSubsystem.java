@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 
 import dev.doglog.DogLog;
@@ -16,14 +17,14 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+//import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
   //Motors
-  SparkMax Mtr_Inkate = new SparkMax(17, MotorType.kBrushless);
-  SparkMax Mtr_IntakeAngle = new SparkMax(18, MotorType.kBrushless);
+  SparkFlex Mtr_Inkate = new SparkFlex(17, MotorType.kBrushless);
+  SparkFlex Mtr_IntakeAngle = new SparkFlex(18, MotorType.kBrushless);
 
   //Motor Encoders
   RelativeEncoder enc_Intake = Mtr_Inkate.getEncoder();

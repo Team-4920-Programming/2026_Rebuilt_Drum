@@ -18,11 +18,14 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -60,6 +63,8 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import dev.doglog.*;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 
@@ -80,11 +85,11 @@ public class SwerveSubsystem extends SubsystemBase
   private       Vision4920      FrontCamera;
   public Pose3d FrontCameraPose3d = new Pose3d();
 
-  private       Vision4920      RightCamera;
-  public Pose3d RightCameraPose3d = new Pose3d();
+ // private       Vision4920      RightCamera;
+  //public Pose3d RightCameraPose3d = new Pose3d();
   
-  private       Vision4920      LeftCamera;
-  public Pose3d LeftCameraPose3d = new Pose3d();
+  //private       Vision4920      LeftCamera;
+ // public Pose3d LeftCameraPose3d = new Pose3d();
 
   private       Vision4920      RearCamera;
   public Pose3d RearCameraPose3d = new Pose3d();
@@ -98,6 +103,9 @@ public class SwerveSubsystem extends SubsystemBase
 
 //variables
   private boolean AutoAimEnabled = false;
+  private Pose2d AutoAimTarget = new Pose2d();
+  private double AutoAimAngle = 0;
+  private PIDController PID_AutoAim = new PIDController(0.1, 0, 0);
 
   private final SwerveDrivePoseEstimator poseEstimator;
   /**
@@ -187,8 +195,8 @@ public class SwerveSubsystem extends SubsystemBase
   {
     //vision = new Vision(swerveDrive::getPose, swerveDrive.field);
     FrontCamera = new Vision4920(Constants.Vision4920.kFrontCam, Constants.Vision4920.kRobotToFrontCam );
-    RightCamera = new Vision4920(Constants.Vision4920.kRightCam, Constants.Vision4920.kRobotToRightCam );
-    LeftCamera = new Vision4920(Constants.Vision4920.kLeftCam, Constants.Vision4920.kRobotToLeftCam );
+    // RightCamera = new Vision4920(Constants.Vision4920.kRightCam, Constants.Vision4920.kRobotToRightCam );
+    // LeftCamera = new Vision4920(Constants.Vision4920.kLeftCam, Constants.Vision4920.kRobotToLeftCam );
     RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.kRobotToRearCam );
 
   }
@@ -197,10 +205,10 @@ public class SwerveSubsystem extends SubsystemBase
     //Process Vision
     Pose2d FrontCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
     double FrontCamVisionTimestamp;
-    Pose2d RightCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
-    double RightCamVisionTimestamp;
-    Pose2d LeftCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
-    double LeftCamVisionTimestamp;
+    // Pose2d RightCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+    // double RightCamVisionTimestamp;
+    // Pose2d LeftCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+    // double LeftCamVisionTimestamp;
     Pose2d RearCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
     double RearCamVisionTimestamp;
     
@@ -227,40 +235,40 @@ public class SwerveSubsystem extends SubsystemBase
     
     }
   
-    if ( DriverStation.isDSAttached() && RightCamera != null)
-    {
-       var visionEst = RightCamera.getEstimatedGlobalPose();
-       DogLog.log("SwerveSS/Vision/RightCameraPresent", RightCamera.isConnected());
+    // if ( DriverStation.isDSAttached() && RightCamera != null)
+    // {
+    //    var visionEst = RightCamera.getEstimatedGlobalPose();
+    //    DogLog.log("SwerveSS/Vision/RightCameraPresent", RightCamera.isConnected());
        
-        if (visionEst.isPresent()){
-            RightCamPose = visionEst.get().estimatedPose.toPose2d();
-            RightCameraPose3d = visionEst.get().estimatedPose;
+    //     if (visionEst.isPresent()){
+    //         RightCamPose = visionEst.get().estimatedPose.toPose2d();
+    //         RightCameraPose3d = visionEst.get().estimatedPose;
   
             
-            RightCamVisionTimestamp = visionEst.get().timestampSeconds;
-            DogLog.log("SwerveSS/Vision/RightCameraPose", RightCameraPose3d);
-            DogLog.log("SwerveSS/Vision/RightTimeStamp",RightCamVisionTimestamp);
-            VisionReading(RightCamPose, RightCamVisionTimestamp, RightCamera.confidenceCalculator(visionEst.get()));
-        }
+    //         RightCamVisionTimestamp = visionEst.get().timestampSeconds;
+    //         DogLog.log("SwerveSS/Vision/RightCameraPose", RightCameraPose3d);
+    //         DogLog.log("SwerveSS/Vision/RightTimeStamp",RightCamVisionTimestamp);
+    //         VisionReading(RightCamPose, RightCamVisionTimestamp, RightCamera.confidenceCalculator(visionEst.get()));
+    //     }
     
-    }
-    if ( DriverStation.isDSAttached() && LeftCamera != null)
-    {
-       var visionEst = LeftCamera.getEstimatedGlobalPose();
-       DogLog.log("SwerveSS/Vision/LeftCameraPresent", LeftCamera.isConnected());
+    // }
+    // if ( DriverStation.isDSAttached() && LeftCamera != null)
+    // {
+    //    var visionEst = LeftCamera.getEstimatedGlobalPose();
+    //    DogLog.log("SwerveSS/Vision/LeftCameraPresent", LeftCamera.isConnected());
        
-        if (visionEst.isPresent()){
-            LeftCamPose = visionEst.get().estimatedPose.toPose2d();
-            LeftCameraPose3d = visionEst.get().estimatedPose;
+    //     if (visionEst.isPresent()){
+    //         LeftCamPose = visionEst.get().estimatedPose.toPose2d();
+    //         LeftCameraPose3d = visionEst.get().estimatedPose;
   
             
-            LeftCamVisionTimestamp = visionEst.get().timestampSeconds;
-            DogLog.log("SwerveSS/Vision/LeftCameraPose", LeftCameraPose3d);
-            DogLog.log("SwerveSS/Vision/LeftTimeStamp", LeftCamVisionTimestamp);
-            VisionReading(LeftCamPose, LeftCamVisionTimestamp, LeftCamera.confidenceCalculator(visionEst.get()));
-        }
+    //         LeftCamVisionTimestamp = visionEst.get().timestampSeconds;
+    //         DogLog.log("SwerveSS/Vision/LeftCameraPose", LeftCameraPose3d);
+    //         DogLog.log("SwerveSS/Vision/LeftTimeStamp", LeftCamVisionTimestamp);
+    //         VisionReading(LeftCamPose, LeftCamVisionTimestamp, LeftCamera.confidenceCalculator(visionEst.get()));
+    //     }
     
-    }
+    // }
     if ( DriverStation.isDSAttached() && RearCamera != null)
     {
        var visionEst = RearCamera.getEstimatedGlobalPose();
@@ -303,10 +311,46 @@ public class SwerveSubsystem extends SubsystemBase
       DogLog.log("SwerveSS/Pose/YASGLRobotPose", swerveDrive.getPose());
  
       UpdateDataHighway();
+      double HubX = 1;
+      double HubY = 1;
+      if (AutoAimEnabled)
+      {
+        if (DHOut_InAllianceZone)
+        {
+          AutoAimTarget = new Pose2d(HubX,HubY,Rotation2d.fromDegrees(0));
+          Transform2d PoseDiff = AutoAimTarget.minus(getPose());
+          AutoAimAngle = Math.toDegrees(Math.atan2(PoseDiff.getX(),PoseDiff.getY()));
+
+
+        }
+      }
       
   }
   public void UpdateDataHighway()
   {
+   AprilTagFieldLayout fieldLayout = AprilTagFields.k2026RebuiltWelded.loadAprilTagLayoutField();
+
+    DHOut_InAllianceZone = false;
+    DHOut_InNeutralZone = false;
+    DHOut_InBumpZone = false;
+    if (getPose().getX() > fieldLayout.getTagPose(17).get().getX() && getPose().getX() < fieldLayout.getTagPose(6).get().getX())
+      DHOut_InNeutralZone = true;
+    if (getPose().getX() > fieldLayout.getTagPose(4).get().getX() && getPose().getX() < fieldLayout.getTagPose(9).get().getX())
+      DHOut_InBumpZone = true;
+      if (getPose().getX() > fieldLayout.getTagPose(26).get().getX() && getPose().getX() < fieldLayout.getTagPose(19).get().getX())
+      DHOut_InBumpZone = true;
+
+    if (isRedAlliance())
+    {
+      if (getPose().getX() > fieldLayout.getTagPose(9).get().getX() )
+       DHOut_InAllianceZone = true;
+      
+    }
+    else
+    {
+      if (getPose().getX() < fieldLayout.getTagPose(26).get().getX())
+        DHOut_InAllianceZone = true;
+    }
     //Set Variables from Datahighway
 
     //Set Variable to DataHighway
@@ -666,6 +710,13 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public void drive(ChassisSpeeds velocity)
   {
+    //this is the default command from robot containter
+    if (AutoAimEnabled)
+    {
+      PID_AutoAim.setSetpoint(AutoAimAngle);
+      PID_AutoAim.setTolerance(3);
+      velocity.omegaRadiansPerSecond = PID_AutoAim.calculate(getPose().getRotation().getDegrees());
+    }
     swerveDrive.drive(velocity);
   }
 
