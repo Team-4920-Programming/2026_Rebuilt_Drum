@@ -35,6 +35,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -99,6 +100,8 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DHOut_InNeutralZone = false;
   public boolean DHOut_InAllianceZone = false;
   public boolean DHOut_InBumpZone = false;
+  public double DHOut_HubDistance = 0.0;
+  public double DHOut_CornerDistance = 0.0;
   
 
 //variables
@@ -320,6 +323,7 @@ public class SwerveSubsystem extends SubsystemBase
           AutoAimTarget = new Pose2d(HubX,HubY,Rotation2d.fromDegrees(0));
           Transform2d PoseDiff = AutoAimTarget.minus(getPose());
           AutoAimAngle = Math.toDegrees(Math.atan2(PoseDiff.getX(),PoseDiff.getY()));
+          
 
 
         }
@@ -333,6 +337,36 @@ public class SwerveSubsystem extends SubsystemBase
     DHOut_InAllianceZone = false;
     DHOut_InNeutralZone = false;
     DHOut_InBumpZone = false;
+      Pose2d RedHubPose = new Pose2d(4.626,4.0,new Rotation2d().fromDegrees(0));
+      Pose2d BlueHubPose = new Pose2d(11.9,4.0, new Rotation2d().fromDegrees(0));
+      Pose2d BlueOutpostCorner = new Pose2d(1,1,new Rotation2d().fromDegrees(0));
+      Pose2d BlueDepotCorner = new Pose2d(1,fieldLayout.getFieldWidth() -1, new Rotation2d().fromDegrees(0));
+      Pose2d RedOutpostCorner = new Pose2d(fieldLayout.getFieldLength() -1, fieldLayout.getFieldWidth() -1, new Rotation2d().fromDegrees(0));
+      Pose2d RedDepotCorner = new Pose2d(fieldLayout.getFieldLength() -1, 1, new Rotation2d().fromDegrees(0));
+  double OutpostCornerDist = 0;
+  double DepotCornerDist  =0;
+      if (isRedAlliance())
+      {
+        Transform2d RedOutpost2Robot = RedOutpostCorner.minus(getPose());
+        Transform2d RedDepot2Robot = RedDepotCorner.minus(getPose());
+        Transform2d Hub2Robot = RedHubPose.minus(getPose());
+        OutpostCornerDist = RedDepot2Robot.getTranslation().getNorm();
+        DepotCornerDist = RedDepot2Robot.getTranslation().getNorm();   
+        DHOut_HubDistance = Hub2Robot.getTranslation().getNorm();
+        DHOut_CornerDistance = Math.min(OutpostCornerDist, DepotCornerDist);
+      }
+      else
+      {
+        Transform2d BlueOutpost2Robot = BlueOutpostCorner.minus(getPose());
+        Transform2d BlueDepot2Robot = BlueDepotCorner.minus(getPose());
+        Transform2d Hub2Robot = BlueHubPose.minus(getPose());
+        OutpostCornerDist = BlueDepot2Robot.getTranslation().getNorm();
+        DepotCornerDist = BlueDepot2Robot.getTranslation().getNorm(); 
+        DHOut_HubDistance = Hub2Robot.getTranslation().getNorm();
+        DHOut_CornerDistance = Math.min(OutpostCornerDist, DepotCornerDist);
+      }
+
+
     if (getPose().getX() > fieldLayout.getTagPose(17).get().getX() && getPose().getX() < fieldLayout.getTagPose(6).get().getX())
       DHOut_InNeutralZone = true;
     if (getPose().getX() > fieldLayout.getTagPose(4).get().getX() && getPose().getX() < fieldLayout.getTagPose(9).get().getX())
@@ -342,9 +376,11 @@ public class SwerveSubsystem extends SubsystemBase
 
     if (isRedAlliance())
     {
-      if (getPose().getX() > fieldLayout.getTagPose(9).get().getX() )
-       DHOut_InAllianceZone = true;
-      
+       if (getPose().getX() > fieldLayout.getTagPose(9).get().getX() )
+      {
+         DHOut_InAllianceZone = true;
+      }
+  
     }
     else
     {
