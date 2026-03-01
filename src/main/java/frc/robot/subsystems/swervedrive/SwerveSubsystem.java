@@ -197,10 +197,10 @@ public class SwerveSubsystem extends SubsystemBase
   public void setupPhotonVision()
   {
     //vision = new Vision(swerveDrive::getPose, swerveDrive.field);
-    FrontCamera = new Vision4920(Constants.Vision4920.kFrontCam, Constants.Vision4920.kRobotToFrontCam );
+    FrontCamera = new Vision4920(Constants.Vision4920.kFrontCam, Constants.Vision4920.ROBOT_TO_CAMERA_Front);
     // RightCamera = new Vision4920(Constants.Vision4920.kRightCam, Constants.Vision4920.kRobotToRightCam );
     // LeftCamera = new Vision4920(Constants.Vision4920.kLeftCam, Constants.Vision4920.kRobotToLeftCam );
-    RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.kRobotToRearCam );
+    RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.ROBOT_TO_CAMERA_Rear );
 
   }
   private void ProcessVision4920()

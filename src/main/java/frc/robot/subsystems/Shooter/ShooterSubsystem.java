@@ -74,23 +74,23 @@ public class ShooterSubsystem extends SubsystemBase {
   
 
   //PIDs
-  PIDController PID_Shooter1 = new PIDController(.1, 0, 0);
-  PIDController PID_Shooter2 = new PIDController(.1, 0, 0);
-  SimpleMotorFeedforward FF_Shooter1 = new SimpleMotorFeedforward(0, 0.0075);
-    SimpleMotorFeedforward FF_Shooter2 = new SimpleMotorFeedforward(0, 0.0075);
+  PIDController PID_Shooter1 = new PIDController(.000167, 0, 0.0);
+  PIDController PID_Shooter2 = new PIDController(.0, 0, 0);
+  SimpleMotorFeedforward FF_Shooter1 = new SimpleMotorFeedforward(0, 0.00017);
+    SimpleMotorFeedforward FF_Shooter2 = new SimpleMotorFeedforward(0, 0.00017);
 
-  DoubleSupplier ShooterKP = DogLog.tunable("Shooter/kp", 0.1);
-  DoubleSupplier ShooterKD = DogLog.tunable("Shooter/kD", 0.0);
-   DoubleSupplier ShooterKv = DogLog.tunable("Shooter/kv", 0.0);
+  DoubleSupplier ShooterKP = DogLog.tunable("Shooter/kp", 0.000167);
+  DoubleSupplier ShooterKD = DogLog.tunable("Shooter/kD", 0.000);
+   DoubleSupplier ShooterKv = DogLog.tunable("Shooter/kv", 0.00017);
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
     //Setup Motors
-    mtrCfg_Shooter1.smartCurrentLimit(40);
+    mtrCfg_Shooter1.smartCurrentLimit(60);
     mtrCfg_Shooter1.idleMode(IdleMode.kCoast);
     Mtr_Shooter1.configure(mtrCfg_Shooter1,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     
-    mtrCfg_Shooter2.smartCurrentLimit(40);
+    mtrCfg_Shooter2.smartCurrentLimit(60);
     mtrCfg_Shooter2.idleMode(IdleMode.kCoast);
     Mtr_Shooter2.configure(mtrCfg_Shooter1,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     mtrCfg_Feeder.smartCurrentLimit(40);
@@ -131,12 +131,14 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public boolean Shooter1AtSpeed ()
   {
-    return PID_Shooter1.atSetpoint();
+    return PID_Shooter1.atSetpoint() || enc_Shooter1.getVelocity()>3000 ;
+    //return (enc_Shooter1.getVelocity()>3000);
   }
 
   public boolean Shooter2AtSpeed ()
   {
-    return PID_Shooter2.atSetpoint();
+    return PID_Shooter2.atSetpoint() || enc_Shooter1.getVelocity()>3000;
+    //return (enc_Shooter2.getVelocity()>3000);
   }
 public void SetHood(int HoodAngle)
 {
@@ -174,11 +176,15 @@ PulseWidth = PulseWidth *1000; // convert to microseconds
 
 
     if (PID_Shooter1.getSetpoint() > 500)
-      Mtr_Shooter1.set(PID_Shooter1.calculate(enc_Shooter1.getVelocity()) + FF_Shooter1.calculate(PID_Shooter1.getSetpoint()));
+    {
+      double mtrSpeed = PID_Shooter1.calculate(enc_Shooter1.getVelocity())+ FF_Shooter1.calculate(PID_Shooter1.getSetpoint());
+      Mtr_Shooter1.set(mtrSpeed);
+      DogLog.log("Shooter/MotorCmd",mtrSpeed);
+    }
     else 
       Mtr_Shooter1.set(0);
     if (PID_Shooter2.getSetpoint() > 500)
-        Mtr_Shooter2.set(PID_Shooter1.calculate(enc_Shooter2.getVelocity()+ FF_Shooter2.calculate(PID_Shooter2.getSetpoint())));
+        Mtr_Shooter2.set(PID_Shooter1.calculate(enc_Shooter2.getVelocity())+ FF_Shooter2.calculate(PID_Shooter2.getSetpoint()));
     else 
       Mtr_Shooter2.set(0);
 

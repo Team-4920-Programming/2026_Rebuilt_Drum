@@ -34,10 +34,10 @@ public class IntakeSubsystem extends SubsystemBase {
   AbsoluteEncoder absEnc_IntakeAngle = Mtr_IntakeAngle.getAbsoluteEncoder();
   
   //PID Controllers
-  PIDController PID_IntakeAngle = new PIDController(0.001, 0, 0);
+  PIDController PID_IntakeAngle = new PIDController(0.003, 0, 0);
    ArmFeedforward FF_IntakeAngle= new ArmFeedforward(0, 0, 0);
 
-  DoubleSupplier IntakeAngKP = DogLog.tunable("Intake/Angle_kp", 0.001);
+  DoubleSupplier IntakeAngKP = DogLog.tunable("Intake/Angle_kp", 0.003);
   DoubleSupplier IntakeAngKD = DogLog.tunable("Intake/Angle_kD", 0.0);
    DoubleSupplier IntakeAngKs = DogLog.tunable("Intake/Angle_ks", 0.0);
    DoubleSupplier IntakeAngKg = DogLog.tunable("Intake/Angle_kg", 0.0);
@@ -53,6 +53,7 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     PID_IntakeAngle.setSetpoint(absEnc_IntakeAngle.getPosition());
+    PID_IntakeAngle.enableContinuousInput(0, 360);
   }
 
   public void SetIntakeAngle(Double Angle)
@@ -62,7 +63,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void SetIntakeSpeed(double Speed)
   {
-    Mtr_Inkate.set(Speed);
+    Mtr_Inkate.set(-Speed);
   }
 
   @Override
@@ -76,6 +77,7 @@ public class IntakeSubsystem extends SubsystemBase {
     double IntakePosRad = Units.degreesToRadians(PID_IntakeAngle.getSetpoint());
     double IntakePosDeg = absEnc_IntakeAngle.getPosition();
     Mtr_IntakeAngle.set(PID_IntakeAngle.calculate(IntakePosDeg)+FF_IntakeAngle.calculate(IntakePosRad, 0));
+    DogLog.log("intake/pos",absEnc_IntakeAngle.getPosition());
 
 
 
