@@ -37,6 +37,8 @@ import frc.robot.commands.shooter.tele.*;
 import frc.robot.commands.Drive.CmdT_DepotAutoAim;
 import frc.robot.commands.Drive.CmdT_DisableAutoAim;
 import frc.robot.commands.Drive.CmdT_EnableAutoAim;
+import frc.robot.commands.Drive.CmdT_EnableAutoLock;
+import frc.robot.commands.Drive.CmdT_EnableCornerAim;
 import frc.robot.commands.Drive.CmdT_OutpostAutoAim;
 // import frc.robot.commands.shooter.Auto.*;
 // import frc.robot.commands.Climber.Auto.*;
@@ -226,8 +228,9 @@ public class RobotContainer
         driverXbox.y().whileTrue(new CmdT_RunIntake(Intake, 1));
         driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
         driverXbox.leftBumper().onTrue(new CmdT_DisableAutoAim(drivebase));
-        driverXbox.rightTrigger().whileTrue(new CmdT_OutpostAutoAim(drivebase));
-        driverXbox.leftTrigger().whileTrue(new CmdT_DepotAutoAim(drivebase));
+        driverXbox.rightTrigger().whileTrue(new CmdT_EnableAutoLock(drivebase));
+        // driverXbox.rightTrigger().whileTrue(new CmdT_OutpostAutoAim(drivebase));
+       // driverXbox.leftTrigger().whileTrue(new CmdT_DepotAutoAim(drivebase));
          // Pre-match calibration routine - Back + Start buttons together
          // This ensures accidental activation is avoided during matches
          //driverXbox.x().onTrue(drivebase.getPreMatchCalibrationCommand());

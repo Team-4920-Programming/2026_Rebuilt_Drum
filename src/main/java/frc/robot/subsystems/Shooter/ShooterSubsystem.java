@@ -63,7 +63,8 @@ public class ShooterSubsystem extends SubsystemBase {
   boolean unJamFeeder = false;
   double  JamAugerTime = 0;
   double JamFdderTimer = 0;
-    
+  public double DHIn_ShotDistance = 0;
+  public boolean DHIn_AutoShoot = false;
   //Servo
   ServoHub Servos = new ServoHub(14);
   ServoHubConfig cfg_Servos = new ServoHubConfig();
@@ -140,6 +141,38 @@ public class ShooterSubsystem extends SubsystemBase {
     return PID_Shooter2.atSetpoint() || enc_Shooter1.getVelocity()>3000;
     //return (enc_Shooter2.getVelocity()>3000);
   }
+  ;
+public void AutoShoot(){
+if (DHIn_ShotDistance >= 0 && DHIn_ShotDistance <0.5){
+ 
+   
+}
+else if (DHIn_ShotDistance >= 0.5 && DHIn_ShotDistance <1){
+
+
+}
+
+else if (DHIn_ShotDistance >= 1 && DHIn_ShotDistance <1.5){
+
+
+}
+else if (DHIn_ShotDistance >= 1.5 && DHIn_ShotDistance <2){
+
+
+}
+else if (DHIn_ShotDistance >= 2 && DHIn_ShotDistance <2.5){
+
+
+}
+else if (DHIn_ShotDistance >= 2.5 && DHIn_ShotDistance <3){
+
+
+}
+
+}
+
+
+
 public void SetHood(int HoodAngle)
 {
   Hood1.setEnabled(true);

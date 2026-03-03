@@ -37,6 +37,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -104,8 +105,8 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DHOut_InBumpZone = false;
   public double DHOut_HubDistance = 0.0;
   public double DHOut_CornerDistance = 0.0;
-  public double DepotAngle = 0;
-  public double OutpostAngle = 0;
+ 
+  
   
 
 //variables
@@ -115,11 +116,13 @@ public class SwerveSubsystem extends SubsystemBase
 
   private boolean DepotAimEnabled = false;
   private Pose2d DepotAimTarget = new Pose2d();
-  private double DepotAimAngle = 0;
+  //private double DepotAimAngle = 0;
+   public double DepotAngle = 0;
 
    private boolean OutpostAimEnabled = false;
   private Pose2d OutpostAimTarget = new Pose2d();
-  private double OutpostAimAngle = 0;
+  //private double OutpostAimAngle = 0;
+  public double OutpostAngle = 0;
   
   
   private PIDController PID_AutoAim = new PIDController(0.1, 0, 0);
@@ -562,7 +565,46 @@ DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
     return DepotAimEnabled;
   }
 
+  public void EnableCornerAim(){
+    if (isRedAlliance()){
+    if (getPose().getY() <= 4 && DHOut_InNeutralZone){
+      DepotAimEnabled = true;
+      OutpostAimEnabled = false;
+  }
+  else {
+    OutpostAimEnabled = true;
+    DepotAimEnabled = false;
+  }
+  }
+else {
 
+  if (getPose().getY() >= 4 && DHOut_InNeutralZone){
+      DepotAimEnabled = true;
+      OutpostAimEnabled = false;
+  }
+  else {
+    OutpostAimEnabled = true;
+    DepotAimEnabled = false;
+  }
+}
+
+
+  }
+
+  public void DisableCornerAim(){
+    OutpostAimEnabled = false;
+    DepotAimEnabled = false;
+  }
+
+  public void EnableAutoLock (){
+if (DHOut_InNeutralZone == true){
+EnableCornerAim();
+}
+else if (DHOut_InAllianceZone == true){
+EnableAutoAim();
+DisableCornerAim();
+}
+  }
 
   /**
    * Use PathPlanner Path finding to go to a point on the field.
@@ -803,12 +845,12 @@ DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
       PID_AutoAim.setTolerance(3);
       PID_AutoAim.enableContinuousInput(-180, 180);
       v.omegaRadiansPerSecond = PID_AutoAim.calculate(getPose().getRotation().getDegrees());
-      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -3, 3);
+      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4,4);
     }
       DogLog.log("Fieldinfo/AutoAimRotVel", v.omegaRadiansPerSecond);
       DogLog.log("Fieldinfo/AutoAimAngle", AutoAimAngle);
 
-      swerveDrive.driveFieldOriented(v);
+      
     ;
   
   
@@ -816,29 +858,29 @@ DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
 
   if (DepotAimEnabled)
     {
-      PID_DepotAim.setSetpoint(DepotAimAngle);
+      PID_DepotAim.setSetpoint(DepotAngle);
       PID_DepotAim.setTolerance(3);
       PID_DepotAim.enableContinuousInput(-180, 180);
       v.omegaRadiansPerSecond = PID_DepotAim.calculate(getPose().getRotation().getDegrees());
-      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -3, 3);
+      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
     }
       
-      DogLog.log("Fieldinfo/DepotAimAngle", DepotAimAngle);
+      DogLog.log("Fieldinfo/DepotAimAngle", DepotAngle);
 
-      swerveDrive.driveFieldOriented(v);
+     
     ;
   
 
   if (OutpostAimEnabled)
     {
-      PID_OutpostAim.setSetpoint(OutpostAimAngle);
+      PID_OutpostAim.setSetpoint(OutpostAngle);
       PID_OutpostAim.setTolerance(3);
       PID_OutpostAim.enableContinuousInput(-180, 180);
       v.omegaRadiansPerSecond = PID_OutpostAim.calculate(getPose().getRotation().getDegrees());
-      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -3, 3);
+      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
     }
       
-      DogLog.log("Fieldinfo/OutpostAimAngle", OutpostAimAngle);
+      DogLog.log("Fieldinfo/OutpostAimAngle", OutpostAngle);
 
       swerveDrive.driveFieldOriented(v);
     });

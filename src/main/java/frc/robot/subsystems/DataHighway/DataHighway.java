@@ -25,6 +25,8 @@ public class DataHighway extends SubsystemBase {
   ClimberSubsystem SS_Climber;
 
   //DH Data from Subsystems
+  double DH_ShotDistance = 0;
+  boolean DH_AutoAim = false;
 
   /** Creates a new DataHighway. */
     public DataHighway(SwerveSubsystem SwerveSS, ShooterSubsystem ShooterSS, ClimberSubsystem ClimberSS, IntakeSubsystem IntakeSS) {
@@ -64,9 +66,11 @@ public class DataHighway extends SubsystemBase {
     DogLog.forceNt.log("ForcedNT/Match/Allicance",AllianceColor);
   }
   private void GetDHData(){
-
+DH_ShotDistance = SS_Swerve.DHOut_HubDistance;
+DH_AutoAim = SS_Swerve.isAutoAim();
   }
   private void SetDHData(){
-
+SS_Shooter.DHIn_ShotDistance = DH_ShotDistance;
+SS_Shooter.DHIn_AutoShoot = DH_AutoAim;
   }
 }

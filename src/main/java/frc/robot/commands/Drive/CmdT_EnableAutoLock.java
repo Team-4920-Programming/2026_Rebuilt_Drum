@@ -10,10 +10,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_DepotAutoAim extends Command {
+public class CmdT_EnableAutoLock extends Command {
   /** Creates a new CmdT_EnableAutoAim. */
   SwerveSubsystem Drive_SS;
-  public CmdT_DepotAutoAim(SwerveSubsystem DriveSS) {
+  public CmdT_EnableAutoLock(SwerveSubsystem DriveSS) {
     // Use addRequirements() here to declare subsystem dependencies.
     Drive_SS = DriveSS;
   }
@@ -29,14 +29,16 @@ public class CmdT_DepotAutoAim extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Drive_SS.EnableDepotAim();
+    //Drive_SS.EnableCornerAim();
+    Drive_SS.EnableAutoLock();
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    Drive_SS.DisableDepotAim();
-
+    Drive_SS.DisableCornerAim();
+Drive_SS.DisableAutoAim();
 
   }
 
