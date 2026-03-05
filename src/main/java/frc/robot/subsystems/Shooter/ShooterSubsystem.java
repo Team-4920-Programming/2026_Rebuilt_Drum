@@ -51,6 +51,7 @@ public class ShooterSubsystem extends SubsystemBase {
   //Other Speeds
   double AugerSpeed = 0;
   double FeederSpeed = 0;
+  
 
   //Critical Motor Currents
   double AugerCurrent =0;
@@ -65,6 +66,16 @@ public class ShooterSubsystem extends SubsystemBase {
   double JamFdderTimer = 0;
   public double DHIn_ShotDistance = 0;
   public boolean DHIn_AutoShoot = false;
+  public double AngleToHub =0;
+  public boolean DHIn_Aimed = false;
+   private boolean Shoot = false;
+ 
+   public boolean DHIn_InAllianceZone = false;
+   public boolean DHIn_InNeutralZone = false;
+   public double DHIn_AngleToOutpost = 0;
+   public double DHIn_AngleToDepot = 0;
+   public double DHIn_CornerDistance = 0;
+  
   //Servo
   ServoHub Servos = new ServoHub(14);
   ServoHubConfig cfg_Servos = new ServoHubConfig();
@@ -141,35 +152,103 @@ public class ShooterSubsystem extends SubsystemBase {
     return PID_Shooter2.atSetpoint() || enc_Shooter1.getVelocity()>3000;
     //return (enc_Shooter2.getVelocity()>3000);
   }
-  ;
-public void AutoShoot(){
-if (DHIn_ShotDistance >= 0 && DHIn_ShotDistance <0.5){
- 
+  public void EnableShooter(){
+    Shoot = true;
+    
+  }
+public void DisableShooter(){
+    Shoot = false;
    
+  }
+
+
+public void AutoShoot(){
+  
+
+if (DHIn_ShotDistance >= 0 && DHIn_ShotDistance <0.5){
+
+ SetShooterSpeeds(1000);
+
+
 }
+
 else if (DHIn_ShotDistance >= 0.5 && DHIn_ShotDistance <1){
 
+ SetShooterSpeeds(1500);
 
-}
+}  
+
+
+
 
 else if (DHIn_ShotDistance >= 1 && DHIn_ShotDistance <1.5){
 
+ SetShooterSpeeds(2000);
 
-}
+}  
+
+
+
 else if (DHIn_ShotDistance >= 1.5 && DHIn_ShotDistance <2){
 
+ SetShooterSpeeds(2500);
 
+ 
 }
+
+
 else if (DHIn_ShotDistance >= 2 && DHIn_ShotDistance <2.5){
 
+ SetShooterSpeeds(3000);
 
+ 
 }
+
 else if (DHIn_ShotDistance >= 2.5 && DHIn_ShotDistance <3){
 
+ SetShooterSpeeds(3500);
+
+}
+else if (DHIn_ShotDistance >= 3 && DHIn_ShotDistance <3.5){
+
+ SetShooterSpeeds(4000);
+}
+else if (DHIn_ShotDistance >= 3.5 && DHIn_ShotDistance <4){
+
+ SetShooterSpeeds(4500);
+}
+else if (DHIn_ShotDistance >= 4 && DHIn_ShotDistance <4.5){
+
+ SetShooterSpeeds(5000);
+}
+else if (DHIn_ShotDistance >= 4.5 ){
+
+ SetShooterSpeeds(5500);
+}
+  else {
+   SetShooterSpeeds(0);
+  }
+}
+
+public void CornerShoot(){
+if (DHIn_CornerDistance >=4 && DHIn_CornerDistance < 5.5 ){
+
+ SetShooterSpeeds(4000);
+
+
+}
+else if (DHIn_CornerDistance >=5.5 && DHIn_CornerDistance < 6.5 ){
+SetShooterSpeeds(4500);
+
+}
+
+else if (DHIn_CornerDistance >=6.5 && DHIn_CornerDistance < 10 ){
+SetShooterSpeeds(5000);
 
 }
 
 }
+
 
 
 
@@ -195,6 +274,25 @@ PulseWidth = PulseWidth *1000; // convert to microseconds
     FeederCurrent = Mtr_Feeder.getOutputCurrent();
     Shooter1Current = Mtr_Shooter1.getOutputCurrent();
     Shooter2Current = Mtr_Shooter2.getOutputCurrent();
+    if (DHIn_InAllianceZone){
+    if (AngleToHub <20 && Shoot){
+    AutoShoot();
+    }
+    else {
+      SetShooterSpeeds(0);
+    }
+  }
+else {
+  if((DHIn_AngleToOutpost <20 || DHIn_AngleToDepot <20 )&& Shoot){
+CornerShoot();
+  }
+  else {
+SetShooterSpeeds(0);
+  }
+}
+ 
+
+  
     DogLog.log("Shooter/Shooter1Speed",enc_Shooter1.getVelocity(),"rpm");
     DogLog.log("Shooter/Shooter2Speed",enc_Shooter2.getVelocity(),"rpm");
     DogLog.log("Shooter/AugerSpeed",enc_Auger.getVelocity(),"rpm");
@@ -204,7 +302,9 @@ PulseWidth = PulseWidth *1000; // convert to microseconds
     DogLog.log("Shooter/Shooter2Amps", Shooter2Current,"amps");
     DogLog.log("Shooter/FeederAmps", FeederCurrent,"amps");
     DogLog.log("Shooter/AugerAmps", AugerCurrent,"amps");
-    
+    DogLog.log("Shooter/Shooter1Setpoint", PID_Shooter1.getSetpoint());
+    DogLog.log("Shooter/Shooter2Setpoint", PID_Shooter2.getSetpoint());
+    DogLog.log("Shooter/Shoot",Shoot);
 
 
 

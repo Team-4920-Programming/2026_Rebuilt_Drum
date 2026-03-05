@@ -30,6 +30,7 @@ public class CmdT_EnableAutoAim extends Command {
   @Override
   public void execute() {
     Drive_SS.EnableAutoAim();
+   
   }
 
   // Called once the command ends or is interrupted.

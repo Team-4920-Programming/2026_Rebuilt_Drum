@@ -226,9 +226,10 @@ public class RobotContainer
         driverXbox.x().whileTrue(new CmdT_SetIntakeAngle(Intake, 70));
         driverXbox.x().whileFalse(new CmdT_SetIntakeAngle(Intake, 5));
         driverXbox.y().whileTrue(new CmdT_RunIntake(Intake, 1));
-        driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
-        driverXbox.leftBumper().onTrue(new CmdT_DisableAutoAim(drivebase));
+       // driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
+       // driverXbox.leftBumper().onTrue(new CmdT_DisableAutoAim(drivebase));
         driverXbox.rightTrigger().whileTrue(new CmdT_EnableAutoLock(drivebase));
+        driverXbox.leftTrigger().whileTrue(new CmdT_AutoShoot(Shooter, drivebase));
         // driverXbox.rightTrigger().whileTrue(new CmdT_OutpostAutoAim(drivebase));
        // driverXbox.leftTrigger().whileTrue(new CmdT_DepotAutoAim(drivebase));
          // Pre-match calibration routine - Back + Start buttons together

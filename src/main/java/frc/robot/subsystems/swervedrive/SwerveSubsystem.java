@@ -37,6 +37,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -105,7 +106,10 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DHOut_InBumpZone = false;
   public double DHOut_HubDistance = 0.0;
   public double DHOut_CornerDistance = 0.0;
- 
+  public boolean DHOut_Aimed = false;
+ public double DHOut_AngleToHub = 0;
+ public double DHOut_AngleToDepot = 0;
+  public double DHOut_AngleToOutpost = 0;
   
   
 
@@ -113,6 +117,8 @@ public class SwerveSubsystem extends SubsystemBase
   private boolean AutoAimEnabled = false;
   private Pose2d AutoAimTarget = new Pose2d();
   private double AutoAimAngle = 0;
+  
+  
 
   private boolean DepotAimEnabled = false;
   private Pose2d DepotAimTarget = new Pose2d();
@@ -370,6 +376,10 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
         AutoAimAngle = Units.radiansToDegrees(AutoAimAngle);
         DHOut_HubDistance = Math.sqrt(Math.pow(getPose().getY() - RedHubPose.getY(),2) + Math.pow(getPose().getX() - RedHubPose.getX(),2));
         DHOut_CornerDistance = Math.min(OutpostCornerDist, DepotCornerDist);
+        DHOut_AngleToHub = Math.abs (AutoAimAngle - getPose().getRotation().getDegrees());
+        DHOut_AngleToOutpost = Math.abs (OutpostAngle - getPose().getRotation().getDegrees());
+        DHOut_AngleToDepot = Math.abs (DepotAngle - getPose().getRotation().getDegrees());
+        
         DogLog.log("Fieldinfo/Hub2Robot",Hub2Robot);
         DogLog.log("Fieldinfo/HubPose",BlueHubPose);
         DogLog.log("Fieldinfo/HubDistance",DHOut_HubDistance);
@@ -394,6 +404,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
         AutoAimAngle = Units.radiansToDegrees(AutoAimAngle);
         DHOut_HubDistance = Math.sqrt(Math.pow(getPose().getY() - BlueHubPose.getY(),2) + Math.pow(getPose().getX() - BlueHubPose.getX(),2));
         DHOut_CornerDistance = Math.min(OutpostCornerDist, DepotCornerDist);
+        DHOut_AngleToHub = Math.abs (AutoAimAngle - getPose().getRotation().getDegrees());
         DogLog.log("Fieldinfo/Hub2Robot",Hub2Robot);
         DogLog.log("Fieldinfo/HubPose",BlueHubPose);
         DogLog.log("Fieldinfo/HubDistance",DHOut_HubDistance);
@@ -846,9 +857,11 @@ DisableCornerAim();
       PID_AutoAim.enableContinuousInput(-180, 180);
       v.omegaRadiansPerSecond = PID_AutoAim.calculate(getPose().getRotation().getDegrees());
       v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4,4);
+      DHOut_Aimed = PID_AutoAim.atSetpoint();
     }
       DogLog.log("Fieldinfo/AutoAimRotVel", v.omegaRadiansPerSecond);
       DogLog.log("Fieldinfo/AutoAimAngle", AutoAimAngle);
+      
 
       
     ;

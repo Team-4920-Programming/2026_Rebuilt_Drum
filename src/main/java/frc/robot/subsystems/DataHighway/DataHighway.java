@@ -27,6 +27,14 @@ public class DataHighway extends SubsystemBase {
   //DH Data from Subsystems
   double DH_ShotDistance = 0;
   boolean DH_AutoAim = false;
+  double DH_AngleToHub = 0;
+  boolean DH_Aimed = false;
+  boolean DH_InNeutralZone = false;
+  boolean DH_InAllianceZone = false;
+  
+  double DH_AngleToOutpost = 0;
+  double DH_AngleToDepot = 0;
+  double DH_CornerDistance = 0;
 
   /** Creates a new DataHighway. */
     public DataHighway(SwerveSubsystem SwerveSS, ShooterSubsystem ShooterSS, ClimberSubsystem ClimberSS, IntakeSubsystem IntakeSS) {
@@ -68,9 +76,25 @@ public class DataHighway extends SubsystemBase {
   private void GetDHData(){
 DH_ShotDistance = SS_Swerve.DHOut_HubDistance;
 DH_AutoAim = SS_Swerve.isAutoAim();
+DH_AngleToHub = SS_Swerve.DHOut_AngleToHub;
+DH_Aimed = SS_Swerve.DHOut_Aimed;
+DH_InAllianceZone = SS_Swerve.DHOut_InAllianceZone;
+DH_InNeutralZone = SS_Swerve.DHOut_InNeutralZone;
+DH_AngleToOutpost = SS_Swerve.DHOut_AngleToOutpost;
+DH_AngleToDepot = SS_Swerve.DHOut_AngleToDepot;
+DH_CornerDistance = SS_Swerve.DHOut_CornerDistance;
+
   }
   private void SetDHData(){
 SS_Shooter.DHIn_ShotDistance = DH_ShotDistance;
 SS_Shooter.DHIn_AutoShoot = DH_AutoAim;
+SS_Shooter.AngleToHub = DH_AngleToHub;
+SS_Shooter.DHIn_Aimed = DH_Aimed;
+SS_Shooter.DHIn_InAllianceZone = DH_InAllianceZone;
+SS_Shooter.DHIn_InNeutralZone = DH_InNeutralZone;
+SS_Shooter.DHIn_AngleToOutpost = DH_AngleToOutpost;
+SS_Shooter.DHIn_AngleToDepot = DH_AngleToDepot;
+SS_Shooter.DHIn_CornerDistance = DH_CornerDistance;
+
   }
 }
