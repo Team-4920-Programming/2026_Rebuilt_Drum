@@ -25,6 +25,12 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.RobotController;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -64,18 +70,27 @@ public class ShooterSubsystem extends SubsystemBase {
   boolean unJamFeeder = false;
   double  JamAugerTime = 0;
   double JamFdderTimer = 0;
+
+
   public double DHIn_ShotDistance = 0;
   public boolean DHIn_AutoShoot = false;
   public double AngleToHub =0;
   public boolean DHIn_Aimed = false;
    private boolean Shoot = false;
- 
    public boolean DHIn_InAllianceZone = false;
    public boolean DHIn_InNeutralZone = false;
    public double DHIn_AngleToOutpost = 0;
    public double DHIn_AngleToDepot = 0;
    public double DHIn_CornerDistance = 0;
+   public ChassisSpeeds DHIn_FieldVelocity = new ChassisSpeeds(0,0,0);
+   public double DHIn_HubPoseX;
+   public double DHIn_HubPoseY;
+   public double DHOut_reqRobotAngle =0;
+   
   
+
+
+
   //Servo
   ServoHub Servos = new ServoHub(14);
   ServoHubConfig cfg_Servos = new ServoHubConfig();
@@ -127,6 +142,26 @@ public class ShooterSubsystem extends SubsystemBase {
 
 
   }
+
+public void SOTFCalc(){
+
+double IdealSpeed = getShooterSpeedForDistance(DHIn_ShotDistance);
+  Translation2d targetPosition = new Translation2d(DHIn_HubPoseX, DHIn_HubPoseY);
+
+  Translation2d targetVector = targetPosition.div(DHIn_ShotDistance).times(IdealSpeed);
+  
+  Translation2d robotVelocity = new Translation2d(DHIn_FieldVelocity.vxMetersPerSecond, DHIn_FieldVelocity.vyMetersPerSecond);
+  Translation2d shotVector = targetVector.minus(robotVelocity);
+
+  double requiredRobotAngle = shotVector.getAngle().getDegrees();
+double requiredSpeed = shotVector.getNorm();
+double shooterRPM = (requiredSpeed);
+  DHOut_reqRobotAngle = requiredRobotAngle;
+if (Shoot){
+ SetShooterSpeeds(shooterRPM);
+}
+}
+
   public void SetShooterSpeeds(double speed)
   {
     PID_Shooter1.setSetpoint(speed);
@@ -161,6 +196,9 @@ public void DisableShooter(){
    
   }
 
+  // public void SOTFShoot(){
+  //   SetShooterSpeeds(shooterRPM);
+  // }
 
 public void AutoShoot(){
   
@@ -230,6 +268,10 @@ else if (DHIn_ShotDistance >= 4.5 ){
   }
 }
 
+public double getShooterSpeedForDistance(double Distance){
+return 250 * Distance + 1000;
+}
+
 public void CornerShoot(){
 if (DHIn_CornerDistance >=4 && DHIn_CornerDistance < 5.5 ){
 
@@ -275,12 +317,12 @@ PulseWidth = PulseWidth *1000; // convert to microseconds
     Shooter1Current = Mtr_Shooter1.getOutputCurrent();
     Shooter2Current = Mtr_Shooter2.getOutputCurrent();
     if (DHIn_InAllianceZone){
-    if (AngleToHub <20 && Shoot){
-    AutoShoot();
-    }
-    else {
-      SetShooterSpeeds(0);
-    }
+    
+    // AutoShoot();
+    //SOTFShoot();
+    SOTFCalc();
+    
+    
   }
 else {
   if((DHIn_AngleToOutpost <20 || DHIn_AngleToDepot <20 )&& Shoot){
@@ -305,7 +347,7 @@ SetShooterSpeeds(0);
     DogLog.log("Shooter/Shooter1Setpoint", PID_Shooter1.getSetpoint());
     DogLog.log("Shooter/Shooter2Setpoint", PID_Shooter2.getSetpoint());
     DogLog.log("Shooter/Shoot",Shoot);
-
+DogLog.log("Fieldinfo/reqRobotAngle",DHOut_reqRobotAngle);
 
 
     if (PID_Shooter1.getSetpoint() > 500)

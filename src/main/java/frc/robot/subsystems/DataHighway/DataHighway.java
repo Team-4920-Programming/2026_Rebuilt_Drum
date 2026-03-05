@@ -7,6 +7,8 @@ package frc.robot.subsystems.DataHighway;
 import java.util.Optional;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,6 +33,10 @@ public class DataHighway extends SubsystemBase {
   boolean DH_Aimed = false;
   boolean DH_InNeutralZone = false;
   boolean DH_InAllianceZone = false;
+  ChassisSpeeds DH_FieldVelocity;
+  double DH_HubPoseX =0;
+  double DH_HubPoseY =0;
+  double DH_reqRobotAngle =0;
   
   double DH_AngleToOutpost = 0;
   double DH_AngleToDepot = 0;
@@ -83,6 +89,10 @@ DH_InNeutralZone = SS_Swerve.DHOut_InNeutralZone;
 DH_AngleToOutpost = SS_Swerve.DHOut_AngleToOutpost;
 DH_AngleToDepot = SS_Swerve.DHOut_AngleToDepot;
 DH_CornerDistance = SS_Swerve.DHOut_CornerDistance;
+DH_FieldVelocity = SS_Swerve.getFieldVelocity();
+DH_HubPoseX = SS_Swerve.DHOut_HubPoseX;
+DH_HubPoseY = SS_Swerve.DHOut_HubPoseY;
+DH_reqRobotAngle = SS_Shooter.DHOut_reqRobotAngle;
 
   }
   private void SetDHData(){
@@ -95,6 +105,9 @@ SS_Shooter.DHIn_InNeutralZone = DH_InNeutralZone;
 SS_Shooter.DHIn_AngleToOutpost = DH_AngleToOutpost;
 SS_Shooter.DHIn_AngleToDepot = DH_AngleToDepot;
 SS_Shooter.DHIn_CornerDistance = DH_CornerDistance;
-
+SS_Shooter.DHIn_FieldVelocity = DH_FieldVelocity;
+SS_Shooter.DHIn_HubPoseX = DH_HubPoseX;
+SS_Shooter.DHIn_HubPoseY = DH_HubPoseY;
+SS_Swerve.DHIn_reqRobotAngle = DH_reqRobotAngle;
   }
 }
