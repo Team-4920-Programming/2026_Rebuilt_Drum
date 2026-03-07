@@ -156,9 +156,12 @@ double IdealSpeed = getShooterSpeedForDistance(DHIn_ShotDistance);
   double requiredRobotAngle = shotVector.getAngle().getDegrees();
 double requiredSpeed = shotVector.getNorm();
 double shooterRPM = (requiredSpeed);
-  DHOut_reqRobotAngle = requiredRobotAngle;
+  DHOut_reqRobotAngle = requiredRobotAngle -180;
 if (Shoot){
  SetShooterSpeeds(shooterRPM);
+}
+else {
+  SetShooterSpeeds(0);
 }
 }
 
@@ -269,7 +272,7 @@ else if (DHIn_ShotDistance >= 4.5 ){
 }
 
 public double getShooterSpeedForDistance(double Distance){
-return 250 * Distance + 1000;
+return 750 * Distance + 1000;
 }
 
 public void CornerShoot(){

@@ -865,7 +865,7 @@ DisableCornerAim();
     {
       //PID_AutoAim.setSetpoint(AutoAimAngle);
       PID_AutoAim.setSetpoint(DHIn_reqRobotAngle);
-      PID_AutoAim.setTolerance(3);
+      PID_AutoAim.setTolerance(2);
       PID_AutoAim.enableContinuousInput(-180, 180);
       v.omegaRadiansPerSecond = PID_AutoAim.calculate(getPose().getRotation().getDegrees());
       v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4,4);
