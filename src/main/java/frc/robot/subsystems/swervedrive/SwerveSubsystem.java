@@ -37,6 +37,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -66,6 +68,7 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import dev.doglog.*;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 
@@ -76,6 +79,7 @@ public class SwerveSubsystem extends SubsystemBase
    * Swerve drive object.
    */
   private final SwerveDrive swerveDrive;
+  
   /**
    * Enable vision odometry updates while driving.
    */
@@ -102,14 +106,41 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DHOut_InBumpZone = false;
   public double DHOut_HubDistance = 0.0;
   public double DHOut_CornerDistance = 0.0;
+  public boolean DHOut_Aimed = false;
+ public double DHOut_AngleToHub = 0;
+ public double DHOut_AngleToDepot = 0;
+  public double DHOut_AngleToOutpost = 0;
+  public double DHOut_HubPoseX= 0;
+  public double DHOut_HubPoseY= 0;
+  public double DHIn_reqRobotAngle =0;
+  // public double DHOut_robotY = getPose().getY();
+  // public double DHOut_robotX = getPose().getX();
+  
   
 
+  public double DHOut_robotY = 0;
+  public double DHOut_robotX = 0;
 //variables
   private boolean AutoAimEnabled = false;
   private Pose2d AutoAimTarget = new Pose2d();
   private double AutoAimAngle = 0;
-  private PIDController PID_AutoAim = new PIDController(0.1, 0, 0);
+  
+  
 
+  private boolean DepotAimEnabled = false;
+  private Pose2d DepotAimTarget = new Pose2d();
+  //private double DepotAimAngle = 0;
+   public double DepotAngle = 0;
+
+   private boolean OutpostAimEnabled = false;
+  private Pose2d OutpostAimTarget = new Pose2d();
+  //private double OutpostAimAngle = 0;
+  public double OutpostAngle = 0;
+  
+  
+  private PIDController PID_AutoAim = new PIDController(0.1, 0, 0);
+  private PIDController PID_DepotAim = new PIDController(0.1, 0, 0);
+private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
   private final SwerveDrivePoseEstimator poseEstimator;
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -191,16 +222,18 @@ public class SwerveSubsystem extends SubsystemBase
             visionStdDevs);
   }
 
+  
+
   /**
    * Setup the photon vision class.
    */
   public void setupPhotonVision()
   {
     //vision = new Vision(swerveDrive::getPose, swerveDrive.field);
-    FrontCamera = new Vision4920(Constants.Vision4920.kFrontCam, Constants.Vision4920.kRobotToFrontCam );
+    FrontCamera = new Vision4920(Constants.Vision4920.kFrontCam, Constants.Vision4920.ROBOT_TO_CAMERA_Front);
     // RightCamera = new Vision4920(Constants.Vision4920.kRightCam, Constants.Vision4920.kRobotToRightCam );
     // LeftCamera = new Vision4920(Constants.Vision4920.kLeftCam, Constants.Vision4920.kRobotToLeftCam );
-    RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.kRobotToRearCam );
+    RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.ROBOT_TO_CAMERA_Rear );
 
   }
   private void ProcessVision4920()
@@ -316,18 +349,7 @@ public class SwerveSubsystem extends SubsystemBase
       UpdateDataHighway();
       double HubX = 1;
       double HubY = 1;
-      if (AutoAimEnabled)
-      {
-        if (DHOut_InAllianceZone)
-        {
-          AutoAimTarget = new Pose2d(HubX,HubY,Rotation2d.fromDegrees(0));
-          Transform2d PoseDiff = AutoAimTarget.minus(getPose());
-          AutoAimAngle = Math.toDegrees(Math.atan2(PoseDiff.getX(),PoseDiff.getY()));
-          
-
-
-        }
-      }
+      
       
   }
   public void UpdateDataHighway()
@@ -337,33 +359,73 @@ public class SwerveSubsystem extends SubsystemBase
     DHOut_InAllianceZone = false;
     DHOut_InNeutralZone = false;
     DHOut_InBumpZone = false;
-      Pose2d RedHubPose = new Pose2d(4.626,4.0,new Rotation2d().fromDegrees(0));
-      Pose2d BlueHubPose = new Pose2d(11.9,4.0, new Rotation2d().fromDegrees(0));
+      Pose2d BlueHubPose = new Pose2d(4.626,4.0,new Rotation2d().fromDegrees(0));
+      Pose2d RedHubPose = new Pose2d(11.9,4.0, new Rotation2d().fromDegrees(0));
       Pose2d BlueOutpostCorner = new Pose2d(1,1,new Rotation2d().fromDegrees(0));
       Pose2d BlueDepotCorner = new Pose2d(1,fieldLayout.getFieldWidth() -1, new Rotation2d().fromDegrees(0));
       Pose2d RedOutpostCorner = new Pose2d(fieldLayout.getFieldLength() -1, fieldLayout.getFieldWidth() -1, new Rotation2d().fromDegrees(0));
       Pose2d RedDepotCorner = new Pose2d(fieldLayout.getFieldLength() -1, 1, new Rotation2d().fromDegrees(0));
   double OutpostCornerDist = 0;
   double DepotCornerDist  =0;
+  
       if (isRedAlliance())
       {
         Transform2d RedOutpost2Robot = RedOutpostCorner.minus(getPose());
         Transform2d RedDepot2Robot = RedDepotCorner.minus(getPose());
-        Transform2d Hub2Robot = RedHubPose.minus(getPose());
-        OutpostCornerDist = RedDepot2Robot.getTranslation().getNorm();
-        DepotCornerDist = RedDepot2Robot.getTranslation().getNorm();   
+        Transform2d Hub2Robot = getPose().minus(RedHubPose);
+        
+        OutpostCornerDist = RedOutpost2Robot.getTranslation().getNorm();
+        DepotCornerDist = RedDepot2Robot.getTranslation().getNorm();  
+        OutpostAngle = Math.atan2(getPose().getY() - RedOutpostCorner.getY(), getPose().getX() - RedOutpostCorner.getX());
+        OutpostAngle = Units.radiansToDegrees(OutpostAngle);
+        DepotAngle = Math.atan2(getPose().getY() - RedDepotCorner.getY(), getPose().getX() - RedDepotCorner.getX());
+        DepotAngle = Units.radiansToDegrees(DepotAngle);
         DHOut_HubDistance = Hub2Robot.getTranslation().getNorm();
+        AutoAimAngle = Math.atan2(getPose().getY() - RedHubPose.getY(), getPose().getX() - RedHubPose.getX());
+        AutoAimAngle = Units.radiansToDegrees(AutoAimAngle);
+        DHOut_HubDistance = Math.sqrt(Math.pow(getPose().getY() - RedHubPose.getY(),2) + Math.pow(getPose().getX() - RedHubPose.getX(),2));
         DHOut_CornerDistance = Math.min(OutpostCornerDist, DepotCornerDist);
+        DHOut_AngleToHub = Math.abs (AutoAimAngle - getPose().getRotation().getDegrees());
+        DHOut_AngleToOutpost = Math.abs (OutpostAngle - getPose().getRotation().getDegrees());
+        DHOut_AngleToDepot = Math.abs (DepotAngle - getPose().getRotation().getDegrees());
+        DHOut_HubPoseX = 11.9 - getPose().getX();
+        DHOut_HubPoseY = 4 - getPose().getY();
+        DogLog.log("Fieldinfo/Hub2Robot",Hub2Robot);
+        DogLog.log("Fieldinfo/HubPose",BlueHubPose);
+        DogLog.log("Fieldinfo/HubDistance",DHOut_HubDistance);
+        DogLog.log("Fieldinfo/DepotCornerDist",DepotCornerDist);
+        DogLog.log("Fieldinfo/OutpostCornerDist",OutpostCornerDist);
+        DogLog.log("Fieldinfo/DepotCornerAngle",DepotAngle);
+        DogLog.log("Fieldinfo/OutpostCornerAngle",OutpostAngle);
       }
       else
       {
         Transform2d BlueOutpost2Robot = BlueOutpostCorner.minus(getPose());
         Transform2d BlueDepot2Robot = BlueDepotCorner.minus(getPose());
-        Transform2d Hub2Robot = BlueHubPose.minus(getPose());
+        Transform2d Hub2Robot = getPose().minus(BlueHubPose);
         OutpostCornerDist = BlueDepot2Robot.getTranslation().getNorm();
         DepotCornerDist = BlueDepot2Robot.getTranslation().getNorm(); 
+        OutpostAngle = Math.atan2(getPose().getY() - BlueOutpostCorner.getY(), getPose().getX() - BlueOutpostCorner.getX());
+        OutpostAngle = Units.radiansToDegrees(OutpostAngle);
+        DepotAngle = Math.atan2(getPose().getY() - BlueDepotCorner.getY(), getPose().getX() - BlueDepotCorner.getX());
+        DepotAngle = Units.radiansToDegrees(DepotAngle);
         DHOut_HubDistance = Hub2Robot.getTranslation().getNorm();
+        AutoAimAngle = Math.atan2(getPose().getY() - BlueHubPose.getY(), getPose().getX() - BlueHubPose.getX());
+        AutoAimAngle = Units.radiansToDegrees(AutoAimAngle);
+        DHOut_HubDistance = Math.sqrt(Math.pow(getPose().getY() - BlueHubPose.getY(),2) + Math.pow(getPose().getX() - BlueHubPose.getX(),2));
         DHOut_CornerDistance = Math.min(OutpostCornerDist, DepotCornerDist);
+        DHOut_AngleToHub = Math.abs (AutoAimAngle - getPose().getRotation().getDegrees());
+        DHOut_AngleToOutpost = Math.abs (OutpostAngle - getPose().getRotation().getDegrees());
+        DHOut_AngleToDepot = Math.abs (DepotAngle - getPose().getRotation().getDegrees());
+        DHOut_HubPoseX = 4.626 - getPose().getX();
+        DHOut_HubPoseY = 4 - getPose().getY();
+        DogLog.log("Fieldinfo/Hub2Robot",Hub2Robot);
+        DogLog.log("Fieldinfo/HubPose",BlueHubPose);
+        DogLog.log("Fieldinfo/HubDistance",DHOut_HubDistance);
+        DogLog.log("Fieldinfo/DepotCornerDist",DepotCornerDist);
+        DogLog.log("Fieldinfo/OutpostCornerDist",OutpostCornerDist);
+        DogLog.log("Fieldinfo/DepotCornerAngle",DepotAngle);
+        DogLog.log("Fieldinfo/OutpostCornerAngle",OutpostAngle);
       }
 
 
@@ -387,8 +449,11 @@ public class SwerveSubsystem extends SubsystemBase
       if (getPose().getX() < fieldLayout.getTagPose(26).get().getX())
         DHOut_InAllianceZone = true;
     }
-    //Set Variables from Datahighway
 
+   
+    //Set Variables from Datahighway
+DogLog.log("Fieldinfo/Inalliancezone",DHOut_InAllianceZone);
+DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
     //Set Variable to DataHighway
   }
   @Override
@@ -500,8 +565,71 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return AutoAimEnabled;
   }
+  public void EnableOutpostAim()
+  {
+    OutpostAimEnabled = true;
+  }
+  public void DisableOutpostAim()
+  {
+    OutpostAimEnabled = false;
+  }
+  public boolean isOutpostAim()
+  {
+    return OutpostAimEnabled;
+  }
+  public void EnableDepotAim()
+  {
+    DepotAimEnabled = true;
+  }
+  public void DisableDepotAim()
+  {
+    DepotAimEnabled = false;
+  }
+  public boolean isDepotAim()
+  {
+    return DepotAimEnabled;
+  }
+
+  public void EnableCornerAim(){
+    if (isRedAlliance()){
+    if (getPose().getY() <= 4 && DHOut_InNeutralZone){
+      DepotAimEnabled = true;
+      OutpostAimEnabled = false;
+  }
+  else {
+    OutpostAimEnabled = true;
+    DepotAimEnabled = false;
+  }
+  }
+else {
+
+  if (getPose().getY() >= 4 && DHOut_InNeutralZone){
+      DepotAimEnabled = true;
+      OutpostAimEnabled = false;
+  }
+  else {
+    OutpostAimEnabled = true;
+    DepotAimEnabled = false;
+  }
+}
 
 
+  }
+
+  public void DisableCornerAim(){
+    OutpostAimEnabled = false;
+    DepotAimEnabled = false;
+  }
+
+  public void EnableAutoLock (){
+if (DHOut_InNeutralZone == true){
+EnableCornerAim();
+}
+else if (DHOut_InAllianceZone == true){
+EnableAutoAim();
+DisableCornerAim();
+}
+  }
 
   /**
    * Use PathPlanner Path finding to go to a point on the field.
@@ -735,7 +863,54 @@ public class SwerveSubsystem extends SubsystemBase
   public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity)
   {
     return run(() -> {
-      swerveDrive.driveFieldOriented(velocity.get());
+      ChassisSpeeds v = velocity.get();
+    if (AutoAimEnabled)
+    {
+      //PID_AutoAim.setSetpoint(AutoAimAngle);
+      PID_AutoAim.setSetpoint(DHIn_reqRobotAngle);
+      PID_AutoAim.setTolerance(2);
+      PID_AutoAim.enableContinuousInput(-180, 180);
+      v.omegaRadiansPerSecond = PID_AutoAim.calculate(getPose().getRotation().getDegrees());
+      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4,4);
+      DHOut_Aimed = PID_AutoAim.atSetpoint();
+    }
+      DogLog.log("Fieldinfo/AutoAimRotVel", v.omegaRadiansPerSecond);
+      DogLog.log("Fieldinfo/AutoAimAngle", AutoAimAngle);
+      
+
+      
+    ;
+  
+  
+   
+
+  if (DepotAimEnabled)
+    {
+      PID_DepotAim.setSetpoint(DepotAngle);
+      PID_DepotAim.setTolerance(3);
+      PID_DepotAim.enableContinuousInput(-180, 180);
+      v.omegaRadiansPerSecond = PID_DepotAim.calculate(getPose().getRotation().getDegrees());
+      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
+    }
+      
+      DogLog.log("Fieldinfo/DepotAimAngle", DepotAngle);
+
+     
+    ;
+  
+
+  if (OutpostAimEnabled)
+    {
+      PID_OutpostAim.setSetpoint(OutpostAngle);
+      PID_OutpostAim.setTolerance(3);
+      PID_OutpostAim.enableContinuousInput(-180, 180);
+      v.omegaRadiansPerSecond = PID_OutpostAim.calculate(getPose().getRotation().getDegrees());
+      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
+    }
+      
+      DogLog.log("Fieldinfo/OutpostAimAngle", OutpostAngle);
+
+      swerveDrive.driveFieldOriented(v);
     });
   }
 
@@ -747,15 +922,12 @@ public class SwerveSubsystem extends SubsystemBase
   public void drive(ChassisSpeeds velocity)
   {
     //this is the default command from robot containter
-    if (AutoAimEnabled)
-    {
-      PID_AutoAim.setSetpoint(AutoAimAngle);
-      PID_AutoAim.setTolerance(3);
-      velocity.omegaRadiansPerSecond = PID_AutoAim.calculate(getPose().getRotation().getDegrees());
-    }
+  
     swerveDrive.drive(velocity);
+    
   }
 
+  
 
   /**
    * Get the swerve drive kinematics object.
@@ -933,6 +1105,8 @@ public class SwerveSubsystem extends SubsystemBase
 
 
   }
+
+
 
   /**
    * Get the {@link SwerveController} in the swerve drive.

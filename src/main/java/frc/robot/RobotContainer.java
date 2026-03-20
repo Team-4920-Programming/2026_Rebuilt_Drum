@@ -32,12 +32,23 @@ import frc.robot.subsystems.Shooter.*;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.Climber.*;
 import frc.robot.subsystems.DataHighway.*;
+import frc.robot.commands.shooter.auto.CmdA_ShootTillEmpty;
 import frc.robot.commands.shooter.tele.*;
-import frc.robot.commands.shooter.Auto.*;
-import frc.robot.commands.Climber.Auto.*;
-import frc.robot.commands.Climber.Tele.*;
-import frc.robot.commands.Intake.Auto.*;
+import frc.robot.commands.Drive.CmdT_DepotAutoAim;
+import frc.robot.commands.Drive.CmdT_DisableAutoAim;
+import frc.robot.commands.Drive.CmdT_EnableAutoAim;
+import frc.robot.commands.Drive.CmdT_EnableAutoLock;
+import frc.robot.commands.Drive.CmdT_EnableCornerAim;
+import frc.robot.commands.Drive.CmdT_OutpostAutoAim;
+// import frc.robot.commands.shooter.Auto.*;
+// import frc.robot.commands.Climber.Auto.*;
+// import frc.robot.commands.Climber.Tele.*;
+// import frc.robot.commands.Intake.Auto.*;
 import frc.robot.commands.Intake.Tele.*;
+import frc.robot.commands.Intake.auto.CmdA_RunIntake;
+import frc.robot.commands.Intake.Tele.CmdT_RunIntake;
+import static edu.wpi.first.units.Units.RPM;
+
 import java.io.File;
 
 import swervelib.SwerveDrive;
@@ -59,6 +70,7 @@ public class RobotContainer
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
   private final ShooterSubsystem Shooter = new ShooterSubsystem();
+  //private final ShooterYAMS_SubSystem Shooter = new ShooterYAMS_SubSystem();
   private final IntakeSubsystem Intake = new IntakeSubsystem();
   private final ClimberSubsystem Climber =  new ClimberSubsystem();
 
@@ -128,6 +140,9 @@ public class RobotContainer
     DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
     DogLog.setPdh(new PowerDistribution());
 
+    NamedCommands.registerCommand("CmdA_ShootTillEmpty", new CmdA_ShootTillEmpty (Shooter).withTimeout(5));
+    NamedCommands.registerCommand("CmdA_RunIntake", new CmdA_RunIntake (Intake, 1));
+    NamedCommands.registerCommand("CmdA_StopIntake", new CmdA_RunIntake (Intake, 0));
 
     // Configure the trigger bindings
     configureBindings();
@@ -205,11 +220,18 @@ public class RobotContainer
          driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
          //driverXbox.a().whileTrue(new DriveToTargetV0_1(drivebase));
         driverXbox.a().whileTrue(new CmdT_ShootTillEmpty(Shooter));
-        driverXbox.x().whileTrue(new CmdT_SetIntakeAngle(Intake, 20));
+
+        //driverXbox.a().whileTrue(Shooter.setVelocity(RPM.of(5000)));
+       // driverXbox.a().onFalse(Shooter.setVelocity(RPM.of(0)));
+        driverXbox.x().whileTrue(new CmdT_SetIntakeAngle(Intake, 70));
         driverXbox.x().whileFalse(new CmdT_SetIntakeAngle(Intake, 5));
-        driverXbox.y().onTrue(new CmdT_RunIntake(Intake, 1));
-        driverXbox.b().onTrue(new CmdT_RunIntake(Intake, 0));
+        driverXbox.y().whileTrue(new CmdT_RunIntake(Intake));
+       // driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
+       // driverXbox.leftBumper().onTrue(new CmdT_DisableAutoAim(drivebase));
+        driverXbox.rightTrigger().whileTrue(new CmdT_AutoShoot(Shooter, drivebase));
         
+        // driverXbox.rightTrigger().whileTrue(new CmdT_OutpostAutoAim(drivebase));
+       // driverXbox.leftTrigger().whileTrue(new CmdT_DepotAutoAim(drivebase));
          // Pre-match calibration routine - Back + Start buttons together
          // This ensures accidental activation is avoided during matches
          //driverXbox.x().onTrue(drivebase.getPreMatchCalibrationCommand());

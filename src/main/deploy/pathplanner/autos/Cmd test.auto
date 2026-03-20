@@ -7,19 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Example Path"
+            "pathName": "Left Bump to Shoot"
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Example Path 2"
+            "name": "CmdA_ShootTillEmpty"
           }
         }
       ]

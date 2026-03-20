@@ -7,6 +7,8 @@ package frc.robot.subsystems.DataHighway;
 import java.util.Optional;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,6 +27,22 @@ public class DataHighway extends SubsystemBase {
   ClimberSubsystem SS_Climber;
 
   //DH Data from Subsystems
+  double DH_ShotDistance = 0;
+  boolean DH_AutoAim = false;
+  double DH_AngleToHub = 0;
+  boolean DH_Aimed = false;
+  boolean DH_InNeutralZone = false;
+  boolean DH_InAllianceZone = false;
+  ChassisSpeeds DH_FieldVelocity;
+  double DH_HubPoseX =0;
+  double DH_HubPoseY =0;
+  double DH_reqRobotAngle =0;
+  
+  double DH_AngleToOutpost = 0;
+  double DH_AngleToDepot = 0;
+  double DH_CornerDistance = 0;
+
+  
 
   /** Creates a new DataHighway. */
     public DataHighway(SwerveSubsystem SwerveSS, ShooterSubsystem ShooterSS, ClimberSubsystem ClimberSS, IntakeSubsystem IntakeSS) {
@@ -64,9 +82,37 @@ public class DataHighway extends SubsystemBase {
     DogLog.forceNt.log("ForcedNT/Match/Allicance",AllianceColor);
   }
   private void GetDHData(){
+DH_ShotDistance = SS_Swerve.DHOut_HubDistance;
+DH_AutoAim = SS_Swerve.isAutoAim();
+DH_AngleToHub = SS_Swerve.DHOut_AngleToHub;
+DH_Aimed = SS_Swerve.DHOut_Aimed;
+DH_InAllianceZone = SS_Swerve.DHOut_InAllianceZone;
+DH_InNeutralZone = SS_Swerve.DHOut_InNeutralZone;
+DH_AngleToOutpost = SS_Swerve.DHOut_AngleToOutpost;
+DH_AngleToDepot = SS_Swerve.DHOut_AngleToDepot;
+DH_CornerDistance = SS_Swerve.DHOut_CornerDistance;
+DH_FieldVelocity = SS_Swerve.getFieldVelocity();
+DH_HubPoseX = SS_Swerve.DHOut_HubPoseX;
+DH_HubPoseY = SS_Swerve.DHOut_HubPoseY;
+DH_reqRobotAngle = SS_Shooter.DHOut_reqRobotAngle;
+
 
   }
   private void SetDHData(){
+SS_Shooter.DHIn_ShotDistance = DH_ShotDistance;
+SS_Shooter.DHIn_AutoShoot = DH_AutoAim;
+SS_Shooter.AngleToHub = DH_AngleToHub;
+SS_Shooter.DHIn_Aimed = DH_Aimed;
+SS_Shooter.DHIn_InAllianceZone = DH_InAllianceZone;
+SS_Shooter.DHIn_InNeutralZone = DH_InNeutralZone;
+SS_Shooter.DHIn_AngleToOutpost = DH_AngleToOutpost;
+SS_Shooter.DHIn_AngleToDepot = DH_AngleToDepot;
+SS_Shooter.DHIn_CornerDistance = DH_CornerDistance;
+SS_Shooter.DHIn_FieldVelocity = DH_FieldVelocity;
+SS_Shooter.DHIn_HubPoseX = DH_HubPoseX;
+SS_Shooter.DHIn_HubPoseY = DH_HubPoseY;
+SS_Swerve.DHIn_reqRobotAngle = DH_reqRobotAngle;
+
 
   }
 }

@@ -30,10 +30,10 @@ import edu.wpi.first.math.Matrix;
 public final class Constants
 {
 
-  public static final double ROBOT_MASS = (83) * 0.453592; // 32lbs * kg per pound
+  public static final double ROBOT_MASS = (140) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED  = Units.feetToMeters(30); //was 14.5
+  public static final double MAX_SPEED  = Units.feetToMeters(14); //was 14.5
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
 //  public static final class AutonConstants
@@ -42,6 +42,28 @@ public final class Constants
 //    public static final PIDConstants TRANSLATION_PID = new PIDConstants(0.7, 0, 0);
 //    public static final PIDConstants ANGLE_PID       = new PIDConstants(0.4, 0, 0.01);
 //  }
+
+// Can IDs
+  public static int Can_PDH = 1;
+  public static int Can_FL_Drive = 2;
+  public static int Can_FL_Angle = 3;
+  public static int Can_FR_Drive = 4;
+  public static int Can_FR_Angle = 5;
+  public static int Can_BR_Drive = 6;
+  public static int Can_BR_Angle = 7;
+  public static int Can_BL_Drive = 8;
+  public static int Can_BL_Angle = 9;
+  public static int Can_Shooter1 = 10;
+  public static int Can_Shooter2 = 11;
+  public static int Can_Feeder = 12;
+  public static int Can_Hood = 13;
+  public static int Can_Rollers = 14;
+  public static int Can_Tipper = 15;
+  public static int Can_Intake1 = 16;
+  public static int Can_Intake2 = 17;
+  public static int Can_Pigeon = 18;
+  public static int Can_Mitrocandria = 19;
+  public static int Can_Climber = 20;
 
   public static final class DrivebaseConstants
   {
@@ -80,8 +102,8 @@ public static final class DriveConstants {
 
     // positive x to the left, positive up
     public static final Transform3d kRobotToFrontCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(14), Units.inchesToMeters(-1.375), Units.inchesToMeters(19)), 
-            new Rotation3d(Units.degreesToRadians(359), Units.degreesToRadians(8), Units.degreesToRadians(2))); //
+            new Transform3d(new Translation3d(Units.inchesToMeters(0.5), Units.inchesToMeters(-7.5), Units.inchesToMeters(-32.25)), //0,-7.5,32
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(13), Units.degreesToRadians(0))); //
 
     public static final Transform3d kRobotToRightCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(-9.5), Units.inchesToMeters(19)), 
@@ -91,8 +113,8 @@ public static final class DriveConstants {
             new Transform3d(new Translation3d(Units.inchesToMeters(-3.25), Units.inchesToMeters(-10.75), Units.inchesToMeters(38.25)), 
             new Rotation3d(0, Units.degreesToRadians(309), Units.degreesToRadians(180))); //
   public static final Transform3d kRobotToRearCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(14.75), Units.inchesToMeters(-5.5), Units.inchesToMeters(7.5)), 
-            new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(-13), Units.degreesToRadians(0))); // 0.48
+            new Transform3d(new Translation3d(Units.inchesToMeters(-.5), Units.inchesToMeters(2), Units.inchesToMeters(-32.25)), 
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-13), Units.degreesToRadians(180))); // 0.48     0,-10,180
   
   public static final Transform3d ROBOT_TO_CAMERA_Front = kRobotToFrontCam.inverse();
   public static final Transform3d ROBOT_TO_CAMERA_Rear = kRobotToRearCam.inverse();
