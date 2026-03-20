@@ -48,6 +48,7 @@ public class IntakeSubsystem extends SubsystemBase {
 SparkFlexConfig Intake2Config = new SparkFlexConfig();
 
 
+
   
 
   //Motor Encoders
@@ -82,15 +83,17 @@ double IntakeSpeed = 0;
   
 
         
-        //Intake1Config.inverted(false);
-        // Intake1Config.smartCurrentLimit(40);
-
+        Intake1Config.inverted(true);
+        Intake1Config.idleMode(IdleMode.kBrake);
+        Intake1Config.smartCurrentLimit(40);
+Mtr_Intake1.configure(Intake1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         
         
-        Intake2Config.inverted(true);
-        Intake2Config.follow(Mtr_Intake1);
-        Mtr_Intake2.configure(Intake2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-  }      
+        // Intake2Config.inverted(true);
+            Intake2Config.idleMode(IdleMode.kBrake);
+        Intake2Config.follow(Mtr_Intake1,true);
+         Mtr_Intake2.configure(Intake2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+   }      
 
 
   public void SetIntakeAngle(Double Angle)
@@ -109,7 +112,10 @@ Intake = false;
   public void SetIntakeSpeed(double Speed){
     Mtr_Intake1.set(Speed);
   }
-
+  public void SetTipperSpeed(double Speed){
+    Mtr_Tipper.set(Speed);
+  }
+  
 
 
   @Override
@@ -122,7 +128,7 @@ Intake = false;
     
     double IntakePosRad = Units.degreesToRadians(PID_IntakeAngle.getSetpoint());
     double IntakePosDeg = absEnc_IntakeAngle.getPosition();
-    Mtr_Tipper.set(PID_IntakeAngle.calculate(IntakePosDeg)+FF_IntakeAngle.calculate(IntakePosRad, 0));
+   // Mtr_Tipper.set(PID_IntakeAngle.calculate(IntakePosDeg)+FF_IntakeAngle.calculate(IntakePosRad, 0));
     DogLog.log("intake/pos",absEnc_IntakeAngle.getPosition());
 if (Intake){
   SetIntakeSpeed(1);

@@ -13,10 +13,10 @@ import frc.robot.subsystems.Shooter.ShooterSubsystem;
 //import frc.robot.subsystems.Shooter.ShooterYAMS_SubSystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdT_ShootTillEmpty extends Command {
+public class CmdT_RampUpShooter extends Command {
   ShooterSubsystem m_shooter;
   /** Creates a new CmdT_ShootTillEmpty. */
-  public CmdT_ShootTillEmpty(ShooterSubsystem m_ShooterSubsystem) {
+  public CmdT_RampUpShooter(ShooterSubsystem m_ShooterSubsystem) {
     //addRequirements(m_ShooterSubsystem);
     m_shooter = m_ShooterSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -37,23 +37,21 @@ public class CmdT_ShootTillEmpty extends Command {
     // double FeederSpeed = 1;
     // double RollerSpeed = 1;
     //m_shooter.setVelocity(RPM.of(3000));
-    
+    m_shooter.SetShooterSpeed(-0.3);
     //double CurrentShooter1Vel = m_shooter.getVelocity().magnitude();
 
     //m_shooter.SetShooterSpeed(ShooterSpeed.get());
     
-      m_shooter.SetFeederSpeed(-0.8);
-      m_shooter.SetRollerSpeed(-0.8);
+      
     
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    
+    m_shooter.SetShooterSpeed( 0);
     //m_shooter.setVelocity(RPM.of(0));
-    m_shooter.SetFeederSpeed(0);
-    m_shooter.SetRollerSpeed(0);
+   
   }
 
   // Returns true when the command should end.

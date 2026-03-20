@@ -13,13 +13,14 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class ClimberSubsystem extends SubsystemBase {
   /** Creates a new Climber. */
  
  //Motors
-  SparkFlex Mtr_Climber = new SparkFlex(15,MotorType.kBrushless);
-  SparkMax Mtr_Hooks = new SparkMax(16,MotorType.kBrushless);
+  //SparkFlex Mtr_Climber = new SparkFlex(Constants.Can_Climber,MotorType.kBrushless);
+  SparkMax Mtr_Climber = new SparkMax(Constants.Can_Climber,MotorType.kBrushless);
 
 //Motor Configs
   SparkMaxConfig mtrCfg_Climber = new SparkMaxConfig();
@@ -27,10 +28,10 @@ public class ClimberSubsystem extends SubsystemBase {
 
 //Motor Encoders
   RelativeEncoder enc_Climber = Mtr_Climber.getEncoder();
-  RelativeEncoder enc_Hooks = Mtr_Hooks.getEncoder();
+ // RelativeEncoder enc_Hooks = Mtr_Hooks.getEncoder();
 
   //Absolute Encoders
-  AbsoluteEncoder absEnc_Hooks = Mtr_Hooks.getAbsoluteEncoder();
+  //AbsoluteEncoder absEnc_Hooks = Mtr_Hooks.getAbsoluteEncoder();
 
   
   public ClimberSubsystem() {
@@ -49,12 +50,16 @@ public class ClimberSubsystem extends SubsystemBase {
 
   public void ClimberUp()
   {
-
+Mtr_Climber.set(1);
   }
 
   public void Climb()
   {
-    
+    Mtr_Climber.set(-1);
+  }
+
+  public void ClimberStop(){
+    Mtr_Climber.set(0);
   }
 
   @Override
