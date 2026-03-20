@@ -94,7 +94,7 @@ public static final class DriveConstants {
   }
   public static class Vision4920 {
     public static final String kFrontCam = "FrontCam";  //Intake Camera
-    public static final String kRearCam = "RearCam"; //Shooter Camera
+    // public static final String kRearCam = "RearCam"; //Shooter Camera
     public static final String kLeftCam = "LeftCam";  //Climber Camera
     public static final String kRightCam = "RightCam"; //Right Camera
     // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
@@ -112,12 +112,12 @@ public static final class DriveConstants {
     public static final Transform3d kRobotToLeftCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(-3.25), Units.inchesToMeters(-10.75), Units.inchesToMeters(38.25)), 
             new Rotation3d(0, Units.degreesToRadians(309), Units.degreesToRadians(180))); //
-  public static final Transform3d kRobotToRearCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(-.5), Units.inchesToMeters(2), Units.inchesToMeters(-32.25)), 
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-13), Units.degreesToRadians(180))); // 0.48     0,-10,180
+  // public static final Transform3d kRobotToRearCam =
+  //           new Transform3d(new Translation3d(Units.inchesToMeters(-.5), Units.inchesToMeters(2), Units.inchesToMeters(-32.25)), 
+  //           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-13), Units.degreesToRadians(180))); // 0.48     0,-10,180
   
   public static final Transform3d ROBOT_TO_CAMERA_Front = kRobotToFrontCam.inverse();
-  public static final Transform3d ROBOT_TO_CAMERA_Rear = kRobotToRearCam.inverse();
+  // public static final Transform3d ROBOT_TO_CAMERA_Rear = kRobotToRearCam.inverse();
   public static final Transform3d ROBOT_TO_CAMERA_Right = kRobotToRightCam .inverse();
   public static final Transform3d ROBOT_TO_CAMERA_Left = kRobotToLeftCam.inverse();
   

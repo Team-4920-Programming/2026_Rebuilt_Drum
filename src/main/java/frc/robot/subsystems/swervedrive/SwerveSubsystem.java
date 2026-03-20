@@ -149,7 +149,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
    */
   public SwerveSubsystem(File directory)
   {
-    boolean blueAlliance = false;
+    boolean blueAlliance = true;
     Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
                                                                       Meter.of(4)),
                                                     Rotation2d.fromDegrees(0))
@@ -233,7 +233,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     FrontCamera = new Vision4920(Constants.Vision4920.kFrontCam, Constants.Vision4920.ROBOT_TO_CAMERA_Front);
     // RightCamera = new Vision4920(Constants.Vision4920.kRightCam, Constants.Vision4920.kRobotToRightCam );
     // LeftCamera = new Vision4920(Constants.Vision4920.kLeftCam, Constants.Vision4920.kRobotToLeftCam );
-    RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.ROBOT_TO_CAMERA_Rear );
+    // RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.ROBOT_TO_CAMERA_Rear );
 
   }
   private void ProcessVision4920()

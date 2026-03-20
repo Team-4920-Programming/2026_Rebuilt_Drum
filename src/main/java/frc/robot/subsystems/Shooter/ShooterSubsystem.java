@@ -20,6 +20,7 @@ import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.config.ServoHubConfig;
 import com.revrobotics.servohub.config.ServoChannelConfig.BehaviorWhenDisabled;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
@@ -45,8 +46,9 @@ public class ShooterSubsystem extends SubsystemBase {
   private final TalonFX Mtr_Shooter2 = new TalonFX(Constants.Can_Shooter2);
   private final TalonFX Mtr_Feeder = new TalonFX(Constants.Can_Feeder);
   private final TalonFX Mtr_Roller = new TalonFX(Constants.Can_Rollers);
-  
+  private final SparkMax Mtr_Hood = new SparkMax(Constants.Can_Hood,MotorType.kBrushless);
  
+  
   //SparkFlex Configs
   SparkFlexConfig mtrCfg_Shooter1 = new SparkFlexConfig();
   SparkFlexConfig mtrCfg_Shooter2 = new SparkFlexConfig();
@@ -60,10 +62,10 @@ public class ShooterSubsystem extends SubsystemBase {
   // RelativeEncoder enc_Feeder = Mtr_Feeder.getEncoder();
 
   //Other Speeds
-  double RollerSpeed = 1;
-  double FeederSpeed = 1;
+  double RollerSpeed = -0.8;
+  double FeederSpeed = 0.8;
   double ShooterIdleSpeed =0;
-  
+  double HoodSpeed = 0.3;
 
   //Critical Motor Currents
   double RollerCurrent =0;
@@ -190,9 +192,14 @@ Feed = true;
 // }
 }
 
+public void SetHoodSpeed(double speed){
+  Mtr_Hood.set(speed);
+}
+
   public void SetShooterSpeed(double speed)
   {
-    PID_Shooter1.setSetpoint(speed);
+    //PID_Shooter1.setSetpoint(speed);
+    Mtr_Shooter1.set(speed);
     
   }
   public void SetRollerSpeed (double speed)
@@ -354,25 +361,25 @@ else {
     // FeederCurrent = Mtr_Feeder.getOutputCurrent();
     // Shooter1Current = Mtr_Shooter1.getOutputCurrent();
     // Shooter2Current = Mtr_Shooter2.getOutputCurrent();
-    if (Shoot){
-    SOTFCalc(); 
-  }
-else {
+//     if (Shoot){
+//     SOTFCalc(); 
+//   }
+// else {
  
-  SetShooterSpeed(ShooterIdleSpeed);
-  Feed = false;
+//   SetShooterSpeed(ShooterIdleSpeed);
+//   Feed = false;
   
-}
+// }
  
-if (Feed){
-SetFeederSpeed(FeederSpeed);
-SetRollerSpeed(RollerSpeed);
-}
-  else if (!Feed){
-SetFeederSpeed(0);
-SetRollerSpeed(0);
+// if (Feed){
+// SetFeederSpeed(FeederSpeed);
+// SetRollerSpeed(RollerSpeed);
+// }
+//   else if (!Feed){
+// SetFeederSpeed(0);
+// SetRollerSpeed(0);
 
-  }
+//   }
     // DogLog.log("Shooter/Shooter1Speed",enc_Shooter1.getVelocity(),"rpm");
     // DogLog.log("Shooter/Shooter2Speed",enc_Shooter2.getVelocity(),"rpm");
     // DogLog.log("Shooter/RollerSpeed",enc_Roller.getVelocity(),"rpm");

@@ -34,6 +34,8 @@ import frc.robot.subsystems.Climber.*;
 import frc.robot.subsystems.DataHighway.*;
 import frc.robot.commands.shooter.auto.CmdA_ShootTillEmpty;
 import frc.robot.commands.shooter.tele.*;
+import frc.robot.commands.Climber.tele.CmdT_Climb;
+import frc.robot.commands.Climber.tele.CmdT_ClimberUp;
 import frc.robot.commands.Drive.CmdT_DepotAutoAim;
 import frc.robot.commands.Drive.CmdT_DisableAutoAim;
 import frc.robot.commands.Drive.CmdT_EnableAutoAim;
@@ -46,7 +48,7 @@ import frc.robot.commands.Drive.CmdT_OutpostAutoAim;
 // import frc.robot.commands.Intake.Auto.*;
 import frc.robot.commands.Intake.Tele.*;
 import frc.robot.commands.Intake.auto.CmdA_RunIntake;
-import frc.robot.commands.Intake.Tele.CmdT_RunIntake;
+
 import static edu.wpi.first.units.Units.RPM;
 
 import java.io.File;
@@ -223,13 +225,20 @@ public class RobotContainer
 
         //driverXbox.a().whileTrue(Shooter.setVelocity(RPM.of(5000)));
        // driverXbox.a().onFalse(Shooter.setVelocity(RPM.of(0)));
-        driverXbox.x().whileTrue(new CmdT_SetIntakeAngle(Intake, 70));
-        driverXbox.x().whileFalse(new CmdT_SetIntakeAngle(Intake, 5));
-        driverXbox.y().whileTrue(new CmdT_RunIntake(Intake));
+        
+       // driverXbox.x().whileTrue(new CmdT_SetIntakeAngle(Intake, 70));
+        // driverXbox.x().whileFalse(new CmdT_SetIntakeAngle(Intake, 5));
+        driverXbox.x().whileTrue(new CmdT_TipperUp(Intake));
+        driverXbox.b().whileTrue(new CmdT_TipperDown(Intake));
+         driverXbox.y().whileTrue(new CmdT_RunIntake(Intake));
        // driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
        // driverXbox.leftBumper().onTrue(new CmdT_DisableAutoAim(drivebase));
+       driverXbox.leftTrigger().whileTrue(new CmdT_RampUpShooter(Shooter));
         driverXbox.rightTrigger().whileTrue(new CmdT_AutoShoot(Shooter, drivebase));
-        
+        driverXbox.povDown().whileTrue(new CmdT_HoodDown(Shooter));
+        driverXbox.povUp().whileTrue(new CmdT_HoodUp(Shooter));
+        driverXbox.povLeft().whileTrue(new CmdT_Climb(Climber));
+        driverXbox.povRight().whileTrue(new CmdT_ClimberUp(Climber));
         // driverXbox.rightTrigger().whileTrue(new CmdT_OutpostAutoAim(drivebase));
        // driverXbox.leftTrigger().whileTrue(new CmdT_DepotAutoAim(drivebase));
          // Pre-match calibration routine - Back + Start buttons together
