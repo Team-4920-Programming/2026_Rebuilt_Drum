@@ -47,6 +47,8 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.DataHighway.ShooterLookupTable;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -113,6 +115,8 @@ public class SwerveSubsystem extends SubsystemBase
   public double DHOut_HubPoseX= 0;
   public double DHOut_HubPoseY= 0;
   public double DHIn_reqRobotAngle =0;
+  public Pose2d DHOUT_RobotPose = Pose2d.kZero;
+  public ShooterLookupTable DHIn_ShooterLookupTable;
   // public double DHOut_robotY = getPose().getY();
   // public double DHOut_robotX = getPose().getX();
   
@@ -354,19 +358,21 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
   }
   public void UpdateDataHighway()
   {
-   AprilTagFieldLayout fieldLayout = AprilTagFields.k2026RebuiltWelded.loadAprilTagLayoutField();
+    AprilTagFieldLayout fieldLayout = AprilTagFields.k2026RebuiltWelded.loadAprilTagLayoutField();
 
-    DHOut_InAllianceZone = false;
-    DHOut_InNeutralZone = false;
-    DHOut_InBumpZone = false;
+      DHOut_InAllianceZone = false;
+      DHOut_InNeutralZone = false;
+      DHOut_InBumpZone = false;
+      DHOUT_RobotPose = getPose();
       Pose2d BlueHubPose = new Pose2d(4.626,4.0,new Rotation2d().fromDegrees(0));
       Pose2d RedHubPose = new Pose2d(11.9,4.0, new Rotation2d().fromDegrees(0));
       Pose2d BlueOutpostCorner = new Pose2d(1,1,new Rotation2d().fromDegrees(0));
       Pose2d BlueDepotCorner = new Pose2d(1,fieldLayout.getFieldWidth() -1, new Rotation2d().fromDegrees(0));
       Pose2d RedOutpostCorner = new Pose2d(fieldLayout.getFieldLength() -1, fieldLayout.getFieldWidth() -1, new Rotation2d().fromDegrees(0));
       Pose2d RedDepotCorner = new Pose2d(fieldLayout.getFieldLength() -1, 1, new Rotation2d().fromDegrees(0));
-  double OutpostCornerDist = 0;
-  double DepotCornerDist  =0;
+      double OutpostCornerDist = 0;
+      double DepotCornerDist  =0;
+      
   
       if (isRedAlliance())
       {

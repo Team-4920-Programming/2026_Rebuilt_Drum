@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.RobotController;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.DataHighway.ShooterLookupTable;
 
 public class ShooterSubsystem extends SubsystemBase {
    //Motors
@@ -93,7 +94,7 @@ public class ShooterSubsystem extends SubsystemBase {
    public double DHIn_HubPoseX = 0;
    public double DHIn_HubPoseY =0;
    public double DHOut_reqRobotAngle =0;
-   
+   public ShooterLookupTable DHIn_ShooterLookupTable;
    
    
   
