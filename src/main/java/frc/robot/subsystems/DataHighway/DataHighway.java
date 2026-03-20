@@ -4,12 +4,26 @@
 
 package frc.robot.subsystems.DataHighway;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.ADXL345_I2C.AllAxes;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Shooter.*;
@@ -49,6 +63,31 @@ public class DataHighway extends SubsystemBase {
     OPPONENTSCORINGZONE
   }
 
+  public final AprilTagFieldLayout fieldLayout = AprilTagFields.k2026RebuiltWelded.loadAprilTagLayoutField();
+
+  public enum TargetPoses {
+    BLUEALLIANCEHUB(Pose2d.kZero),
+    BLUEALLIANCEPASSDRIVERLEFT(Pose2d.kZero),
+    BLUEALLIANCEPASSDRIVERRIGHT(Pose2d.kZero),
+    REDALLIANCEHUB(Pose2d.kZero),
+    REDALLIANCEPASSDRIVERLEFT(Pose2d.kZero),
+    REDALLIANCEPASSDRIVERRIGHT(Pose2d.kZero);
+  
+    private Pose2d targetPose;
+
+    // Constructor
+    TargetPoses(Pose2d pose) {
+        this.targetPose = pose;
+    }
+    // Getter
+    public Pose2d getValue() {
+        return this.targetPose;
+    }
+    public void setTargetPose(Pose2d pose) {
+        this.targetPose = pose;
+    }
+  }
+
   private static enum ShiftSchedule{
     MATCH_START(160.0),
     AUTO_END(140.0),
@@ -84,6 +123,8 @@ public class DataHighway extends SubsystemBase {
   MatchPhase currentMatchPhase = MatchPhase.UNKNOWN;
   boolean gameDataUpdated = false;
   String gameData;
+  boolean targetSetup = false;
+  boolean validTargetSetup = false;
 
 
   //Subsystems
@@ -111,6 +152,8 @@ public class DataHighway extends SubsystemBase {
   double DH_matchTime = 0;
   boolean DH_safeToShoot = false;
   Pose2d DH_robotPose = new Pose2d().kZero;
+  List<Pose2d> passTargetList = new ArrayList<>();
+  Pose2d hubPose = new Pose2d().kZero;
   ShooterLookupTable DH_ShooterLookupTable = new ShooterLookupTable();
 
   /** Creates a new DataHighway. */
@@ -125,17 +168,21 @@ public class DataHighway extends SubsystemBase {
   @Override
   public void periodic() {
 
+
+    GetDHData();
+    DogLogData();
+    SetDHData();
+    updateTargetData();
+    updateValidTargetData();
     updateMatchTime();
     updateGameData();
     updateMatchPhase();
     updateActiveHub();
     updateCurrentZone();
+
+    updateLogs();
     
     DH_safeToShoot = CalculateSafeToShoot();
-
-    GetDHData();
-    DogLogData();
-    SetDHData();
     // This method will be called once per scheduler run
   }
 
@@ -146,6 +193,56 @@ public class DataHighway extends SubsystemBase {
     }
     else{
       DH_matchTime = 160.0 - DriverStation.getMatchTime();
+    }
+  }
+
+  private void updateLogs(){
+    DogLog.log("Data/Targets/BLUEALLIANCEHUB", TargetPoses.BLUEALLIANCEHUB.getValue());
+    DogLog.log("Data/Targets/REDALLIANCEHUB", TargetPoses.REDALLIANCEHUB.getValue());
+
+    DogLog.log("Data/Targets/BLUEALLIANCEPASSDRIVERLEFT", TargetPoses.BLUEALLIANCEPASSDRIVERLEFT.getValue());
+    DogLog.log("Data/Targets/BLUEALLIANCEPASSDRIVERRIGHT", TargetPoses.BLUEALLIANCEPASSDRIVERRIGHT.getValue());
+
+    DogLog.log("Data/Targets/REDALLIANCEPASSDRIVERLEFT", TargetPoses.REDALLIANCEPASSDRIVERLEFT.getValue());
+    DogLog.log("Data/Targets/REDALLIANCEPASSDRIVERRIGHT", TargetPoses.REDALLIANCEPASSDRIVERRIGHT.getValue());
+
+    for (var tag : fieldLayout.getTags()){
+      String id = String.format("Data/AprilTags/AprilTag%s", tag.ID);
+      DogLog.log(id, tag.pose);
+    }
+  }
+
+  private void updateTargetData(){
+
+    if (targetSetup == false){
+      TargetPoses.BLUEALLIANCEHUB.setTargetPose(new Pose2d(4.6316, 4.035, Rotation2d.k180deg));
+      TargetPoses.REDALLIANCEHUB.setTargetPose(new Pose2d(11.9094, 4.035, Rotation2d.kZero));
+
+      
+      TargetPoses.BLUEALLIANCEPASSDRIVERLEFT.setTargetPose(new Pose2d(2.4124, 6.1686, Rotation2d.k180deg));
+      TargetPoses.BLUEALLIANCEPASSDRIVERRIGHT.setTargetPose(new Pose2d(2.4124, 1.9014, Rotation2d.k180deg));
+      
+      TargetPoses.REDALLIANCEPASSDRIVERLEFT.setTargetPose(new Pose2d(14.1276, 1.9014, Rotation2d.kZero));
+      TargetPoses.REDALLIANCEPASSDRIVERRIGHT.setTargetPose(new Pose2d(14.1276, 6.1686, Rotation2d.kZero));
+      targetSetup = true;
+  
+    }
+  }
+
+  private void updateValidTargetData(){
+
+    if (targetSetup && !validTargetSetup && allianceColor != AllianceColor.UNKNOWN){
+      if (allianceColor == AllianceColor.BLUE){
+        passTargetList.add(TargetPoses.BLUEALLIANCEPASSDRIVERLEFT.getValue());
+        passTargetList.add(TargetPoses.BLUEALLIANCEPASSDRIVERRIGHT.getValue());
+        hubPose = TargetPoses.BLUEALLIANCEHUB.getValue();
+      }
+      else{
+        passTargetList.add(TargetPoses.REDALLIANCEPASSDRIVERLEFT.getValue());
+        passTargetList.add(TargetPoses.REDALLIANCEPASSDRIVERRIGHT.getValue());
+        hubPose = TargetPoses.REDALLIANCEHUB.getValue();
+      }
+      validTargetSetup = true;
     }
   }
 
