@@ -219,7 +219,7 @@ public class RobotContainer
 //       //driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 //       driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 //       driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-         driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+        driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
          //driverXbox.a().whileTrue(new DriveToTargetV0_1(drivebase));
         driverXbox.a().whileTrue(new CmdT_ShootTillEmpty(Shooter));
 
@@ -235,10 +235,10 @@ public class RobotContainer
        // driverXbox.leftBumper().onTrue(new CmdT_DisableAutoAim(drivebase));
        driverXbox.leftTrigger().whileTrue(new CmdT_RampUpShooter(Shooter));
         driverXbox.rightTrigger().whileTrue(new CmdT_AutoShoot(Shooter, drivebase));
-        driverXbox.povDown().whileTrue(new CmdT_HoodDown(Shooter));
         driverXbox.povUp().whileTrue(new CmdT_HoodUp(Shooter));
-        driverXbox.povLeft().whileTrue(new CmdT_Climb(Climber));
-        driverXbox.povRight().whileTrue(new CmdT_ClimberUp(Climber));
+        driverXbox.povDown().whileTrue(new CmdT_HoodDown(Shooter));
+        driverXbox.povLeft().whileTrue(new CmdT_Manual_SlowDownShooter(Shooter));
+        driverXbox.povRight().whileTrue(new CmdT_Manual_SpeedUpShooter(Shooter));
         // driverXbox.rightTrigger().whileTrue(new CmdT_OutpostAutoAim(drivebase));
        // driverXbox.leftTrigger().whileTrue(new CmdT_DepotAutoAim(drivebase));
          // Pre-match calibration routine - Back + Start buttons together

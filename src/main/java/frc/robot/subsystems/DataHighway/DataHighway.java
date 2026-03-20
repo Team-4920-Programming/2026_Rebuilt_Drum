@@ -153,7 +153,7 @@ public class DataHighway extends SubsystemBase {
   boolean DH_safeToShoot = false;
   Pose2d DH_robotPose = new Pose2d().kZero;
   List<Pose2d> passTargetList = new ArrayList<>();
-  Pose2d hubPose = new Pose2d().kZero;
+  Pose2d DH_HubPose = new Pose2d().kZero;
   ShooterLookupTable DH_ShooterLookupTable = new ShooterLookupTable();
 
   /** Creates a new DataHighway. */
@@ -181,6 +181,7 @@ public class DataHighway extends SubsystemBase {
     updateCurrentZone();
 
     updateLogs();
+    calculateShotDistance();
     
     DH_safeToShoot = CalculateSafeToShoot();
     // This method will be called once per scheduler run
@@ -196,6 +197,11 @@ public class DataHighway extends SubsystemBase {
     }
   }
 
+  private void calculateShotDistance(){
+    DH_ShotDistance = DH_HubPose.getTranslation().getDistance(DH_robotPose.getTranslation());
+
+  }
+
   private void updateLogs(){
     DogLog.log("Data/Targets/BLUEALLIANCEHUB", TargetPoses.BLUEALLIANCEHUB.getValue());
     DogLog.log("Data/Targets/REDALLIANCEHUB", TargetPoses.REDALLIANCEHUB.getValue());
@@ -206,10 +212,16 @@ public class DataHighway extends SubsystemBase {
     DogLog.log("Data/Targets/REDALLIANCEPASSDRIVERLEFT", TargetPoses.REDALLIANCEPASSDRIVERLEFT.getValue());
     DogLog.log("Data/Targets/REDALLIANCEPASSDRIVERRIGHT", TargetPoses.REDALLIANCEPASSDRIVERRIGHT.getValue());
 
-    for (var tag : fieldLayout.getTags()){
-      String id = String.format("Data/AprilTags/AprilTag%s", tag.ID);
-      DogLog.log(id, tag.pose);
+    DogLog.log("Data/Targets/HUBPOSE", DH_HubPose);
+
+    for (int i = 0 ; i < passTargetList.size(); i++){
+      String id = String.format("Data/Targets/PassTarget_%d",i);
+      DogLog.log(id, passTargetList.get(i));
     }
+
+    DogLog.log("Data/ShotData/DistancefromHub", DH_ShotDistance);
+
+
   }
 
   private void updateTargetData(){
@@ -235,12 +247,12 @@ public class DataHighway extends SubsystemBase {
       if (allianceColor == AllianceColor.BLUE){
         passTargetList.add(TargetPoses.BLUEALLIANCEPASSDRIVERLEFT.getValue());
         passTargetList.add(TargetPoses.BLUEALLIANCEPASSDRIVERRIGHT.getValue());
-        hubPose = TargetPoses.BLUEALLIANCEHUB.getValue();
+        DH_HubPose = TargetPoses.BLUEALLIANCEHUB.getValue();
       }
       else{
         passTargetList.add(TargetPoses.REDALLIANCEPASSDRIVERLEFT.getValue());
         passTargetList.add(TargetPoses.REDALLIANCEPASSDRIVERRIGHT.getValue());
-        hubPose = TargetPoses.REDALLIANCEHUB.getValue();
+        DH_HubPose = TargetPoses.REDALLIANCEHUB.getValue();
       }
       validTargetSetup = true;
     }
@@ -374,7 +386,6 @@ public class DataHighway extends SubsystemBase {
   
   private void GetDHData()
   {
-    DH_ShotDistance = SS_Swerve.DHOut_HubDistance;
     DH_AutoAim = SS_Swerve.isAutoAim();
     DH_AngleToHub = SS_Swerve.DHOut_AngleToHub;
     DH_Aimed = SS_Swerve.DHOut_Aimed;
@@ -406,6 +417,7 @@ public class DataHighway extends SubsystemBase {
     SS_Swerve.DHIn_reqRobotAngle = DH_reqRobotAngle;
     SS_Shooter.DHIn_ShooterLookupTable = DH_ShooterLookupTable;
     SS_Swerve.DHIn_ShooterLookupTable = DH_ShooterLookupTable;
+    SS_Swerve.DHIn_ShotDistance = DH_ShotDistance;
   }
 
   

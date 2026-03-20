@@ -8,7 +8,9 @@ import static edu.wpi.first.units.Units.Newton;
 
 import java.util.function.DoubleSupplier;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.revrobotics.PersistMode;
@@ -43,16 +45,14 @@ import frc.robot.subsystems.DataHighway.ShooterLookupTable;
 
 public class ShooterSubsystem extends SubsystemBase {
    //Motors
-   private final TalonFX Mtr_Shooter1 = new TalonFX(Constants.Can_Shooter1);
-  private final TalonFX Mtr_Shooter2 = new TalonFX(Constants.Can_Shooter2);
-  private final TalonFX Mtr_Feeder = new TalonFX(Constants.Can_Feeder);
-  private final TalonFX Mtr_Roller = new TalonFX(Constants.Can_Rollers);
-  private final SparkMax Mtr_Hood = new SparkMax(Constants.Can_Hood,MotorType.kBrushless);
+  private final TalonFX shooterMotor1 = new TalonFX(Constants.Can_Shooter1);
+  private final TalonFX shooterMotor2 = new TalonFX(Constants.Can_Shooter2);
+  private final TalonFX feederMotor = new TalonFX(Constants.Can_Feeder);
+  private final TalonFX rollerMotor = new TalonFX(Constants.Can_Rollers);
+  private final SparkMax hoodMotor = new SparkMax(Constants.Can_Hood,MotorType.kBrushless);
  
   
   //SparkFlex Configs
-  SparkFlexConfig mtrCfg_Shooter1 = new SparkFlexConfig();
-  SparkFlexConfig mtrCfg_Shooter2 = new SparkFlexConfig();
   SparkFlexConfig mtrCfg_Feeder = new SparkFlexConfig();
   SparkFlexConfig mtrCfg_Roller = new SparkFlexConfig();
 
@@ -65,8 +65,11 @@ public class ShooterSubsystem extends SubsystemBase {
   //Other Speeds
   double RollerSpeed = -0.8;
   double FeederSpeed = 0.8;
-  double ShooterIdleSpeed =0;
+  double m_shooterSpeed = 0.0;
   double HoodSpeed = 0.3;
+
+  //Shooter Velocity Control
+  private final VelocityVoltage m_shooterMotorVelocityRequest  = new VelocityVoltage(0).withSlot(0);
 
   //Critical Motor Currents
   double RollerCurrent =0;
@@ -77,153 +80,118 @@ public class ShooterSubsystem extends SubsystemBase {
   double FeederJammedCurrent = 20;
   boolean unJamRoller = false;
   boolean unJamFeeder = false;
-  double  JamRollerTime = 0;
+  double JamRollerTime = 0;
   double JamFdderTimer = 0;
+
+  //Mechanism State Flags
+  private boolean shooterEnabled = false;
+  private boolean feederEnabled = false;
+  private boolean rollerEnabled = false;
 
 
   public double DHIn_ShotDistance = 0;
   public boolean DHIn_AutoShoot = false;
   public double AngleToHub =0;
   public boolean DHIn_Aimed = false;
-   private boolean Shoot = false;
-   private boolean Feed = false;
-   public boolean DHIn_InAllianceZone = false;
-   public boolean DHIn_InNeutralZone = false;
-   public double DHIn_AngleToOutpost = 0;
-   public double DHIn_AngleToDepot = 0;
-   public double DHIn_CornerDistance = 0;
-   public ChassisSpeeds DHIn_FieldVelocity = new ChassisSpeeds(0,0,0);
-   public double DHIn_HubPoseX = 0;
-   public double DHIn_HubPoseY =0;
-   public double DHOut_reqRobotAngle =0;
-   public ShooterLookupTable DHIn_ShooterLookupTable;
-   
-   
-  
 
-
-
-  //Servo
- 
-
-
-  
-
-  //PIDs
-  PIDController PID_Shooter1 = new PIDController(.000167, 0, 0.0);
-  
-  SimpleMotorFeedforward FF_Shooter1 = new SimpleMotorFeedforward(0, 0.00017);
+  public boolean DHIn_InAllianceZone = false;
+  public boolean DHIn_InNeutralZone = false;
+  public double DHIn_AngleToOutpost = 0;
+  public double DHIn_AngleToDepot = 0;
+  public double DHIn_CornerDistance = 0;
+  public ChassisSpeeds DHIn_FieldVelocity = new ChassisSpeeds(0,0,0);
+  public double DHIn_HubPoseX = 0;
+  public double DHIn_HubPoseY =0;
+  public double DHOut_reqRobotAngle =0;
+  public ShooterLookupTable DHIn_ShooterLookupTable;
    
 
   DoubleSupplier ShooterKP = DogLog.tunable("Shooter/kp", 0.000167);
   DoubleSupplier ShooterKD = DogLog.tunable("Shooter/kD", 0.000);
-   DoubleSupplier ShooterKv = DogLog.tunable("Shooter/kv", 0.00017);
+  DoubleSupplier ShooterKv = DogLog.tunable("Shooter/kv", 0.00017);
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
     //Setup Motors
-    mtrCfg_Shooter1.smartCurrentLimit(60);
-    mtrCfg_Shooter1.idleMode(IdleMode.kCoast);
-    //Mtr_Shooter1.configure(mtrCfg_Shooter1,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    
-    mtrCfg_Shooter2.smartCurrentLimit(60);
-    mtrCfg_Shooter2.idleMode(IdleMode.kCoast);
-   // Mtr_Shooter2.configure(mtrCfg_Shooter1,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    mtrCfg_Feeder.smartCurrentLimit(40);
-    mtrCfg_Feeder.idleMode(IdleMode.kCoast);
-   // Mtr_Feeder.configure(mtrCfg_Shooter1,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    mtrCfg_Roller.smartCurrentLimit(40);
-    mtrCfg_Roller.idleMode( IdleMode.kCoast);
-   // Mtr_Roller.configure(mtrCfg_Shooter1,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    
-    Mtr_Shooter2.setControl(new Follower(Mtr_Shooter1.getDeviceID(), MotorAlignmentValue.Opposed));
-
-    //Setup PIDs
-    PID_Shooter1.setTolerance(100);
-    // PID_Shooter2.setTolerance(100);
-
-    //setup Servohub
-   
+    var talonFXConfigs = new TalonFXConfiguration();
+    talonFXConfigs.Slot0.kP = 0.000167; // Example P gain
+    talonFXConfigs.Slot0.kI = 0.0;
+    talonFXConfigs.Slot0.kD = 0.0;
+    talonFXConfigs.Slot0.kV = 0.00017; // Example Velocity Feedforward V/rps
+    talonFXConfigs.Slot0.kA = 0.0;
+    shooterMotor1.getConfigurator().apply(talonFXConfigs);
+    shooterMotor2.setControl(new Follower(shooterMotor1.getDeviceID(), MotorAlignmentValue.Opposed));
 
 
   }
 
 public void SOTFCalc(){
 
-double IdealSpeed = getShooterSpeedForDistance(DHIn_ShotDistance);
-  Translation2d targetPosition = new Translation2d(DHIn_HubPoseX, DHIn_HubPoseY);
+  // double IdealSpeed = getShooterSpeedForDistance(DHIn_ShotDistance);
+  // Translation2d targetPosition = new Translation2d(DHIn_HubPoseX, DHIn_HubPoseY);
 
-  Translation2d targetVector = targetPosition.div(DHIn_ShotDistance).times(IdealSpeed);
+  // Translation2d targetVector = targetPosition.div(DHIn_ShotDistance).times(IdealSpeed);
   
-  Translation2d robotVelocity = new Translation2d(DHIn_FieldVelocity.vxMetersPerSecond, DHIn_FieldVelocity.vyMetersPerSecond);
-  Translation2d shotVector = targetVector.minus(robotVelocity);
+  // Translation2d robotVelocity = new Translation2d(DHIn_FieldVelocity.vxMetersPerSecond, DHIn_FieldVelocity.vyMetersPerSecond);
+  // Translation2d shotVector = targetVector.minus(robotVelocity);
 
-  double requiredRobotAngle = shotVector.getAngle().getDegrees();
-double requiredSpeed = shotVector.getNorm();
-double shooterRPM = (requiredSpeed);
-// DHOut_reqRobotAngle = requiredRobotAngle -180;
+  // double requiredRobotAngle = shotVector.getAngle().getDegrees();
+  // double requiredSpeed = shotVector.getNorm();
+  // double shooterRPM = (requiredSpeed);
+  // // DHOut_reqRobotAngle = requiredRobotAngle -180;
 
-if (requiredRobotAngle > 0) {
-DHOut_reqRobotAngle = requiredRobotAngle -182.5;
-}
-else {
-DHOut_reqRobotAngle = requiredRobotAngle -180;
-}
-if (Shoot && DHIn_InAllianceZone){
- SetShooterSpeed(shooterRPM);
-if (ShooterAtSpeed()){
-Feed = true;
+  // if (requiredRobotAngle > 0) {
+  // DHOut_reqRobotAngle = requiredRobotAngle -182.5;
+  // }
+  // else {
+  // DHOut_reqRobotAngle = requiredRobotAngle -180;
+  // }
+  // if (Shoot && DHIn_InAllianceZone){
+  // SetShooterSpeed(shooterRPM);
+  // if (ShooterAtSpeed()){
+  // Feed = true;
+  // }
+
+  
+  // }
+  // else if (Shoot && DHIn_InNeutralZone){
+  // CornerShoot();
+  // if (ShooterAtSpeed()){
+  // Feed = true;
+  // }
+  // }
+
+  // else {
+  //   RollerSpeed = 0;
+  //   FeederSpeed = 0;
+  //   SetShooterSpeeds(0);
+  //   SetRollerSpeed(RollerSpeed);
+  // SetFeederSpeed(FeederSpeed);
+  // }
 }
 
- 
-}
-else if (Shoot && DHIn_InNeutralZone){
-CornerShoot();
-if (ShooterAtSpeed()){
-Feed = true;
-}
-}
-
-// else {
-//   RollerSpeed = 0;
-//   FeederSpeed = 0;
-//   SetShooterSpeeds(0);
-//   SetRollerSpeed(RollerSpeed);
-// SetFeederSpeed(FeederSpeed);
-// }
-}
-
-public void SetHoodSpeed(double speed){
-  Mtr_Hood.set(speed);
-}
+  public void SetHoodSpeed(double speed){
+    hoodMotor.set(speed);
+  }
 
   public void SetShooterSpeed(double speed)
   {
-    //PID_Shooter1.setSetpoint(speed);
-    Mtr_Shooter1.set(speed);
-    
+    m_shooterSpeed = speed; 
   }
   public void SetRollerSpeed (double speed)
   {
-    Mtr_Roller.set(speed);
+    rollerMotor.set(speed);
   }
   public void SetFeederSpeed (double speed)
   {
-    Mtr_Feeder.set(speed);
-  }
-
-  public boolean ShooterAtSpeed ()
-  {
-    return PID_Shooter1.atSetpoint() ; // || enc_Shooter1.getVelocity()>3000
-    //return (enc_Shooter1.getVelocity()>3000);
+    feederMotor.set(speed);
   }
 
   public void EnableShooter(){
-    Shoot = true;
-    
+    shooterEnabled = true;
   }
 public void DisableShooter(){
-    Shoot = false;
+    shooterEnabled = false;
    
   }
 
@@ -352,78 +320,43 @@ else {
 
   @Override
   public void periodic() {
-    PID_Shooter1.setD(ShooterKD.getAsDouble());
-   
-    PID_Shooter1.setP(ShooterKP.getAsDouble());
-    
-    FF_Shooter1.setKv(ShooterKv.getAsDouble());
-    
-    // RollerCurrent = Mtr_Roller.getOutputCurrent();
-    // FeederCurrent = Mtr_Feeder.getOutputCurrent();
-    // Shooter1Current = Mtr_Shooter1.getOutputCurrent();
-    // Shooter2Current = Mtr_Shooter2.getOutputCurrent();
-//     if (Shoot){
-//     SOTFCalc(); 
-//   }
-// else {
- 
-//   SetShooterSpeed(ShooterIdleSpeed);
-//   Feed = false;
-  
-// }
- 
-// if (Feed){
-// SetFeederSpeed(FeederSpeed);
-// SetRollerSpeed(RollerSpeed);
-// }
-//   else if (!Feed){
-// SetFeederSpeed(0);
-// SetRollerSpeed(0);
 
-//   }
+    updateLogs();
+    ControlShooter();
+
+    
     // DogLog.log("Shooter/Shooter1Speed",enc_Shooter1.getVelocity(),"rpm");
     // DogLog.log("Shooter/Shooter2Speed",enc_Shooter2.getVelocity(),"rpm");
     // DogLog.log("Shooter/RollerSpeed",enc_Roller.getVelocity(),"rpm");
     // DogLog.log("Shooter/FeederSpeed",enc_Feeder.getVelocity(),"rpm");
 
+
+   
+
+  }
+
+  private void updateLogs(){
+
     DogLog.log("Shooter/Shooter1Amps", Shooter1Current,"amps");
     DogLog.log("Shooter/Shooter2Amps", Shooter2Current,"amps");
     DogLog.log("Shooter/FeederAmps", FeederCurrent,"amps");
     DogLog.log("Shooter/RollerAmps", RollerCurrent,"amps");
-    DogLog.log("Shooter/Shooter1Setpoint", PID_Shooter1.getSetpoint());
-   
-    DogLog.log("Shooter/Shoot",Shoot);
-DogLog.log("Fieldinfo/reqRobotAngle",DHOut_reqRobotAngle);
+    DogLog.log("Shooter/Enabled",shooterEnabled);
+    DogLog.log("Fieldinfo/reqRobotAngle",DHOut_reqRobotAngle);
+    DogLog.log("Shooter/SavedShooterSpeedRPM", m_shooterSpeed / 60.0);
+    DogLog.log("Shooter/ActualShooterSpeedRPM", shooterMotor1.getVelocity().getValueAsDouble() * 60.0);
 
-
-    // if (PID_Shooter1.getSetpoint() > 500)
-    // {
-    //   double mtrSpeed = PID_Shooter1.calculate(enc_Shooter1.getVelocity())+ FF_Shooter1.calculate(PID_Shooter1.getSetpoint());
-    //   Mtr_Shooter1.set(mtrSpeed);
-    //   DogLog.log("Shooter/MotorCmd",mtrSpeed);
-    // }
-    // else 
-    //   Mtr_Shooter1.set(0);
-    // if (PID_Shooter2.getSetpoint() > 500)
-    //     Mtr_Shooter2.set(PID_Shooter1.calculate(enc_Shooter2.getVelocity())+ FF_Shooter2.calculate(PID_Shooter2.getSetpoint()));
-    // else 
-    //   Mtr_Shooter2.set(0);
-
-
-    // Mtr_Roller.set(RollerSpeed);
-    // Mtr_Feeder.set(FeederSpeed);
-
-
-
-
-    
-    // This method will be called once per scheduler run
-    UpdateDataHighway();
   }
-    public void UpdateDataHighway()
-  {
-    //Set Variables from Datahighway
 
-    //Set Variable to DataHighway
+  private void ControlShooter(){
+    if (shooterEnabled)
+    shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(m_shooterSpeed / 60.0));
+  else
+    shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(0.0 / 60.0));
   }
+
+  public void ChangeShooterSpeed(double delta){
+        SetShooterSpeed(m_shooterSpeed + delta);
+  }
+
 }
