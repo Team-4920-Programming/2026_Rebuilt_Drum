@@ -42,6 +42,8 @@ public class DataHighway extends SubsystemBase {
   double DH_AngleToDepot = 0;
   double DH_CornerDistance = 0;
 
+  
+
   /** Creates a new DataHighway. */
     public DataHighway(SwerveSubsystem SwerveSS, ShooterSubsystem ShooterSS, ClimberSubsystem ClimberSS, IntakeSubsystem IntakeSS) {
       SS_Shooter = ShooterSS;
@@ -94,6 +96,7 @@ DH_HubPoseX = SS_Swerve.DHOut_HubPoseX;
 DH_HubPoseY = SS_Swerve.DHOut_HubPoseY;
 DH_reqRobotAngle = SS_Shooter.DHOut_reqRobotAngle;
 
+
   }
   private void SetDHData(){
 SS_Shooter.DHIn_ShotDistance = DH_ShotDistance;
@@ -109,5 +112,7 @@ SS_Shooter.DHIn_FieldVelocity = DH_FieldVelocity;
 SS_Shooter.DHIn_HubPoseX = DH_HubPoseX;
 SS_Shooter.DHIn_HubPoseY = DH_HubPoseY;
 SS_Swerve.DHIn_reqRobotAngle = DH_reqRobotAngle;
+
+
   }
 }

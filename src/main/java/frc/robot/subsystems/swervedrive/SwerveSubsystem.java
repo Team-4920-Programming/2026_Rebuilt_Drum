@@ -110,13 +110,16 @@ public class SwerveSubsystem extends SubsystemBase
  public double DHOut_AngleToHub = 0;
  public double DHOut_AngleToDepot = 0;
   public double DHOut_AngleToOutpost = 0;
-  public double DHOut_HubPoseX;
-  public double DHOut_HubPoseY;
-  public double DHIn_reqRobotAngle;
-  
+  public double DHOut_HubPoseX= 0;
+  public double DHOut_HubPoseY= 0;
+  public double DHIn_reqRobotAngle =0;
+  // public double DHOut_robotY = getPose().getY();
+  // public double DHOut_robotX = getPose().getX();
   
   
 
+  public double DHOut_robotY = 0;
+  public double DHOut_robotX = 0;
 //variables
   private boolean AutoAimEnabled = false;
   private Pose2d AutoAimTarget = new Pose2d();
@@ -414,7 +417,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
         DHOut_AngleToHub = Math.abs (AutoAimAngle - getPose().getRotation().getDegrees());
         DHOut_AngleToOutpost = Math.abs (OutpostAngle - getPose().getRotation().getDegrees());
         DHOut_AngleToDepot = Math.abs (DepotAngle - getPose().getRotation().getDegrees());
-        DHOut_HubPoseX = 4.626 - getPose().getY();
+        DHOut_HubPoseX = 4.626 - getPose().getX();
         DHOut_HubPoseY = 4 - getPose().getY();
         DogLog.log("Fieldinfo/Hub2Robot",Hub2Robot);
         DogLog.log("Fieldinfo/HubPose",BlueHubPose);

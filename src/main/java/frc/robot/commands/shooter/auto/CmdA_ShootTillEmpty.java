@@ -35,26 +35,26 @@ public class CmdA_ShootTillEmpty extends Command {
 
     double ShooterSpeed = 5000;
     double FeederSpeed = 1;
-    double AugerSpeed = .5;
+    double RollerSpeed = .5;
     //m_shooter.setVelocity(RPM.of(3000));
-    m_shooter.SetShooterSpeeds(ShooterSpeed);
+    m_shooter.SetShooterSpeed(ShooterSpeed);
     //double CurrentShooter1Vel = m_shooter.getVelocity().magnitude();
 
     //m_shooter.SetShooterSpeed(ShooterSpeed.get());
     if (true)
     {
       m_shooter.SetFeederSpeed(FeederSpeed);
-      m_shooter.SetAugerSpeed(AugerSpeed);
+      m_shooter.SetRollerSpeed(RollerSpeed);
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter.SetShooterSpeeds( 0);
+    m_shooter.SetShooterSpeed( 0);
     //m_shooter.setVelocity(RPM.of(0));
     m_shooter.SetFeederSpeed(0);
-    m_shooter.SetAugerSpeed(0);
+    m_shooter.SetRollerSpeed(0);
   }
 
   // Returns true when the command should end.

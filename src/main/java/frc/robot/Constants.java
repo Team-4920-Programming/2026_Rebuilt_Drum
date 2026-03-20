@@ -43,6 +43,28 @@ public final class Constants
 //    public static final PIDConstants ANGLE_PID       = new PIDConstants(0.4, 0, 0.01);
 //  }
 
+// Can IDs
+  public static int Can_PDH = 1;
+  public static int Can_FL_Drive = 2;
+  public static int Can_FL_Angle = 3;
+  public static int Can_FR_Drive = 4;
+  public static int Can_FR_Angle = 5;
+  public static int Can_BR_Drive = 6;
+  public static int Can_BR_Angle = 7;
+  public static int Can_BL_Drive = 8;
+  public static int Can_BL_Angle = 9;
+  public static int Can_Shooter1 = 10;
+  public static int Can_Shooter2 = 11;
+  public static int Can_Feeder = 12;
+  public static int Can_Hood = 13;
+  public static int Can_Rollers = 14;
+  public static int Can_Tipper = 15;
+  public static int Can_Intake1 = 16;
+  public static int Can_Intake2 = 17;
+  public static int Can_Pigeon = 18;
+  public static int Can_Mitrocandria = 19;
+  public static int Can_Climber = 20;
+
   public static final class DrivebaseConstants
   {
 
