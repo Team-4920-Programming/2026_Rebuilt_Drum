@@ -370,7 +370,7 @@ else {
       m_shooterSpeed = shooterCal.rpm();
       m_hoodAngle = shooterCal.hoodAngle();
       
-hoodOutput = hoodPID.calculate(m_hoodAngle);
+//hoodOutput = hoodPID.calculate(m_hoodAngle);
     hoodMotor.set(hoodOutput);
 
       DogLog.log("Shooter/calculatedShooterSpeed",shooterCal.rpm());
