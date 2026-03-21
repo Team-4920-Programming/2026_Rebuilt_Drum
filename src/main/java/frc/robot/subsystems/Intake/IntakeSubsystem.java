@@ -73,8 +73,8 @@ public class IntakeSubsystem extends SubsystemBase {
   SparkFlexConfig TipperConfig = new SparkFlexConfig();
 
   //Absolute Enocders
-  SplineEncoder tipAbsoluteEncoder = new SplineEncoder(Constants.Can_TipperAbsEncoder);
-  
+  //SplineEncoder tipAbsoluteEncoder = new SplineEncoder(Constants.Can_TipperAbsEncoder);
+  private final CANcoder tipAbsoluteEncoder = new CANcoder(Constants.Can_TipperAbsEncoder);
   //PID Controllers
   PIDController tipperPID = new PIDController(Constants.Tipper.TipperKp, Constants.Tipper.TipperKi, Constants.Tipper.TipperKd);
   // DoubleSupplier tipperSetpoint = DogLog.tunable("Intake/TipperSetpoint", 45.0);
@@ -114,18 +114,25 @@ public class IntakeSubsystem extends SubsystemBase {
     TipperConfig.inverted(true);
     tipperMotor.configure(TipperConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    DetachedEncoderConfig dec = new DetachedEncoderConfig();
-    dec.positionConversionFactor(360);
-    dec.angleConversionFactor(360);
-    dec.dutyCycleZeroCentered(true);
-    dec.dutyCycleOffset(0.56874955);
-    dec.inverted(true);
+    // DetachedEncoderConfig dec = new DetachedEncoderConfig();
+    // dec.positionConversionFactor(360);
+    // dec.angleConversionFactor(360);
+    // dec.dutyCycleZeroCentered(true);
+    // dec.dutyCycleOffset(0.56874955);
+    // dec.inverted(true);
 
-    tipAbsoluteEncoder.configure(dec, ResetMode.kNoResetSafeParameters);
-    tipperPID.setSetpoint(tipAbsoluteEncoder.getAngle());
+//    tipAbsoluteEncoder.configure(dec, ResetMode.kNoResetSafeParameters);
+
+tipperPID.setSetpoint(getTipperAngle());
    }      
 
+public double getTipperAngle() {
+        // return hoodMotor.getPosition().getValueAsDouble() / 360;
+        double absolutePosition = tipAbsoluteEncoder.getAbsolutePosition().getValueAsDouble(); // Returns in Rotations (0-1)
 
+
+        return absolutePosition * 360;
+    }
   public void SetIntakeAngle(Double Angle)
   {
     tipperPID.setSetpoint(Angle);
@@ -173,7 +180,7 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
-    tipperOutput = tipperPID.calculate(tipAbsoluteEncoder.getAngle());
+    tipperOutput = tipperPID.calculate(getTipperAngle());
     tipperMotor.set(tipperOutput);
 
     if (Intake){
@@ -189,7 +196,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
   private void updateLogs(){
-    DogLog.log("Intake/TipperAngle", tipAbsoluteEncoder.getAngle());
+    DogLog.log("Intake/TipperAngle", getTipperAngle());
     DogLog.log("Intake/TipperCurrent", tipperMotor.getOutputCurrent());
     DogLog.log("Intake/TipperPIDOutput", tipperOutput);
     DogLog.log("Intake/TipperPIDSetpoint",tipperPID.getSetpoint());
