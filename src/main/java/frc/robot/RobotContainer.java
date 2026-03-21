@@ -228,9 +228,11 @@ public class RobotContainer
         
        // driverXbox.x().whileTrue(new CmdT_SetIntakeAngle(Intake, 70));
         // driverXbox.x().whileFalse(new CmdT_SetIntakeAngle(Intake, 5));
-        driverXbox.x().whileTrue(new CmdT_TipperUp(Intake));
-        driverXbox.b().whileTrue(new CmdT_TipperDown(Intake));
-         driverXbox.y().whileTrue(new CmdT_RunIntake(Intake));
+        // driverXbox.x().whileTrue(new CmdT_TipperUp(Intake));
+        // driverXbox.b().whileTrue(new CmdT_TipperDown(Intake));
+          driverXbox.x().whileTrue(new CmdT_TipperShooting(Intake));
+          driverXbox.b().whileTrue(new CmdT_TipperIntaking(Intake));
+          driverXbox.y().whileTrue(new CmdT_RunIntake(Intake));
        // driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
        // driverXbox.leftBumper().onTrue(new CmdT_DisableAutoAim(drivebase));
        driverXbox.leftTrigger().whileTrue(new CmdT_RampUpShooter(Shooter));

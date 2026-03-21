@@ -135,6 +135,7 @@ public class DataHighway extends SubsystemBase {
 
   //DH Data from Subsystems
   double DH_ShotDistance = 0;
+  double DH_PassingDistance = 0;
   boolean DH_AutoAim = false;
   double DH_AngleToHub = 0;
   boolean DH_Aimed = false;
@@ -180,9 +181,9 @@ public class DataHighway extends SubsystemBase {
     updateActiveHub();
     updateCurrentZone();
 
-    updateLogs();
     calculateShotDistance();
-    
+    calculatePassingDistance();
+    updateLogs();
     DH_safeToShoot = CalculateSafeToShoot();
     // This method will be called once per scheduler run
   }
@@ -199,6 +200,10 @@ public class DataHighway extends SubsystemBase {
 
   private void calculateShotDistance(){
     DH_ShotDistance = DH_HubPose.getTranslation().getDistance(DH_robotPose.getTranslation());
+
+  }
+  private void calculatePassingDistance(){
+    DH_PassingDistance = DH_robotPose.nearest(passTargetList).getTranslation().getDistance(DH_robotPose.getTranslation());
 
   }
 
@@ -220,6 +225,7 @@ public class DataHighway extends SubsystemBase {
     }
 
     DogLog.log("Data/ShotData/DistancefromHub", DH_ShotDistance);
+    DogLog.log("Data/ShotData/PassingDistance", DH_PassingDistance);
 
 
   }

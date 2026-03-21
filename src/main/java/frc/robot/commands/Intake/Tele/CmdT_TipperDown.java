@@ -22,17 +22,20 @@ public class CmdT_TipperDown extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    Intake.OverrideTipperPID(true);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Intake.SetTipperSpeed(0.6);
+    Intake.SetTipperSpeed(-0.6);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+        Intake.OverrideTipperPID(false);
         Intake.SetTipperSpeed(0.0);
   }
   // Returns true when the command should end.

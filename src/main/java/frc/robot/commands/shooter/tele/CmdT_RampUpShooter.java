@@ -29,28 +29,15 @@ public class CmdT_RampUpShooter extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //DoubleSubscriber ShooterSpeed = DogLog.tunable("Shooter/ShooterSpeed", 5000.0,"rpm");
-    //DoubleSubscriber FeederSpeed = DogLog.tunable("Shooter/FeederSpeed", 1.0);
-    //DoubleSubscriber AugerSpeed = DogLog.tunable("Shooter/AugerSpeed",0.75);
 
-    // double ShooterSpeed = 5000;
-    // double FeederSpeed = 1;
-    // double RollerSpeed = 1;
-    //m_shooter.setVelocity(RPM.of(3000));
-    m_shooter.SetShooterSpeed(-0.3);
-    //double CurrentShooter1Vel = m_shooter.getVelocity().magnitude();
+    m_shooter.EnableShooter();
 
-    //m_shooter.SetShooterSpeed(ShooterSpeed.get());
-    
-      
-    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter.SetShooterSpeed( 0);
-    //m_shooter.setVelocity(RPM.of(0));
+     m_shooter.DisableShooter();
    
   }
 

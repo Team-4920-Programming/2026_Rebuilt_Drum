@@ -64,6 +64,7 @@ public final class Constants
   public static int Can_Pigeon = 18;
   public static int Can_Mitrocandria = 19;
   public static int Can_Climber = 20;
+  public static int Can_TipperAbsEncoder = 21;
 
   public static final class DrivebaseConstants
   {
@@ -181,5 +182,14 @@ public static final class DriveConstants {
             .1, // y
             .1);
 
+
+
 }
+
+    public static class Tipper{
+      public static final double TipperKp = 0.05;
+      public static final double TipperKi = 0.0;
+      public static final double TipperKd = 0.0;
+
+    }
 }

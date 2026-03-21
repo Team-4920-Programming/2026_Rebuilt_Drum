@@ -29,7 +29,8 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
-
+import com.revrobotics.encoder.SplineEncoder;
+import com.revrobotics.encoder.config.DetachedEncoderConfig;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -39,38 +40,54 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
+
+  
+  public enum TipperState{
+    TUCKED(70.0),
+    SHOOTING(45.0),
+    INTAKING(0.0);
+
+    private final double angle;
+
+    // Constructor
+    TipperState(double angle) {
+        this.angle = angle;
+    }
+
+    // Getter
+    public double getAngle() {
+        return angle;
+    }
+
+  }
+
+  TipperState DHOut_tipperState = TipperState.TUCKED;
+  boolean tipperOverride = false;
   //Motors
-  SparkFlex Mtr_Intake1 = new SparkFlex(Constants.Can_Intake1, MotorType.kBrushless);
-  SparkFlex Mtr_Intake2 = new SparkFlex(Constants.Can_Intake2, MotorType.kBrushless);
-  SparkFlex Mtr_Tipper = new SparkFlex(Constants.Can_Tipper, MotorType.kBrushless);
+  SparkFlex intakeMotor1 = new SparkFlex(Constants.Can_Intake1, MotorType.kBrushless);
+  SparkFlex intakeMotor2 = new SparkFlex(Constants.Can_Intake2, MotorType.kBrushless);
+  SparkFlex tipperMotor = new SparkFlex(Constants.Can_Tipper, MotorType.kBrushless);
 
   SparkFlexConfig Intake1Config = new SparkFlexConfig();
-SparkFlexConfig Intake2Config = new SparkFlexConfig();
-
-
-
-  
-
-  //Motor Encoders
-  RelativeEncoder enc_Intake = Mtr_Intake1.getEncoder();
-  RelativeEncoder enc_IntakeAngle = Mtr_Tipper.getEncoder();
+  SparkFlexConfig Intake2Config = new SparkFlexConfig();
+  SparkFlexConfig TipperConfig = new SparkFlexConfig();
 
   //Absolute Enocders
-  AbsoluteEncoder absEnc_IntakeAngle = Mtr_Tipper.getAbsoluteEncoder();
+  SplineEncoder tipAbsoluteEncoder = new SplineEncoder(Constants.Can_TipperAbsEncoder);
   
   //PID Controllers
-  PIDController PID_IntakeAngle = new PIDController(0.003, 0, 0);
-   ArmFeedforward FF_IntakeAngle= new ArmFeedforward(0, 0, 0);
-
-  DoubleSupplier IntakeAngKP = DogLog.tunable("Intake/Angle_kp", 0.003);
-  DoubleSupplier IntakeAngKD = DogLog.tunable("Intake/Angle_kD", 0.0);
-   DoubleSupplier IntakeAngKs = DogLog.tunable("Intake/Angle_ks", 0.0);
-   DoubleSupplier IntakeAngKg = DogLog.tunable("Intake/Angle_kg", 0.0);
-   DoubleSupplier IntakeAngKv = DogLog.tunable("Intake/Angle_kv", 0.0);
+  PIDController tipperPID = new PIDController(Constants.Tipper.TipperKp, Constants.Tipper.TipperKi, Constants.Tipper.TipperKd);
+  // DoubleSupplier tipperSetpoint = DogLog.tunable("Intake/TipperSetpoint", 45.0);
+  // DoubleSupplier IntakeAngKP = DogLog.tunable("Intake/Angle_kp", 0.003);
+  // DoubleSupplier IntakeAngKD = DogLog.tunable("Intake/Angle_kD", 0.0);
+  // DoubleSupplier IntakeAngKs = DogLog.tunable("Intake/Angle_ks", 0.0);
+  // DoubleSupplier IntakeAngKg = DogLog.tunable("Intake/Angle_kg", 0.0);
+  // DoubleSupplier IntakeAngKv = DogLog.tunable("Intake/Angle_kv", 0.0);
 
   //Variables
-boolean Intake = false;
-double IntakeSpeed = 0;
+  boolean Intake = false;
+  double IntakeSpeed = 0;
+  double tipperOutput = 0;
   //Datahighway
   boolean DHOut_IntakeOut = false;
 
@@ -78,73 +95,106 @@ double IntakeSpeed = 0;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
-    PID_IntakeAngle.setSetpoint(absEnc_IntakeAngle.getPosition());
-    PID_IntakeAngle.enableContinuousInput(0, 360);
-  
+    
+        
+    Intake1Config.inverted(true);
+    Intake1Config.idleMode(IdleMode.kBrake);
+    Intake1Config.smartCurrentLimit(40);
+    intakeMotor1.configure(Intake1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
+    
+    // Intake2Config.inverted(true);
+    Intake2Config.idleMode(IdleMode.kBrake);
+    Intake2Config.follow(intakeMotor1,true);
+    intakeMotor2.configure(Intake2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        
-        Intake1Config.inverted(true);
-        Intake1Config.idleMode(IdleMode.kBrake);
-        Intake1Config.smartCurrentLimit(40);
-Mtr_Intake1.configure(Intake1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        
-        
-        // Intake2Config.inverted(true);
-            Intake2Config.idleMode(IdleMode.kBrake);
-        Intake2Config.follow(Mtr_Intake1,true);
-         Mtr_Intake2.configure(Intake2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    TipperConfig.idleMode(IdleMode.kBrake);
+    TipperConfig.smartCurrentLimit(40);
+    TipperConfig.disableFollowerMode();
+    TipperConfig.inverted(true);
+    tipperMotor.configure(TipperConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    DetachedEncoderConfig dec = new DetachedEncoderConfig();
+    dec.positionConversionFactor(360);
+    dec.angleConversionFactor(360);
+    dec.dutyCycleZeroCentered(true);
+    dec.dutyCycleOffset(0.56874955);
+    dec.inverted(true);
+
+    tipAbsoluteEncoder.configure(dec, ResetMode.kNoResetSafeParameters);
+    tipperPID.setSetpoint(tipAbsoluteEncoder.getAngle());
    }      
 
 
   public void SetIntakeAngle(Double Angle)
   {
-    PID_IntakeAngle.setSetpoint(Angle);
+    tipperPID.setSetpoint(Angle);
   }
 
   public void RunIntake(){
-Intake = true;
+    Intake = true;
   }
 
   public void StopIntake(){
-Intake = false;
+    Intake = false;
   }
 
   public void SetIntakeSpeed(double Speed){
-    Mtr_Intake1.set(Speed);
+    intakeMotor1.set(Speed);
   }
   public void SetTipperSpeed(double Speed){
-    Mtr_Tipper.set(Speed);
+    tipperMotor.set(Speed);
+  }
+  public void OverrideTipperPID(boolean b){
+    tipperOverride = b;
+  }
+  public void SetTipperState(TipperState state){
+    DHOut_tipperState = state;
   }
   
+  private void TuneTipperPID(){
+    // tipperPID.setP(IntakeAngKP.getAsDouble());
+    // tipperPID.setD(IntakeAngKD.getAsDouble());
+    // tipperPID.setSetpoint(tipperSetpoint.getAsDouble());
+  }
+
+  public void setTipperAngle(double angle){
+    tipperPID.setSetpoint(angle);
+  }
+
+  private void ProcessTipperState(){
+    if (!tipperOverride){
+      tipperPID.setSetpoint(DHOut_tipperState.getAngle());
+    }
+  }
+
 
 
   @Override
   public void periodic() {
-    PID_IntakeAngle.setD(IntakeAngKD.getAsDouble());
-    PID_IntakeAngle.setP(IntakeAngKP.getAsDouble());
-    FF_IntakeAngle.setKg(IntakeAngKg.getAsDouble());
-    FF_IntakeAngle.setKv(IntakeAngKv.getAsDouble());
-    FF_IntakeAngle.setKs(IntakeAngKs.getAsDouble());
-    
-    double IntakePosRad = Units.degreesToRadians(PID_IntakeAngle.getSetpoint());
-    double IntakePosDeg = absEnc_IntakeAngle.getPosition();
-   // Mtr_Tipper.set(PID_IntakeAngle.calculate(IntakePosDeg)+FF_IntakeAngle.calculate(IntakePosRad, 0));
-    DogLog.log("intake/pos",absEnc_IntakeAngle.getPosition());
-if (Intake){
-  SetIntakeSpeed(1);
-}
-else if (!Intake){
-  SetIntakeSpeed(0);
-}
 
+    tipperOutput = tipperPID.calculate(tipAbsoluteEncoder.getAngle());
+    tipperMotor.set(tipperOutput);
 
+    if (Intake){
+      SetIntakeSpeed(1);
+    }
+    else if (!Intake){
+      SetIntakeSpeed(0);
+    }
+      ProcessTipperState();
+      // TuneTipperPID();
+      updateLogs();
 
-    // This method will be called once per scheduler run
-  }
-    public void UpdateDataHighway()
-  {
-    //Set Variables from Datahighway
+    }
 
-    //Set Variable to DataHighway
+  private void updateLogs(){
+    DogLog.log("Intake/TipperAngle", tipAbsoluteEncoder.getAngle());
+    DogLog.log("Intake/TipperCurrent", tipperMotor.getOutputCurrent());
+    DogLog.log("Intake/TipperPIDOutput", tipperOutput);
+    DogLog.log("Intake/TipperPIDSetpoint",tipperPID.getSetpoint());
+    DogLog.log("Intake/TipperPIDAtSetpoint",tipperPID.atSetpoint());
+    DogLog.log("Intake/TipperState", DHOut_tipperState);
+    DogLog.log("Intake/TipperOverride", tipperOverride);
   }
 }
