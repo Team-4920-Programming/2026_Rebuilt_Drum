@@ -118,9 +118,9 @@ public class SwerveSubsystem extends SubsystemBase
   public double DHOut_HubPoseY= 0;
   public double DHIn_reqRobotAngle =0;
   public double DHIn_ShotDistance = 0;
-  public Pose2d DHIn_aimTarget;
+  public Pose2d DHIn_aimTarget = new Pose2d(0,0, new Rotation2d().fromDegrees(0));
   private double targetAngle;
-  public Pose2d DHOUT_RobotPose = Pose2d.kZero;
+  public Pose2d DHOUT_RobotPose = new Pose2d(0,0, new Rotation2d().fromDegrees(0));
   public ShooterLookupTable DHIn_ShooterLookupTable;
   // public double DHOut_robotY = getPose().getY();
   // public double DHOut_robotX = getPose().getX();

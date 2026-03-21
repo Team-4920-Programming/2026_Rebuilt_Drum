@@ -158,7 +158,8 @@ public class DataHighway extends SubsystemBase {
   List<Pose2d> passTargetList = new ArrayList<>();
   Pose2d DH_HubPose = new Pose2d().kZero;
   ShooterLookupTable DH_ShooterLookupTable = new ShooterLookupTable();
-
+  private Pose2d DH_passingTargetPose = new Pose2d().kZero;;
+  private Pose2d aimTarget = new Pose2d().kZero;;
   /** Creates a new DataHighway. */
     public DataHighway(SwerveSubsystem SwerveSS, ShooterSubsystem ShooterSS, ClimberSubsystem ClimberSS, IntakeSubsystem IntakeSS) {
       SS_Shooter = ShooterSS;
@@ -263,8 +264,7 @@ else if (DH_InOpposingZone){
     }
   }
 
-  private Pose2d DH_passingTargetPose;
-private Pose2d aimTarget;
+
   private void updateValidTargetData(){
 
     if (targetSetup && !validTargetSetup && allianceColor != AllianceColor.UNKNOWN){

@@ -44,7 +44,7 @@ public class IntakeSubsystem extends SubsystemBase {
   
   public enum TipperState{
     TUCKED(70.0),
-    SHOOTING(45.0),
+    SHOOTING(25.0),
     INTAKING(0.0);
 
     private final double angle;
@@ -85,7 +85,7 @@ public class IntakeSubsystem extends SubsystemBase {
   // DoubleSupplier IntakeAngKv = DogLog.tunable("Intake/Angle_kv", 0.0);
 
   //Variables
-  boolean Intake = false;
+  public boolean Intake = false;
   double IntakeSpeed = 0;
   double tipperOutput = 0;
   //Datahighway
