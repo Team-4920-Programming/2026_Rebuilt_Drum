@@ -61,7 +61,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   }
 
-  TipperState DHOut_tipperState = TipperState.TUCKED;
+  TipperState DHOut_tipperState = TipperState.INTAKING;
   boolean tipperOverride = false;
   //Motors
   SparkFlex intakeMotor1 = new SparkFlex(Constants.Can_Intake1, MotorType.kBrushless);

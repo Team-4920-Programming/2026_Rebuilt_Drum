@@ -34,6 +34,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
@@ -106,6 +107,7 @@ public class SwerveSubsystem extends SubsystemBase
   public boolean DHOut_InNeutralZone = false;
   public boolean DHOut_InAllianceZone = false;
   public boolean DHOut_InBumpZone = false;
+  public boolean DHOut_InOpposingZone = false;
   public double DHOut_HubDistance = 0.0;
   public double DHOut_CornerDistance = 0.0;
   public boolean DHOut_Aimed = false;
@@ -116,6 +118,8 @@ public class SwerveSubsystem extends SubsystemBase
   public double DHOut_HubPoseY= 0;
   public double DHIn_reqRobotAngle =0;
   public double DHIn_ShotDistance = 0;
+  public Pose2d DHIn_aimTarget;
+  private double targetAngle;
   public Pose2d DHOUT_RobotPose = Pose2d.kZero;
   public ShooterLookupTable DHIn_ShooterLookupTable;
   // public double DHOut_robotY = getPose().getY();
@@ -344,7 +348,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     {
       ProcessVision4920();
       swerveDrive.updateOdometry();
-  
+      targetAngle = Units.radiansToDegrees(Math.atan2(getPose().getY() - DHIn_aimTarget.getY(), getPose().getX() - DHIn_aimTarget.getX()));
       //postTrajectory(PathPlannerLogging.logActivePath(null););
     }
       poseEstimator.update(GetGyroAngle(), getModulePositions());
@@ -449,13 +453,25 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
       {
          DHOut_InAllianceZone = true;
       }
+      if (getPose().getX() < fieldLayout.getTagPose(26).get().getX()){
+          DHOut_InOpposingZone = true;
+      }
+        
   
     }
     else
     {
-      if (getPose().getX() < fieldLayout.getTagPose(26).get().getX())
+      if (getPose().getX() < fieldLayout.getTagPose(26).get().getX()){
         DHOut_InAllianceZone = true;
+      }
+if (getPose().getX() > fieldLayout.getTagPose(9).get().getX() )
+      {
+         DHOut_InOpposingZone = true;
+      }
+
     }
+
+
 
    
     //Set Variables from Datahighway
@@ -572,6 +588,9 @@ DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
   {
     return AutoAimEnabled;
   }
+  public boolean robotIsAimed(){
+    return DHOut_Aimed;
+  }
   public void EnableOutpostAim()
   {
     OutpostAimEnabled = true;
@@ -596,6 +615,13 @@ DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
   {
     return DepotAimEnabled;
   }
+  //DepotAngle = Math.atan2(getPose().getY() - BlueDepotCorner.getY(), getPose().getX() - BlueDepotCorner.getX());
+   //     DepotAngle = Units.radiansToDegrees(DepotAngle);
+
+public void AutoAim(){
+targetAngle = Units.radiansToDegrees(Math.atan2(getPose().getY() - DHIn_aimTarget.getY(), getPose().getX() - DHIn_aimTarget.getX()));
+
+}
 
   public void EnableCornerAim(){
     if (isRedAlliance()){
@@ -874,7 +900,7 @@ DisableCornerAim();
     if (AutoAimEnabled)
     {
       //PID_AutoAim.setSetpoint(AutoAimAngle);
-      PID_AutoAim.setSetpoint(DHIn_reqRobotAngle);
+      PID_AutoAim.setSetpoint(targetAngle);
       PID_AutoAim.setTolerance(2);
       PID_AutoAim.enableContinuousInput(-180, 180);
       v.omegaRadiansPerSecond = PID_AutoAim.calculate(getPose().getRotation().getDegrees());
@@ -882,38 +908,38 @@ DisableCornerAim();
       DHOut_Aimed = PID_AutoAim.atSetpoint();
     }
       DogLog.log("Fieldinfo/AutoAimRotVel", v.omegaRadiansPerSecond);
-      DogLog.log("Fieldinfo/AutoAimAngle", AutoAimAngle);
+      DogLog.log("Fieldinfo/AutoAimAngle", targetAngle);
       
 
       
-    ;
+    
   
   
    
 
-  if (DepotAimEnabled)
-    {
-      PID_DepotAim.setSetpoint(DepotAngle);
-      PID_DepotAim.setTolerance(3);
-      PID_DepotAim.enableContinuousInput(-180, 180);
-      v.omegaRadiansPerSecond = PID_DepotAim.calculate(getPose().getRotation().getDegrees());
-      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
-    }
+  // if (DepotAimEnabled)
+  //   {
+  //     PID_DepotAim.setSetpoint(DepotAngle);
+  //     PID_DepotAim.setTolerance(3);
+  //     PID_DepotAim.enableContinuousInput(-180, 180);
+  //     v.omegaRadiansPerSecond = PID_DepotAim.calculate(getPose().getRotation().getDegrees());
+  //     v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
+  //   }
       
-      DogLog.log("Fieldinfo/DepotAimAngle", DepotAngle);
+  //     DogLog.log("Fieldinfo/DepotAimAngle", DepotAngle);
 
      
-    ;
+    
   
 
-  if (OutpostAimEnabled)
-    {
-      PID_OutpostAim.setSetpoint(OutpostAngle);
-      PID_OutpostAim.setTolerance(3);
-      PID_OutpostAim.enableContinuousInput(-180, 180);
-      v.omegaRadiansPerSecond = PID_OutpostAim.calculate(getPose().getRotation().getDegrees());
-      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
-    }
+  // if (OutpostAimEnabled)
+  //   {
+  //     PID_OutpostAim.setSetpoint(OutpostAngle);
+  //     PID_OutpostAim.setTolerance(3);
+  //     PID_OutpostAim.enableContinuousInput(-180, 180);
+  //     v.omegaRadiansPerSecond = PID_OutpostAim.calculate(getPose().getRotation().getDegrees());
+  //     v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
+  //   }
       
       DogLog.log("Fieldinfo/OutpostAimAngle", OutpostAngle);
 

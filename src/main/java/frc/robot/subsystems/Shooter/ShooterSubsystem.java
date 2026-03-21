@@ -72,11 +72,15 @@ public class ShooterSubsystem extends SubsystemBase {
   double FeederSpeed = 0.8;
   double m_shooterSpeed = 2000.0;
   double HoodSpeed = 0.3;
+  double shooterTolerance = 80;
+  double m_hoodAngle = 0;
+  double hoodOutput = 0;
 
   //Shooter Velocity Control
   private final VelocityVoltage m_shooterMotorVelocityRequest  = new VelocityVoltage(0).withSlot(0);
 
   AbsoluteEncoder hoodEncoder = hoodMotor.getAbsoluteEncoder();
+   PIDController hoodPID = new PIDController(Constants.Hood.HoodKp, Constants.Hood.HoodKi, Constants.Hood.HoodKd);
   //Critical Motor Currents
   double RollerJammedCurrent = 20;
   double FeederJammedCurrent = 20;
@@ -362,11 +366,20 @@ else {
   private void updateShotParamsFromCalculations(){
 
     if (DHIn_ShooterLookupTable != null){
-      ShooterParams test = DHIn_ShooterLookupTable.shooterTable.get(DHIn_ShotDistance);
-      m_shooterSpeed = test.rpm();
-      DogLog.log("Shooter/calculatedShooterSpeed",test.rpm());
-      DogLog.log("Shooter/calculatedHoodAngle",test.hoodAngle());
+      ShooterParams shooterCal = DHIn_ShooterLookupTable.shooterTable.get(DHIn_ShotDistance);
+      m_shooterSpeed = shooterCal.rpm();
+      m_hoodAngle = shooterCal.hoodAngle();
+      
+hoodOutput = hoodPID.calculate(m_hoodAngle);
+    hoodMotor.set(hoodOutput);
+
+      DogLog.log("Shooter/calculatedShooterSpeed",shooterCal.rpm());
+      DogLog.log("Shooter/calculatedHoodAngle",shooterCal.hoodAngle());
     }
+  }
+
+  public boolean isShooterAtSpeed(){
+    return Math.abs((shooterMotor1.getVelocity().getValueAsDouble() * 60) - m_shooterSpeed) <= shooterTolerance;
   }
 
   private void ControlShooter(){

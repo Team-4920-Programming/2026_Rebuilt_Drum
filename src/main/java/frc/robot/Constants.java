@@ -192,4 +192,10 @@ public static final class DriveConstants {
       public static final double TipperKd = 0.0;
 
     }
+     public static class Hood{
+      public static final double HoodKp = 0.05;
+      public static final double HoodKi = 0.0;
+      public static final double HoodKd = 0.0;
+
+    }
 }

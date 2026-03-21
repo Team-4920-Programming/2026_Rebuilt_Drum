@@ -58,9 +58,9 @@ public class DataHighway extends SubsystemBase {
 
   public enum ZONE {
     ALLIANCESCORINGZONE,
-    ALLIANCENEUTRAL,
-    OPPONENTNEUTRAL,
-    OPPONENTSCORINGZONE
+    NEUTRAL,
+    OPPONENTSCORINGZONE,
+    UNKNOWN
   }
 
   public final AprilTagFieldLayout fieldLayout = AprilTagFields.k2026RebuiltWelded.loadAprilTagLayoutField();
@@ -121,6 +121,7 @@ public class DataHighway extends SubsystemBase {
   AllianceColor allianceColor = AllianceColor.UNKNOWN;
   AssignedShift assignedShift = AssignedShift.UNKNOWN;
   MatchPhase currentMatchPhase = MatchPhase.UNKNOWN;
+  ZONE currentZone = ZONE.UNKNOWN;
   boolean gameDataUpdated = false;
   String gameData;
   boolean targetSetup = false;
@@ -141,6 +142,7 @@ public class DataHighway extends SubsystemBase {
   boolean DH_Aimed = false;
   boolean DH_InNeutralZone = false;
   boolean DH_InAllianceZone = false;
+  boolean DH_InOpposingZone = false;
   ChassisSpeeds DH_FieldVelocity;
   double DH_HubPoseX =0;
   double DH_HubPoseY =0;
@@ -186,6 +188,20 @@ public class DataHighway extends SubsystemBase {
     updateLogs();
     DH_safeToShoot = CalculateSafeToShoot();
     // This method will be called once per scheduler run
+
+if (DH_InAllianceZone){
+  currentZone = ZONE.ALLIANCESCORINGZONE;
+}
+
+else if (DH_InNeutralZone){
+  currentZone = ZONE.NEUTRAL;
+}
+else if (DH_InOpposingZone){
+  currentZone = ZONE.OPPONENTSCORINGZONE;
+}
+
+
+
   }
 
   private void updateMatchTime(){
@@ -247,6 +263,8 @@ public class DataHighway extends SubsystemBase {
     }
   }
 
+  private Pose2d DH_passingTargetPose;
+private Pose2d aimTarget;
   private void updateValidTargetData(){
 
     if (targetSetup && !validTargetSetup && allianceColor != AllianceColor.UNKNOWN){
@@ -261,6 +279,16 @@ public class DataHighway extends SubsystemBase {
         DH_HubPose = TargetPoses.REDALLIANCEHUB.getValue();
       }
       validTargetSetup = true;
+    }
+    DH_passingTargetPose = DH_robotPose.nearest(passTargetList);
+  }
+
+  private void calculateAutoAim(){
+    if (DH_InAllianceZone){
+      aimTarget = DH_HubPose;
+    }
+    else{
+      aimTarget = DH_passingTargetPose;
     }
   }
 
@@ -405,6 +433,7 @@ public class DataHighway extends SubsystemBase {
     DH_HubPoseY = SS_Swerve.DHOut_HubPoseY;
     DH_reqRobotAngle = SS_Shooter.DHOut_reqRobotAngle;
     DH_robotPose = SS_Swerve.DHOUT_RobotPose;
+    DH_InOpposingZone = SS_Swerve.DHOut_InOpposingZone;
   }
   private void SetDHData()
   {
@@ -424,6 +453,7 @@ public class DataHighway extends SubsystemBase {
     SS_Shooter.DHIn_ShooterLookupTable = DH_ShooterLookupTable;
     SS_Swerve.DHIn_ShooterLookupTable = DH_ShooterLookupTable;
     SS_Swerve.DHIn_ShotDistance = DH_ShotDistance;
+    SS_Swerve.DHIn_aimTarget = aimTarget;
   }
 
   
