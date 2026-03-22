@@ -25,8 +25,11 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -256,8 +259,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     double LeftCamVisionTimestamp;
     // Pose2d RearCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
     // double RearCamVisionTimestamp;
-    
-    
+
     //System.out.println("driver statio"+DriverStation.isDSAttached());
     //System.out.println("CeneterCAm"+(CenterCamera != null));
 
@@ -275,7 +277,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
             FrontCamVisionTimestamp = visionEst.get().timestampSeconds;
             DogLog.log("SwerveSS/Vision/FrontCameraPose", FrontCameraPose3d);
             DogLog.log("SwerveSS/Vision/FrontTimeStamp",FrontCamVisionTimestamp);
-            // VisionReading(FrontCamPose, FrontCamVisionTimestamp, FrontCamera.confidenceCalculator(visionEst.get()));
+            VisionReading(FrontCamPose, FrontCamVisionTimestamp, FrontCamera.confidenceCalculator(visionEst.get()));
         }
     
     }
@@ -310,7 +312,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
             LeftCamVisionTimestamp = visionEst.get().timestampSeconds;
             DogLog.log("SwerveSS/Vision/LeftCameraPose", LeftCameraPose3d);
             DogLog.log("SwerveSS/Vision/LeftTimeStamp", LeftCamVisionTimestamp);
-            // VisionReading(LeftCamPose, LeftCamVisionTimestamp, LeftCamera.confidenceCalculator(visionEst.get()));
+            VisionReading(LeftCamPose, LeftCamVisionTimestamp, LeftCamera.confidenceCalculator(visionEst.get()));
         }
     
     }
