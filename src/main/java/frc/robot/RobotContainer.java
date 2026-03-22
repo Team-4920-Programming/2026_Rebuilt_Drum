@@ -238,8 +238,8 @@ public class RobotContainer
        driverXbox.leftTrigger().whileTrue(new CmdT_RampUpShooter(Shooter));
         driverXbox.rightTrigger().whileTrue(new CmdT_AutoShoot(Shooter, drivebase, Intake));
         driverXbox.leftBumper().whileTrue(new CmdT_AutoAimTest(Shooter, drivebase, Intake));
-        driverXbox.povUp().whileTrue(new CmdT_HoodUp(Shooter));
-        driverXbox.povDown().whileTrue(new CmdT_HoodDown(Shooter));
+        driverXbox.povUp().whileTrue(new CmdT_Manual_HoodUp(Shooter));
+        driverXbox.povDown().whileTrue(new CmdT_Manual_HoodDown(Shooter));
         driverXbox.povLeft().whileTrue(new CmdT_Manual_SlowDownShooter(Shooter));
         driverXbox.povRight().whileTrue(new CmdT_Manual_SpeedUpShooter(Shooter));
         // driverXbox.rightTrigger().whileTrue(new CmdT_OutpostAutoAim(drivebase));

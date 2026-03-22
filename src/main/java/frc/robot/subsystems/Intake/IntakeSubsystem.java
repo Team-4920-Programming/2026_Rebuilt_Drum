@@ -108,7 +108,7 @@ public class IntakeSubsystem extends SubsystemBase {
     Intake2Config.follow(intakeMotor1,true);
     intakeMotor2.configure(Intake2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    TipperConfig.idleMode(IdleMode.kBrake);
+    TipperConfig.idleMode(IdleMode.kCoast);
     TipperConfig.smartCurrentLimit(40);
     TipperConfig.disableFollowerMode();
     TipperConfig.inverted(true);
@@ -122,7 +122,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // dec.inverted(true);
 
 //    tipAbsoluteEncoder.configure(dec, ResetMode.kNoResetSafeParameters);
-
+tipperPID.enableContinuousInput(-180, 180);
 tipperPID.setSetpoint(getTipperAngle());
    }      
 

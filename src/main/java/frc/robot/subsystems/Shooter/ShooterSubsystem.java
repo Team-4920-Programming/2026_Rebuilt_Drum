@@ -30,8 +30,11 @@ import com.revrobotics.servohub.config.ServoChannelConfig.BehaviorWhenDisabled;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import dev.doglog.DogLog;
@@ -111,7 +114,8 @@ public class ShooterSubsystem extends SubsystemBase {
   public double DHIn_HubPoseY =0;
   public double DHOut_reqRobotAngle =0;
   public ShooterLookupTable DHIn_ShooterLookupTable;
-
+  DoubleSupplier HoodKpTunable = DogLog.tunable("Shooter/HoodAngle_kp", 0.003);
+  DoubleSupplier HoodKdTunable = DogLog.tunable("Shooter/HoodAngle_kd", 0.0);
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
     //Setup Motors
@@ -134,8 +138,16 @@ public class ShooterSubsystem extends SubsystemBase {
     shooterMotor2.setControl(new Follower(shooterMotor1.getDeviceID(), MotorAlignmentValue.Opposed));
     shooterMotor2.getConfigurator().apply(shooter2Config);
 
+    SparkMaxConfig hoodConfig =  new SparkMaxConfig();
+    hoodConfig.inverted(false);
+    hoodConfig.smartCurrentLimit(40);
 
-
+    AbsoluteEncoderConfig hoodencoderConfig = new AbsoluteEncoderConfig();
+    hoodencoderConfig.positionConversionFactor(180);
+    hoodencoderConfig.zeroCentered(true);
+    hoodencoderConfig.zeroOffset(0.111133136);
+    hoodConfig.apply(hoodencoderConfig);
+    hoodMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
 public void SOTFCalc(){
@@ -338,7 +350,7 @@ else {
     updateShotParamsFromCalculations();
     ControlShooter();
     // ControlHood();
-
+    // TuneHoodPID();
     
     // DogLog.log("Shooter/Shooter1Speed",enc_Shooter1.getVelocity(),"rpm");
     // DogLog.log("Shooter/Shooter2Speed",enc_Shooter2.getVelocity(),"rpm");
@@ -360,7 +372,9 @@ else {
     DogLog.log("Fieldinfo/reqRobotAngle",DHOut_reqRobotAngle);
     DogLog.log("Shooter/SavedShooterSpeedRPM", m_shooterSpeed);
     DogLog.log("Shooter/ActualShooterSpeedRPM", shooterMotor1.getVelocity().getValueAsDouble() * 60.0);
-    DogLog.log("Shooter/HoodAngle",hoodEncoder.getPosition());
+    DogLog.log("Shooter/HoodAngle",getHoodAngle());
+    DogLog.log("Shooter/HoodSetpoint",hoodPID.getSetpoint());
+    DogLog.log("Shooter/HoodAtSetpoint",hoodPID.atSetpoint());
   }
 
   private void updateShotParamsFromCalculations(){
@@ -370,8 +384,8 @@ else {
       m_shooterSpeed = shooterCal.rpm();
       m_hoodAngle = shooterCal.hoodAngle();
       
-hoodOutput = hoodPID.calculate(m_hoodAngle);
-    // hoodMotor.set(hoodOutput);
+    hoodOutput = hoodPID.calculate(getHoodAngle(),m_hoodAngle);
+    hoodMotor.set(hoodOutput);
 
       DogLog.log("Shooter/calculatedShooterSpeed",shooterCal.rpm());
       DogLog.log("Shooter/calculatedHoodAngle",shooterCal.hoodAngle());
@@ -392,6 +406,23 @@ hoodOutput = hoodPID.calculate(m_hoodAngle);
 
   public void ChangeShooterSpeed(double delta){
         SetShooterSpeed(m_shooterSpeed + delta);
+  }
+
+  public void ChangeHoodAngle(double delta){
+        SetHoodAngle(m_hoodAngle + delta);
+  }
+
+  public void SetHoodAngle (double angle){
+    m_hoodAngle = angle; 
+  }
+
+    private void TuneHoodPID(){
+    // hoodPID.setP(HoodKpTunable.getAsDouble());
+    // hoodPID.setD(HoodKdTunable.getAsDouble());
+  }
+
+  public double getHoodAngle(){
+    return hoodEncoder.getPosition();
   }
 
 }

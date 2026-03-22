@@ -33,13 +33,14 @@ public class ShooterLookupTable {
   public ShooterLookupTable() {
 
         // shooterTable.put(distance,new ShooterParams(rpm, hoodAngle, timeofFlight));
-    shooterTable.put(1.2,new ShooterParams(1325, 0.0, 0.8125));
-    shooterTable.put(2.0,new ShooterParams(1400, 0.0, 0.9375));
-    shooterTable.put(2.5,new ShooterParams(1550, 0.5, 1.0625));
-    shooterTable.put(3.0,new ShooterParams(1500, 11.0, 1.0625));
-    shooterTable.put(3.5,new ShooterParams(1700, 20.0, 1.0625));
-    shooterTable.put(4.0,new ShooterParams(1700, 23.0, 1.375));
-    shooterTable.put(5.0,new ShooterParams(1850, 22.0, 1.5625));
+    shooterTable.put(1.0,new ShooterParams(2225, 0.0, 0.875));
+    shooterTable.put(1.55,new ShooterParams(2375, 0.0, 1.125));
+    shooterTable.put(2.1,new ShooterParams(2600, 1.0, 1.3125));
+    shooterTable.put(2.46,new ShooterParams(2550, 3.0, 1.25));
+    shooterTable.put(3.0,new ShooterParams(2600, 15.0, 0.9375));
+    
+    shooterTable.put(3.9,new ShooterParams(2950, 19.0, 1.375));
+    shooterTable.put(4.9,new ShooterParams(3000, 28.0, 1.0625));
     // TODO: Fill in with real measured data from testing.
     // Format: addEntry(distanceMeters, rpm, hoodAngleDegrees, timeOfFlightSeconds)
     //

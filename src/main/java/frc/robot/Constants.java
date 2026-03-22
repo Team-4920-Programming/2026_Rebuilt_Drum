@@ -103,16 +103,16 @@ public static final class DriveConstants {
 
     // positive x to the left, positive up
     public static final Transform3d kRobotToFrontCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(1.75), Units.inchesToMeters(1.0), Units.inchesToMeters(19.5)), //0,-7.5,32
-            new Rotation3d(Units.degreesToRadians(-1.4), Units.degreesToRadians(0.35), Units.degreesToRadians(0))); //
+            new Transform3d(new Translation3d(Units.inchesToMeters(5.25), Units.inchesToMeters(-12.0), Units.inchesToMeters(19.875)), //0,-7.5,32
+            new Rotation3d(Units.degreesToRadians(-0.75), Units.degreesToRadians(-16.0), Units.degreesToRadians(10.5))); //
 
     public static final Transform3d kRobotToRightCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(0.0), Units.inchesToMeters(-12.25), Units.inchesToMeters(17.25)), 
-            new Rotation3d(Units.degreesToRadians(-1.5), Units.degreesToRadians(-2.5), Units.degreesToRadians(-90))); //
+            new Transform3d(new Translation3d(Units.inchesToMeters(0.125), Units.inchesToMeters(-12.25), Units.inchesToMeters(17.875)), 
+            new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(0.0), Units.degreesToRadians(0.0))); //
 
     public static final Transform3d kRobotToLeftCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(0.25), Units.inchesToMeters(12.25), Units.inchesToMeters(17)), 
-            new Rotation3d(Units.degreesToRadians(-1.0), Units.degreesToRadians(-7.5), Units.degreesToRadians(90))); //
+            new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(0.0), Units.degreesToRadians(90))); //
   // public static final Transform3d kRobotToRearCam =
   //           new Transform3d(new Translation3d(Units.inchesToMeters(-.5), Units.inchesToMeters(2), Units.inchesToMeters(-32.25)), 
   //           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-13), Units.degreesToRadians(180))); // 0.48     0,-10,180
@@ -193,7 +193,7 @@ public static final class DriveConstants {
 
     }
      public static class Hood{
-      public static final double HoodKp = 0.05;
+      public static final double HoodKp = 0.075;
       public static final double HoodKi = 0.0;
       public static final double HoodKd = 0.0;
 

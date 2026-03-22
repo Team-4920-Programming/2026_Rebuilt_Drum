@@ -183,7 +183,7 @@ public class DataHighway extends SubsystemBase {
     updateMatchPhase();
     updateActiveHub();
     updateCurrentZone();
-
+    calculateAutoAim();
     calculateShotDistance();
     calculatePassingDistance();
     updateLogs();

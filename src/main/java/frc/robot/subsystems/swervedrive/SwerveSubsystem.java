@@ -275,7 +275,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
             FrontCamVisionTimestamp = visionEst.get().timestampSeconds;
             DogLog.log("SwerveSS/Vision/FrontCameraPose", FrontCameraPose3d);
             DogLog.log("SwerveSS/Vision/FrontTimeStamp",FrontCamVisionTimestamp);
-            VisionReading(FrontCamPose, FrontCamVisionTimestamp, FrontCamera.confidenceCalculator(visionEst.get()));
+            // VisionReading(FrontCamPose, FrontCamVisionTimestamp, FrontCamera.confidenceCalculator(visionEst.get()));
         }
     
     }
@@ -310,7 +310,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
             LeftCamVisionTimestamp = visionEst.get().timestampSeconds;
             DogLog.log("SwerveSS/Vision/LeftCameraPose", LeftCameraPose3d);
             DogLog.log("SwerveSS/Vision/LeftTimeStamp", LeftCamVisionTimestamp);
-            VisionReading(LeftCamPose, LeftCamVisionTimestamp, LeftCamera.confidenceCalculator(visionEst.get()));
+            // VisionReading(LeftCamPose, LeftCamVisionTimestamp, LeftCamera.confidenceCalculator(visionEst.get()));
         }
     
     }
@@ -348,7 +348,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     {
       ProcessVision4920();
       swerveDrive.updateOdometry();
-      targetAngle = Units.radiansToDegrees(Math.atan2(getPose().getY() - DHIn_aimTarget.getY(), getPose().getX() - DHIn_aimTarget.getX()));
+      targetAngle = Units.radiansToDegrees(Math.atan2(DHIn_aimTarget.getY() - getPose().getY(), DHIn_aimTarget.getX() - getPose().getX()));
       //postTrajectory(PathPlannerLogging.logActivePath(null););
     }
       poseEstimator.update(GetGyroAngle(), getModulePositions());
