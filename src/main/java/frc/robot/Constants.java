@@ -108,11 +108,11 @@ public static final class DriveConstants {
             new Rotation3d(Units.degreesToRadians(-0.75), Units.degreesToRadians(-16.0), Units.degreesToRadians(10.5))); //
 
     public static final Transform3d kRobotToRightCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(0.125), Units.inchesToMeters(-12.25), Units.inchesToMeters(17.875)), 
+            new Transform3d(new Translation3d(Units.inchesToMeters(0.125), Units.inchesToMeters(-13), Units.inchesToMeters(17.25)), 
             new Rotation3d(Units.degreesToRadians(-1.0), Units.degreesToRadians(-10.75), Units.degreesToRadians(-88.75))); //
 
     public static final Transform3d kRobotToLeftCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(0.25), Units.inchesToMeters(12.5), Units.inchesToMeters(16.75)), 
+            new Transform3d(new Translation3d(Units.inchesToMeters(0.25), Units.inchesToMeters(13), Units.inchesToMeters(16.55)), 
 
             new Rotation3d(Units.degreesToRadians(-0.25), Units.degreesToRadians(-7.7), Units.degreesToRadians(91.25))); //
   // public static final Transform3d kRobotToRearCam =
@@ -189,7 +189,7 @@ public static final class DriveConstants {
 }
 
     public static class Tipper{
-      public static final double TipperKp = 0.05;
+      public static final double TipperKp = 0.016;
       public static final double TipperKi = 0.0;
       public static final double TipperKd = 0.0;
 

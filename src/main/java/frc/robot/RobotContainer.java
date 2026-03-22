@@ -50,6 +50,7 @@ import frc.robot.commands.Drive.auto.CmdA_AutoAimRobot;
 import frc.robot.commands.Intake.Tele.*;
 import frc.robot.commands.Intake.auto.CmdA_RunIntake;
 import frc.robot.commands.Intake.auto.CmdA_StopIntake;
+import frc.robot.commands.Intake.auto.CmdA_VerifyHopperDown;
 
 import static edu.wpi.first.units.Units.RPM;
 
@@ -150,6 +151,7 @@ public class RobotContainer
     NamedCommands.registerCommand("CmdA_AutoAimRobot", new CmdA_AutoAimRobot (drivebase).withTimeout(5));
     NamedCommands.registerCommand("CmdA_EnableShooter", new CmdT_EnableShooter(Shooter));
     NamedCommands.registerCommand("CmdA_DisableShooter", new CmdT_DisableShooter(Shooter));
+    NamedCommands.registerCommand("CmdA_VerifyHopperDown", new CmdA_VerifyHopperDown(Intake));
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);

@@ -63,6 +63,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
+import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -107,6 +108,7 @@ public class SwerveSubsystem extends SubsystemBase
   private       Vision4920      RearCamera;
   public Pose3d RearCameraPose3d = new Pose3d();
 
+  private PhotonCamera FindMeBallsCam;
 // Datahighway variables
 //Outputs from this Subsystem
   public boolean DHOut_InNeutralZone = false;
@@ -178,6 +180,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     var stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
     var visionStdDevs = VecBuilder.fill(1.0, 0.25, 0.2);
+    FindMeBallsCam = new PhotonCamera("FindMeBalls");
 
 
     try
@@ -253,9 +256,12 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     LeftCamera = new Vision4920(Constants.Vision4920.kLeftCam, Constants.Vision4920.kRobotToLeftCam );
     // RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.ROBOT_TO_CAMERA_Rear );
 
+
   }
   private void ProcessVision4920()
   {
+    //List<PhotonPipelineResult> Balls = FindMeBallsCam.getAllUnreadResults();
+    DogLog.Log("Swerve/Vision/Balls",FindMeBallsCam.getAllUnreadResults());
     //Process Vision
     Pose2d FrontCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
     double FrontCamVisionTimestamp;
