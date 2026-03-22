@@ -7,14 +7,14 @@ package frc.robot.commands.Intake.Tele;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem.TipperState;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CmdT_TipperTucked extends Command {
   /** Creates a new CmdT_SetIntakeAngle. */
   IntakeSubsystem Intake;
-  double ReqAngle = 0;
-  public CmdT_TipperTucked(IntakeSubsystem IntakeSS) {
-    Intake = IntakeSS;
+  public CmdT_TipperTucked(IntakeSubsystem intake) {
+    Intake = intake;
     // ReqAngle = Angle;
 
 

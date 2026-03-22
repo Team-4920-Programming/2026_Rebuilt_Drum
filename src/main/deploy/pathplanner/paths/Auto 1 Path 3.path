@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.30527817403709,
-        "y": 0.2892582025677608
+        "x": 4.800977777777778,
+        "y": 0.2833888888888886
       },
       "isLocked": false,
       "linkedName": "Auto 1 Path 2 end"
     },
     {
       "anchor": {
-        "x": 0.4809272467882273,
-        "y": 0.6256633380865457
+        "x": 7.967922222222223,
+        "y": 2.4076777777777774
       },
       "prevControl": {
-        "x": 1.5807132667617685,
-        "y": 0.6256633380884444
+        "x": 7.958260499214294,
+        "y": 0.40770111513680596
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": "New Folder",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 57.264773727892454
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": true
 }

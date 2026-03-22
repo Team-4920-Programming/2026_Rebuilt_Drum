@@ -6,6 +6,7 @@ package frc.robot.subsystems.Shooter;
 
 import static edu.wpi.first.units.Units.Newton;
 
+import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -16,6 +17,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.fasterxml.jackson.databind.node.POJONode;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -41,6 +43,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.VelocityUnit;
@@ -110,10 +113,14 @@ public class ShooterSubsystem extends SubsystemBase {
   public double DHIn_AngleToDepot = 0;
   public double DHIn_CornerDistance = 0;
   public ChassisSpeeds DHIn_FieldVelocity = new ChassisSpeeds(0,0,0);
+  public Pose2d DHIn_RobotPose2d = new Pose2d().kZero;
   public double DHIn_HubPoseX = 0;
   public double DHIn_HubPoseY =0;
   public double DHOut_reqRobotAngle =0;
+  public Rotation2d DHOut_SOTFTargetAngle = new Rotation2d().kZero;
+  public boolean DHOut_SOTF = false;
   public ShooterLookupTable DHIn_ShooterLookupTable;
+  public Pose2d DHIN_HubPose = new Pose2d().kZero;
   DoubleSupplier HoodKpTunable = DogLog.tunable("Shooter/HoodAngle_kp", 0.003);
   DoubleSupplier HoodKdTunable = DogLog.tunable("Shooter/HoodAngle_kd", 0.0);
   /** Creates a new ShooterSubsystem. */
@@ -351,7 +358,8 @@ else {
     ControlShooter();
     // ControlHood();
     // TuneHoodPID();
-    
+      hoodOutput = hoodPID.calculate(getHoodAngle(),m_hoodAngle);
+      hoodMotor.set(hoodOutput);
     // DogLog.log("Shooter/Shooter1Speed",enc_Shooter1.getVelocity(),"rpm");
     // DogLog.log("Shooter/Shooter2Speed",enc_Shooter2.getVelocity(),"rpm");
     // DogLog.log("Shooter/RollerSpeed",enc_Roller.getVelocity(),"rpm");
@@ -380,17 +388,59 @@ else {
   private void updateShotParamsFromCalculations(){
 
     if (DHIn_ShooterLookupTable != null){
-      ShooterParams shooterCal = DHIn_ShooterLookupTable.shooterTable.get(DHIn_ShotDistance);
-      m_shooterSpeed = shooterCal.rpm();
-      m_hoodAngle = shooterCal.hoodAngle();
-      
-    hoodOutput = hoodPID.calculate(getHoodAngle(),m_hoodAngle);
-    hoodMotor.set(hoodOutput);
+      if (DHOut_SOTF){
+        ShootOnTheFlyCalculation();
+      }
+      else{
+        ShooterParams shooterCal = DHIn_ShooterLookupTable.shooterTable.get(DHIn_ShotDistance);
+        m_shooterSpeed = shooterCal.rpm();
+        m_hoodAngle = shooterCal.hoodAngle();
+        
+        
 
-      DogLog.log("Shooter/calculatedShooterSpeed",shooterCal.rpm());
-      DogLog.log("Shooter/calculatedHoodAngle",shooterCal.hoodAngle());
-      DogLog.log("Shooter/hoodOutput",hoodOutput);
+        DogLog.log("Shooter/calculatedShooterSpeed",shooterCal.rpm());
+        DogLog.log("Shooter/calculatedHoodAngle",shooterCal.hoodAngle());
+        DogLog.log("Shooter/hoodOutput",hoodOutput);
+      }
     }
+  }
+
+
+
+  public void ShootOnTheFlyCalculation(){
+    double latencyCompensation = 0.2;
+    Translation2d robotPosition = new Translation2d(DHIn_RobotPose2d.getTranslation().getX(),DHIn_RobotPose2d.getY());
+    Translation2d robotVelocity = new Translation2d(DHIn_FieldVelocity.vxMetersPerSecond, DHIn_FieldVelocity.vyMetersPerSecond);
+    Translation2d goalPose = new Translation2d(DHIN_HubPose.getX(),DHIN_HubPose.getY());
+    // 1. Project future position
+            Translation2d futurePos = robotPosition.plus(
+                robotVelocity.times(latencyCompensation)
+            );
+
+            // 2. Get target vector
+            Translation2d toGoal = goalPose.minus(futurePos);
+            double distance = toGoal.getNorm();
+            Translation2d targetDirection = toGoal.div(distance);
+
+            // 3. Look up baseline velocity from table
+            ShooterParams baseline = DHIn_ShooterLookupTable.shooterTable.get(distance);
+            double baselineVelocity = distance / baseline.timeOfFlight();
+
+            // 4. Build target velocity vector
+            Translation2d targetVelocity = targetDirection.times(baselineVelocity);
+
+            // 5. THE MAGIC: subtract robot velocity
+            Translation2d shotVelocity = targetVelocity.minus(robotVelocity);
+
+            // 6. Extract results
+            DHOut_SOTFTargetAngle = shotVelocity.getAngle();
+            double requiredVelocity = shotVelocity.getNorm();
+
+            // 7. Use table in reverse: velocity → effective distance → RPM
+            double effectiveDistance = DHIn_ShooterLookupTable.inverseShooterTable.get(requiredVelocity);
+            m_shooterSpeed = DHIn_ShooterLookupTable.shooterTable.get(effectiveDistance).rpm();
+            m_hoodAngle = DHIn_ShooterLookupTable.shooterTable.get(effectiveDistance).hoodAngle();
+
   }
 
   public boolean isShooterAtSpeed(){

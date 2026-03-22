@@ -1,6 +1,12 @@
 package frc.robot.subsystems.DataHighway;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 
@@ -28,41 +34,29 @@ public class ShooterLookupTable {
     }
 
   }
+  public final List<Double> keyList = List.of(1.0,1.55,2.1,2.46,3.0,3.9,4.9);
   public final InterpolatingTreeMap<Double, ShooterParams> shooterTable = new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Interpolatable::interpolate);
-  
+  public final InterpolatingDoubleTreeMap inverseShooterTable = new InterpolatingDoubleTreeMap();
   public ShooterLookupTable() {
 
         // shooterTable.put(distance,new ShooterParams(rpm, hoodAngle, timeofFlight));
     shooterTable.put(1.0,new ShooterParams(2225, 0.0, 0.875));
-    shooterTable.put(1.55,new ShooterParams(2375, 0.0, 1.125));
-    shooterTable.put(2.1,new ShooterParams(2600, 1.0, 1.3125));
-    shooterTable.put(2.46,new ShooterParams(2550, 3.0, 1.25));
+    shooterTable.put(1.55,new ShooterParams(2150, 4.5, 0.75));
+    shooterTable.put(2.1,new ShooterParams(2350, 7.0, 0.875));
+    shooterTable.put(2.48,new ShooterParams(2400, 9.0, 0.9375));
     shooterTable.put(3.0,new ShooterParams(2600, 15.0, 0.9375));
-    
     shooterTable.put(3.9,new ShooterParams(2950, 19.0, 1.375));
     shooterTable.put(4.9,new ShooterParams(3000, 28.0, 1.0625));
-    // TODO: Fill in with real measured data from testing.
-    // Format: addEntry(distanceMeters, rpm, hoodAngleDegrees, timeOfFlightSeconds)
-    //
-    // Measure these by:
-    //   1. Place robot at known distance from goal
-    //   2. Tune RPM and hood angle until shots consistently score
-    //   3. Measure time of flight (high-speed camera or ball-exit to goal-entry sensors)
-    //   4. Record all three values for each distance
+    shooterTable.put(8.7,new ShooterParams(3500, 41.0, 1.3125));
 
-    // addEntry(1.30, 2600, 74.5, 1.0);
-    // addEntry(2.0, 3000, 74.5, 1.25);
-    // addEntry(2.0, 2600, 62.8, 0.9375);//
-    // addEntry(2.5, 3600, 74.5, 1.5625);
-    // addEntry(2.5, 3000, 67.75, 1.125 );
-    //     addEntry(3.0, 3600, 74.5, 1.4375);
-    // addEntry(3.0, 3000, 61.75, 1.0 );
-    // addEntry(2.5, 3200, 44, 0.6);
-    // addEntry(3.0, 3600, 48, 0.7);
-    // addEntry(3.5, 3900, 51, 0.8);
-    // addEntry(4.0, 4200, 54, 0.9);
-    // addEntry(4.5, 4500, 56, 1.0);
-    // addEntry(5.0, 4800, 58, 1.1);
+    setupInverseMap();
+  }
+
+  public void setupInverseMap(){
+    for (var key : keyList){
+      double distance = (double)key;
+      inverseShooterTable.put(distance/(shooterTable.get(distance).timeOfFlight()), distance);
+    }
   }
 
 }

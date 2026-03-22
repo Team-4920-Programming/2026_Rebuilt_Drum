@@ -8,11 +8,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CmdA_RunIntake extends Command {
+public class CmdA_StopIntake extends Command {
   /** Creates a new CmdT_RunIntake. */
     IntakeSubsystem Intake;
   
-  public CmdA_RunIntake(IntakeSubsystem IntakeSS) {
+  public CmdA_StopIntake(IntakeSubsystem IntakeSS) {
     // Use addRequirements() here to declare subsystem dependencies.
     
     Intake = IntakeSS;
@@ -26,7 +26,7 @@ public class CmdA_RunIntake extends Command {
   @Override
   public void execute() {
 
-      Intake.RunIntake();
+      Intake.StopIntake();
     }
 
   // Called once the command ends or is interrupted.

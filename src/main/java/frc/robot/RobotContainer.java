@@ -42,12 +42,14 @@ import frc.robot.commands.Drive.CmdT_EnableAutoAim;
 import frc.robot.commands.Drive.CmdT_EnableAutoLock;
 import frc.robot.commands.Drive.CmdT_EnableCornerAim;
 import frc.robot.commands.Drive.CmdT_OutpostAutoAim;
+import frc.robot.commands.Drive.auto.CmdA_AutoAimRobot;
 // import frc.robot.commands.shooter.Auto.*;
 // import frc.robot.commands.Climber.Auto.*;
 // import frc.robot.commands.Climber.Tele.*;
 // import frc.robot.commands.Intake.Auto.*;
 import frc.robot.commands.Intake.Tele.*;
 import frc.robot.commands.Intake.auto.CmdA_RunIntake;
+import frc.robot.commands.Intake.auto.CmdA_StopIntake;
 
 import static edu.wpi.first.units.Units.RPM;
 
@@ -143,9 +145,11 @@ public class RobotContainer
     DogLog.setPdh(new PowerDistribution());
 
     NamedCommands.registerCommand("CmdA_ShootTillEmpty", new CmdT_AutoShoot (Shooter, drivebase, Intake).withTimeout(5));
-    NamedCommands.registerCommand("CmdA_RunIntake", new CmdA_RunIntake (Intake, 1));
-    NamedCommands.registerCommand("CmdA_StopIntake", new CmdA_RunIntake (Intake, 0));
-
+    NamedCommands.registerCommand("CmdA_RunIntake", new CmdA_RunIntake (Intake));
+    NamedCommands.registerCommand("CmdA_StopIntake", new CmdA_StopIntake (Intake));
+    NamedCommands.registerCommand("CmdA_AutoAimRobot", new CmdA_AutoAimRobot (drivebase).withTimeout(5));
+    NamedCommands.registerCommand("CmdA_EnableShooter", new CmdT_EnableShooter(Shooter));
+    NamedCommands.registerCommand("CmdA_DisableShooter", new CmdT_DisableShooter(Shooter));
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -233,7 +237,7 @@ public class RobotContainer
           driverXbox.x().whileTrue(new CmdT_TipperShooting(Intake));
           driverXbox.b().whileTrue(new CmdT_TipperIntaking(Intake));
           driverXbox.y().whileTrue(new CmdT_RunIntake(Intake));
-       // driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
+       driverXbox.rightBumper().whileTrue(new CmdT_TipperTucked(Intake));
        // driverXbox.leftBumper().onTrue(new CmdT_DisableAutoAim(drivebase));
        driverXbox.leftTrigger().whileTrue(new CmdT_RampUpShooter(Shooter));
         driverXbox.rightTrigger().whileTrue(new CmdT_AutoShoot(Shooter, drivebase, Intake));

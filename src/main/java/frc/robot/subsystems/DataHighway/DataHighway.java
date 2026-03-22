@@ -151,7 +151,8 @@ public class DataHighway extends SubsystemBase {
   double DH_AngleToOutpost = 0;
   double DH_AngleToDepot = 0;
   double DH_CornerDistance = 0;
-
+  boolean DH_SOTF = false;
+  Rotation2d DH_SOTFTargetAngle = Rotation2d.kZero;
   double DH_matchTime = 0;
   boolean DH_safeToShoot = false;
   Pose2d DH_robotPose = new Pose2d().kZero;
@@ -243,6 +244,8 @@ else if (DH_InOpposingZone){
 
     DogLog.log("Data/ShotData/DistancefromHub", DH_ShotDistance);
     DogLog.log("Data/ShotData/PassingDistance", DH_PassingDistance);
+
+    DogLog.log("Data/ShotData/RobotIsAimed", DH_Aimed);
 
 
   }
@@ -434,6 +437,9 @@ else if (DH_InOpposingZone){
     DH_reqRobotAngle = SS_Shooter.DHOut_reqRobotAngle;
     DH_robotPose = SS_Swerve.DHOUT_RobotPose;
     DH_InOpposingZone = SS_Swerve.DHOut_InOpposingZone;
+    DH_SOTF = SS_Shooter.DHOut_SOTF;
+    DH_SOTFTargetAngle = SS_Shooter.DHOut_SOTFTargetAngle;
+    
   }
   private void SetDHData()
   {
@@ -454,6 +460,10 @@ else if (DH_InOpposingZone){
     SS_Swerve.DHIn_ShooterLookupTable = DH_ShooterLookupTable;
     SS_Swerve.DHIn_ShotDistance = DH_ShotDistance;
     SS_Swerve.DHIn_aimTarget = aimTarget;
+    SS_Shooter.DHIn_RobotPose2d = DH_robotPose;
+    SS_Shooter.DHIN_HubPose = DH_HubPose;
+    SS_Swerve.DHIn_SOTFTargetAngle = DH_SOTFTargetAngle;
+    SS_Swerve.DHIn_SOTF = DH_SOTF;
   }
 
   

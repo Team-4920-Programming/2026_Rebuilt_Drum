@@ -3,49 +3,52 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.6250213980028523,
-        "y": 0.5739087018544944
+        "x": 3.6120827389443653,
+        "y": 0.445
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.625021398002853,
-        "y": 0.5739087018544944
+        "x": 7.612082738944365,
+        "y": 0.445
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.558373751783167,
-        "y": 1.0397004279600572
+        "x": 7.998,
+        "y": 3.149
       },
       "prevControl": {
-        "x": 6.717195276406613,
-        "y": 0.49894283664655803
-      },
-      "nextControl": {
-        "x": 8.282938659058486,
-        "y": 1.5054921540656199
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.998288159771754,
-        "y": 3.148701854493581
-      },
-      "prevControl": {
-        "x": 7.90771754636234,
-        "y": 1.8160199714693295
+        "x": 7.97241084165478,
+        "y": 0.9361911554921556
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Auto 1 Path 1 end"
     }
   ],
-  "rotationTargets": [],
-  "constraintZones": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.15,
+      "rotationDegrees": 90.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.515867656988525,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 4.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 180.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -58,13 +61,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 88.21008939175393
+    "rotation": 91.1457628381751
   },
   "reversed": false,
   "folder": "New Folder",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

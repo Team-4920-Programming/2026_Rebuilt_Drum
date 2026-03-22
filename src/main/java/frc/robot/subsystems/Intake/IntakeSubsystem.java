@@ -43,7 +43,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   
   public enum TipperState{
-    TUCKED(70.0),
+    TUCKED(90.0),
     SHOOTING(25.0),
     INTAKING(0.0);
 
@@ -108,7 +108,7 @@ public class IntakeSubsystem extends SubsystemBase {
     Intake2Config.follow(intakeMotor1,true);
     intakeMotor2.configure(Intake2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    TipperConfig.idleMode(IdleMode.kCoast);
+    TipperConfig.idleMode(IdleMode.kBrake);
     TipperConfig.smartCurrentLimit(40);
     TipperConfig.disableFollowerMode();
     TipperConfig.inverted(true);

@@ -24,25 +24,38 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Auto 1 Path 2"
-          }
-        },
-        {
-          "type": "race",
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "wait",
+                "type": "path",
                 "data": {
-                  "waitTime": 3.4
+                  "pathName": "Auto 1 Path 2"
                 }
               },
               {
                 "type": "named",
                 "data": {
+                  "name": "CmdA_EnableShooter"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
                   "name": "CmdA_ShootTillEmpty"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_AutoAimRobot"
                 }
               }
             ]
@@ -52,18 +65,6 @@
           "type": "path",
           "data": {
             "pathName": "Auto 1 Path 3"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CmdA_ShootTillEmpty"
           }
         }
       ]
