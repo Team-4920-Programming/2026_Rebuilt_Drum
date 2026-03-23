@@ -23,6 +23,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.ADXL345_I2C.AllAxes;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -127,6 +128,7 @@ public class DataHighway extends SubsystemBase {
   boolean targetSetup = false;
   boolean validTargetSetup = false;
 
+  public Timer DH_matchTimer = new Timer();
 
   //Subsystems
   ShooterSubsystem SS_Shooter;
@@ -181,7 +183,7 @@ public class DataHighway extends SubsystemBase {
     updateValidTargetData();
     updateMatchTime();
     updateGameData();
-    updateMatchPhase();
+    processMatchPhase();
     updateActiveHub();
     updateCurrentZone();
     calculateAutoAim();
@@ -207,12 +209,8 @@ else if (DH_InOpposingZone){
   }
 
   private void updateMatchTime(){
-    if (DriverStation.isFMSAttached())
-    {
-      DH_matchTime = DriverStation.getMatchTime();
-    }
-    else{
-      DH_matchTime = 160.0 - DriverStation.getMatchTime();
+    if (DH_matchTimer.isRunning()){
+      DH_matchTime = 160.0 - DH_matchTimer.get();
     }
   }
 
@@ -246,6 +244,14 @@ else if (DH_InOpposingZone){
     DogLog.log("Data/ShotData/PassingDistance", DH_PassingDistance);
 
     DogLog.log("Data/ShotData/RobotIsAimed", DH_Aimed);
+
+    DogLog.log("Data/MatchTimerReading", DH_matchTimer.get());
+    DogLog.log("Data/MatchTimerStarted", DH_matchTimer.isRunning());
+
+    DogLog.log("Data/MatchPhase", currentMatchPhase);
+    DogLog.log("Data/AllianceColor", allianceColor);
+    DogLog.log("Data/AssignedShift", assignedShift);
+    DogLog.log("Data/CurrentZone", currentZone);
 
 
   }
@@ -294,8 +300,11 @@ else if (DH_InOpposingZone){
       aimTarget = DH_passingTargetPose;
     }
   }
+  public void updateMatchPhase(MatchPhase mp){
+    currentMatchPhase = mp;
+  }
 
-  private void updateMatchPhase(){
+  private void processMatchPhase(){
     if (DH_matchTime > ShiftSchedule.AUTO_END.getValue()){
       currentMatchPhase = MatchPhase.AUTO;
     }

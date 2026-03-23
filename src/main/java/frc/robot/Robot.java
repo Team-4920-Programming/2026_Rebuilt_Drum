@@ -81,6 +81,7 @@ public class Robot extends TimedRobot
     m_robotContainer.setMotorBrake(true);
     disabledTimer.reset();
     disabledTimer.start();
+    m_robotContainer.stopMatchTimer();
   }
   
   @Override
@@ -100,6 +101,7 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit()
   {
+    m_robotContainer.resetMatchTimer();
     m_robotContainer.setMotorBrake(true);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -116,6 +118,9 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousPeriodic()
   {
+    if (!m_robotContainer.hasMatchTimerStarted()){
+      m_robotContainer.startMatchTimer();
+    }
   }
 
   @Override
@@ -138,8 +143,11 @@ public class Robot extends TimedRobot
    * This function is called periodically during operator control.
    */
   @Override
-  public void teleopPeriodic()
+  public void teleopPeriodic(
+  )
   {
+    if (!m_robotContainer.hasMatchTimerStarted())
+    m_robotContainer.startMatchTimer();
   }
 
   @Override

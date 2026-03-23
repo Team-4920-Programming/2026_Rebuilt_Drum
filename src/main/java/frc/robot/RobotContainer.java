@@ -32,6 +32,7 @@ import frc.robot.subsystems.Shooter.*;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.Climber.*;
 import frc.robot.subsystems.DataHighway.*;
+import frc.robot.subsystems.DataHighway.DataHighway.MatchPhase;
 import frc.robot.commands.shooter.auto.CmdA_ShootTillEmpty;
 import frc.robot.commands.shooter.tele.*;
 import frc.robot.commands.Climber.tele.CmdT_Climb;
@@ -170,7 +171,7 @@ public class RobotContainer
    */
   private void configureBindings()
   {
-    Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
+    Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
     Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
     Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
     Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(
@@ -280,5 +281,19 @@ public class RobotContainer
   public void setMotorBrake(boolean brake)
   {
     drivebase.setMotorBrake(brake);
+  }
+
+  public void startMatchTimer(){
+    DH.DH_matchTimer.start();
+  }
+  public void stopMatchTimer(){
+    DH.DH_matchTimer.stop();
+  }
+  public void resetMatchTimer(){
+    DH.DH_matchTimer.reset();
+  }
+
+  public boolean hasMatchTimerStarted(){
+    return DH.DH_matchTimer.isRunning();
   }
 }

@@ -57,7 +57,10 @@ import frc.robot.subsystems.DataHighway.ShooterLookupTable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
@@ -65,6 +68,8 @@ import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -258,10 +263,29 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
 
 
   }
+
+  private void ObjectDetectionProcess(){
+    List validTargets = new ArrayList(100);
+    List<PhotonPipelineResult> BallCamResultList = FindMeBallsCam.getAllUnreadResults();
+    if (!BallCamResultList.isEmpty()){
+      PhotonPipelineResult result = BallCamResultList.get(BallCamResultList.size()-1);
+        double numberOfTargets = result.getTargets().size();
+        if (!result.hasTargets()){
+          for (PhotonTrackedTarget photonTrackedTarget : result.getTargets()){
+            if (photonTrackedTarget.getDetectedObjectConfidence() > 0.6){
+              Transform3d test = new Transform3d().kZero;
+              test = photonTrackedTarget.getBestCameraToTarget();
+              String id = String.format("Data/FuelTracking/Transform3D_%d",photonTrackedTarget.getFiducialId());
+              DogLog.log(id, test);
+            }
+          }
+        }
+      }
+    }
   private void ProcessVision4920()
   {
-    //List<PhotonPipelineResult> Balls = FindMeBallsCam.getAllUnreadResults();
-    DogLog.Log("Swerve/Vision/Balls",FindMeBallsCam.getAllUnreadResults());
+    
+    ObjectDetectionProcess();
     //Process Vision
     Pose2d FrontCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
     double FrontCamVisionTimestamp;
