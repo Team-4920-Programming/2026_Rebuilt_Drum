@@ -203,5 +203,6 @@ public double getTipperAngle() {
     DogLog.log("Intake/TipperPIDAtSetpoint",tipperPID.atSetpoint());
     DogLog.log("Intake/TipperState", DHOut_tipperState);
     DogLog.log("Intake/TipperOverride", tipperOverride);
+
   }
 }

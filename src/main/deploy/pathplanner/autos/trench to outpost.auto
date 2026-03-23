@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "CmdA_VerifyHopperDown"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
