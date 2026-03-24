@@ -34,16 +34,16 @@ public class ShooterLookupTable {
     }
 
   }
-  public final List<Double> keyList = List.of(1.0,1.55,2.1,2.46,3.0,3.9,4.9);
+  public final List<Double> keyList = List.of(1.0,1.3,2.1,2.5,3.0,3.9,4.9);
   public final InterpolatingTreeMap<Double, ShooterParams> shooterTable = new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Interpolatable::interpolate);
   public final InterpolatingDoubleTreeMap inverseShooterTable = new InterpolatingDoubleTreeMap();
   public ShooterLookupTable() {
 
         // shooterTable.put(distance,new ShooterParams(rpm, hoodAngle, timeofFlight));
-    shooterTable.put(1.0,new ShooterParams(2225, 0.0, 0.875));
-    shooterTable.put(1.55,new ShooterParams(2150, 4.5, 0.75));
-    shooterTable.put(2.1,new ShooterParams(2350, 7.0, 0.875));
-    shooterTable.put(2.48,new ShooterParams(2400, 9.0, 0.9375));
+    shooterTable.put(1.0,new ShooterParams(2000, 0.0, 0.875));
+    shooterTable.put(1.3,new ShooterParams(2200, 0, 0.75));
+    shooterTable.put(2.1,new ShooterParams(2350, 4.5, 0.875));
+    shooterTable.put(2.5,new ShooterParams(2400, 9.0, 0.9375));
     shooterTable.put(3.0,new ShooterParams(2600, 15.0, 0.9375));
     shooterTable.put(3.9,new ShooterParams(2950, 19.0, 1.375));
     shooterTable.put(4.9,new ShooterParams(3000, 28.0, 1.0625));

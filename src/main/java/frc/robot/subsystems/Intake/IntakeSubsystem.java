@@ -44,8 +44,8 @@ public class IntakeSubsystem extends SubsystemBase {
   
   public enum TipperState{
     TUCKED(90.0),
-    SHOOTING(25.0),
-    INTAKING(0.0);
+    SHOOTING(12.0),
+    INTAKING(0);
 
     private final double angle;
 
@@ -67,6 +67,7 @@ public class IntakeSubsystem extends SubsystemBase {
   SparkFlex intakeMotor1 = new SparkFlex(Constants.Can_Intake1, MotorType.kBrushless);
   SparkFlex intakeMotor2 = new SparkFlex(Constants.Can_Intake2, MotorType.kBrushless);
   SparkFlex tipperMotor = new SparkFlex(Constants.Can_Tipper, MotorType.kBrushless);
+  RelativeEncoder tipperRelativeEncoder = tipperMotor.getEncoder();
 
   SparkFlexConfig Intake1Config = new SparkFlexConfig();
   SparkFlexConfig Intake2Config = new SparkFlexConfig();
@@ -88,6 +89,8 @@ public class IntakeSubsystem extends SubsystemBase {
   public boolean Intake = false;
   double IntakeSpeed = 0;
   double tipperOutput = 0;
+  boolean EliminateBacklash = false;
+  double tipperMotorEnc = 0;
   //Datahighway
   boolean DHOut_IntakeOut = false;
 
@@ -174,6 +177,14 @@ public double getTipperAngle() {
       tipperPID.setSetpoint(DHOut_tipperState.getAngle());
     }
   }
+// public void RemoveBacklash(){
+//   if(tipperRelativeEncoder.getPosition() < (tipperMotorEnc-4)){
+// SetTipperSpeed(-0.1);
+//   }
+//   else {
+//     EliminateBacklash = false;
+//   }
+// }
 
 
 
@@ -181,7 +192,7 @@ public double getTipperAngle() {
   public void periodic() {
 
     tipperOutput = tipperPID.calculate(getTipperAngle());
-    tipperMotor.set(tipperOutput);
+    if (!EliminateBacklash) tipperMotor.set(tipperOutput);
 
     if (Intake){
       SetIntakeSpeed(1);
@@ -192,7 +203,17 @@ public double getTipperAngle() {
       ProcessTipperState();
       // TuneTipperPID();
       updateLogs();
+// if (tipperPID.getSetpoint() > 5.0){
+//   tipperMotorEnc = 0;
+// }
+// if(tipperPID.getSetpoint() <5.0 && tipperPID.atSetpoint() && tipperMotorEnc == 0){
+// tipperMotorEnc = tipperRelativeEncoder.getPosition();
+// EliminateBacklash = true;
 
+// }
+// if (EliminateBacklash){
+//   RemoveBacklash();
+// }
     }
 
   private void updateLogs(){
@@ -203,6 +224,7 @@ public double getTipperAngle() {
     DogLog.log("Intake/TipperPIDAtSetpoint",tipperPID.atSetpoint());
     DogLog.log("Intake/TipperState", DHOut_tipperState);
     DogLog.log("Intake/TipperOverride", tipperOverride);
-
+    DogLog.log("Intake/TipperRelativeEnc", tipperRelativeEncoder.getPosition());
+    DogLog.log("Intake/TipperAbsEnc", tipperMotorEnc);
   }
 }

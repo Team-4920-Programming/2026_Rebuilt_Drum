@@ -152,7 +152,7 @@ public class ShooterSubsystem extends SubsystemBase {
     AbsoluteEncoderConfig hoodencoderConfig = new AbsoluteEncoderConfig();
     hoodencoderConfig.positionConversionFactor(180);
     hoodencoderConfig.zeroCentered(true);
-    hoodencoderConfig.zeroOffset(0.111133136);
+    //hoodencoderConfig.zeroOffset(0.111133136);
     hoodConfig.apply(hoodencoderConfig);
     hoodMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
@@ -360,8 +360,9 @@ else {
     // TuneHoodPID();
       hoodOutput = hoodPID.calculate(getHoodAngle(),m_hoodAngle);
       hoodMotor.set(hoodOutput);
-    // DogLog.log("Shooter/Shooter1Speed",enc_Shooter1.getVelocity(),"rpm");
-    // DogLog.log("Shooter/Shooter2Speed",enc_Shooter2.getVelocity(),"rpm");
+     DogLog.log("Shooter/Shooter1Current",shooterMotor1.getStatorCurrent().getValue());
+     DogLog.log("Shooter/Shooter2Current",shooterMotor2.getStatorCurrent().getValue());
+     //DogLog.log("Shooter/Shooter2Speed",enc_Shooter2.getVelocity(),"rpm");
     // DogLog.log("Shooter/RollerSpeed",enc_Roller.getVelocity(),"rpm");
     // DogLog.log("Shooter/FeederSpeed",enc_Feeder.getVelocity(),"rpm");
 
