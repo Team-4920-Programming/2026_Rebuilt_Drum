@@ -345,34 +345,34 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
               Pose2d estimatedPose = currentPose.transformBy(new Transform2d(ballDistancTreeMap.get(photonTrackedTarget.getArea())*Math.cos(Units.degreesToRadians(-1*photonTrackedTarget.getYaw())),ballDistancTreeMap.get(photonTrackedTarget.getArea())*Math.sin(Units.degreesToRadians(-1*photonTrackedTarget.getYaw())),new Rotation2d().kZero));
               validTargets.add(estimatedPose);
      
-      PhotonPipelineResult result = BallCamResultList.get(BallCamResultList.size()-1);
-        double numberOfTargets = result.getTargets().size();
-         DogLog.log ("Data/FuelTracking/NumberofFuel",numberOfTargets);
-        if (result.hasTargets()){
-          int ctr = 0;
-          for (PhotonTrackedTarget photonTrackedTarget : result.getTargets()){
-            if (photonTrackedTarget.getDetectedObjectConfidence() > 0.6){
-              double x = 0;
-              double y =0;
-              double yaw = photonTrackedTarget.getYaw();
-              double pitch = photonTrackedTarget.getPitch();
-              double area = photonTrackedTarget.getArea();
-              double skew = photonTrackedTarget.getSkew();
-              Transform3d pose = photonTrackedTarget.getAlternateCameraToTarget();
-              List<TargetCorner> corners = photonTrackedTarget.getDetectedCorners();
-              //x = photonTrackedTarget.getDetectedCorners().get(1).x;
-              //y = photonTrackedTarget.getDetectedCorners().get(1).y;
-              ctr++;
-              String id = String.format("Data/FuelTracking/Transform3D_%d",ctr);
-              DogLog.log(id + " corners", corners.size());
-              DogLog.log(id + " yaw", yaw);
-              DogLog.log(id + " pitch", pitch);
+      //PhotonPipelineResult result = BallCamResultList.get(BallCamResultList.size()-1);
+        // double numberOfTargets = result.getTargets().size();
+        //  DogLog.log ("Data/FuelTracking/NumberofFuel",numberOfTargets);
+        // if (result.hasTargets()){
+        //   int ctr = 0;
+        //   for (PhotonTrackedTarget photonTrackedTarget : result.getTargets()){
+        //     if (photonTrackedTarget.getDetectedObjectConfidence() > 0.6){
+        //       double x = 0;
+        //       double y =0;
+        //       double yaw = photonTrackedTarget.getYaw();
+        //       double pitch = photonTrackedTarget.getPitch();
+        //       double area = photonTrackedTarget.getArea();
+        //       double skew = photonTrackedTarget.getSkew();
+        //       Transform3d pose = photonTrackedTarget.getAlternateCameraToTarget();
+        //       List<TargetCorner> corners = photonTrackedTarget.getDetectedCorners();
+        //       //x = photonTrackedTarget.getDetectedCorners().get(1).x;
+        //       //y = photonTrackedTarget.getDetectedCorners().get(1).y;
+        //       ctr++;
+        //       String id = String.format("Data/FuelTracking/Transform3D_%d",ctr);
+        //       DogLog.log(id + " corners", corners.size());
+        //       DogLog.log(id + " yaw", yaw);
+        //       DogLog.log(id + " pitch", pitch);
 
-            }
-          }
-          }
+        //     }
+        //   }
+        //   }
         }
-      }
+      
 
       DogLog.log("BallAssist/Active",       follower.isActive());
       DogLog.log("BallAssist/Target",       follower.getTargetPose());
@@ -381,7 +381,11 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
       DogLog.log("BallAssist/Remaining",    follower.getRemainingBalls());
       DogLog.log("BallAssist/Score",        follower.getPathScore());
     }
-
+  }
+  else {}
+  }
+  }
+}
   public void EnableBallAssist(){
     follower.enable();
   }
