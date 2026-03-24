@@ -43,6 +43,7 @@ import frc.robot.commands.Drive.CmdT_EnableAutoAim;
 import frc.robot.commands.Drive.CmdT_EnableAutoLock;
 import frc.robot.commands.Drive.CmdT_EnableCornerAim;
 import frc.robot.commands.Drive.CmdT_OutpostAutoAim;
+import frc.robot.commands.Drive.CmdT_TrackBallDrive;
 import frc.robot.commands.Drive.auto.CmdA_AutoAimRobot;
 // import frc.robot.commands.shooter.Auto.*;
 // import frc.robot.commands.Climber.Auto.*;
@@ -249,6 +250,8 @@ public class RobotContainer
         driverXbox.povDown().whileTrue(new CmdT_Manual_HoodDown(Shooter));
         driverXbox.povLeft().whileTrue(new CmdT_Manual_SlowDownShooter(Shooter));
         driverXbox.povRight().whileTrue(new CmdT_Manual_SpeedUpShooter(Shooter));
+
+        driverXbox.back().whileTrue(new CmdT_TrackBallDrive(drivebase));
         // driverXbox.rightTrigger().whileTrue(new CmdT_OutpostAutoAim(drivebase));
        // driverXbox.leftTrigger().whileTrue(new CmdT_DepotAutoAim(drivebase));
          // Pre-match calibration routine - Back + Start buttons together
