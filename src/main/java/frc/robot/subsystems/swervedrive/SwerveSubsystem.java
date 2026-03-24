@@ -332,7 +332,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     // END OF TESTING CODE
    
     validTargets.clear();
-      
+    //MIKE VALIDTE IF THIS IS HOW WE ARE SUPPOSED TO GET BALL DETECTIONS, I THINK IT IS BUT IM NOT 100% SURE  
     List<PhotonPipelineResult> BallCamResultList = FindMeBallsCam.getAllUnreadResults();
     if (!BallCamResultList.isEmpty()){
       
@@ -348,7 +348,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
           }
         }
       }
-      
+
       DogLog.log("BallAssist/Active",       follower.isActive());
       DogLog.log("BallAssist/Target",       follower.getTargetPose());
       DogLog.log("BallAssist/Corridor",     follower.getCorridorPoses());
