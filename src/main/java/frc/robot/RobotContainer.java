@@ -250,8 +250,8 @@ public class RobotContainer
         driverXbox.povDown().whileTrue(new CmdT_Manual_HoodDown(Shooter));
         driverXbox.povLeft().whileTrue(new CmdT_Manual_SlowDownShooter(Shooter));
         driverXbox.povRight().whileTrue(new CmdT_Manual_SpeedUpShooter(Shooter));
-
-        driverXbox.back().whileTrue(new CmdT_TrackBallDrive(drivebase));
+        // driverXbox.povUp().whileTrue(new CmdT_Climb(Climber));
+        // driverXbox.povDown().whileTrue(new CmdT_ClimberUp(Climber));
         // driverXbox.rightTrigger().whileTrue(new CmdT_OutpostAutoAim(drivebase));
        // driverXbox.leftTrigger().whileTrue(new CmdT_DepotAutoAim(drivebase));
          // Pre-match calibration routine - Back + Start buttons together
