@@ -30,6 +30,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -43,17 +44,20 @@ import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DataHighway.ShooterLookupTable;
+import frc.robot.subsystems.swervedrive.BallPathCalculator.PathResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +66,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -137,7 +142,7 @@ public class SwerveSubsystem extends SubsystemBase
   public ShooterLookupTable DHIn_ShooterLookupTable;
   // public double DHOut_robotY = getPose().getY();
   // public double DHOut_robotX = getPose().getX();
-  
+  private InterpolatingDoubleTreeMap ballDistancTreeMap = new InterpolatingDoubleTreeMap();
   
   public Rotation2d DHIn_SOTFTargetAngle = Rotation2d.kZero;
   public boolean DHIn_SOTF = false;
@@ -147,8 +152,20 @@ public class SwerveSubsystem extends SubsystemBase
   private boolean AutoAimEnabled = false;
   private Pose2d AutoAimTarget = new Pose2d();
   private double AutoAimAngle = 0;
+
+  public List<Pose2d> validTargets = new ArrayList<>(100) ;
   
-  
+  private final BallPathCalculator calc = new BallPathCalculator()
+    .withCorridorWidth(0.5842)      // your intake width in meters
+    .withSweepResolution(2.0)    // degrees per step
+    .withMaxLookahead(2.5);      // meters
+
+    private final BallAssistFollower follower = new BallAssistFollower()
+    .withMaxSpeed(4.5)
+    .withLateralKp(2.0)
+    .withHysteresis(0.25)
+    .withMinCommitDistance(1.0).withHeadingKp(3.0).withMaxDriverTrim(5.0);
+
 
   private boolean DepotAimEnabled = false;
   private Pose2d DepotAimTarget = new Pose2d();
@@ -160,7 +177,7 @@ public class SwerveSubsystem extends SubsystemBase
   //private double OutpostAimAngle = 0;
   public double OutpostAngle = 0;
   
-  
+  CommandXboxController driverXbox = new CommandXboxController(0);
   private PIDController PID_AutoAim = new PIDController(0.1, 0, 0);
   private PIDController PID_DepotAim = new PIDController(0.1, 0, 0);
 private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
@@ -221,6 +238,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
       swerveDrive.stopOdometryThread();
     }
     setupPathPlanner();
+    BallDistanceMapSetup();
     // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
   }
 
@@ -265,10 +283,67 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
 
   }
 
+  private void BallDistanceMapSetup(){
+
+    ballDistancTreeMap.put(7.8, Units.inchesToMeters(22.0));
+    ballDistancTreeMap.put(3.0, Units.inchesToMeters(33.0));
+    ballDistancTreeMap.put(1.5, Units.inchesToMeters(48.0));
+    ballDistancTreeMap.put(0.88, Units.inchesToMeters(63.0));
+    ballDistancTreeMap.put(0.6, Units.inchesToMeters(77.6));
+    ballDistancTreeMap.put(0.4, Units.inchesToMeters(91.4));
+  }
+  private boolean ballssimulated = false;
+
   private void ObjectDetectionProcess(){
-    List validTargets = new ArrayList(100);
+
+    //TESTING CODE TO SIMULATE BALL DETECTION, LEAVE COMMENTED
+    
+    // Pose2d currentPose = swerveDrive.getPose();
+    // Pose2d estimatedPose = currentPose.transformBy(new Transform2d(ballDistancTreeMap.get(1.0)*Math.cos(Units.degreesToRadians(10.0)),ballDistancTreeMap.get(1.0)*Math.sin(Units.degreesToRadians(10.0)),new Rotation2d().kZero));
+    // DogLog.log("BallTracking/TestBallDistanceX", ballDistancTreeMap.get(1.0)*Math.cos(Units.degreesToRadians(10.0)));
+    // DogLog.log("BallTracking/TestBallDistanceY", ballDistancTreeMap.get(1.0)*Math.sin(Units.degreesToRadians(10.0)));
+    // DogLog.log("BallTracking/TestBallDistance", ballDistancTreeMap.get(1.0));
+    // DogLog.log("BallTracking/TestBallPose", estimatedPose);
+    // Random rand = new Random();
+
+    // if (!ballssimulated){
+    //   Pose2d[] vt = new Pose2d[400];
+    //   ballssimulated = true;
+    //   for (int i = 0 ; i < 400 ; i ++){
+    //     double distance = rand.nextDouble() * 15.0;
+    //     double angle = (rand.nextDouble() - 0.5) * 180;
+    //     estimatedPose = currentPose.transformBy(new Transform2d(ballDistancTreeMap.get(distance)*Math.cos(Units.degreesToRadians(angle)),ballDistancTreeMap.get(distance)*Math.sin(Units.degreesToRadians(angle)),new Rotation2d().kZero));  
+    //     validTargets.add(estimatedPose);
+    //     vt[i] = estimatedPose;
+    //   } 
+    //   DogLog.log("BallTracking/vt",vt);
+    // PathResult result = calc.calculate(getPose(), validTargets);
+     //   if (result.isValid()) {
+    //       // DogLog.log("BallAssist/Path",        result.getTrajectory().forEach(state -> new Pose2d(state.poseMeters.getTranslation(), state.poseMeters.getRotation())));
+    //       DogLog.log("BallAssist/CapturedBalls",  result.getBallPoses());
+    //       DogLog.log("BallAssist/Corridor",       result.getCorridorPoses());
+    //       DogLog.log("BallAssist/AllBalls",        result.getAllBallPoses(validTargets));
+    //       DogLog.log("BallAssist/Score",           result.score);
+    //       DogLog.log("BallAssist/BallCount",       result.ballCount());
+    //       DogLog.log("BallAssist/RelHeadingDeg",   Math.toDegrees(result.relativeHeading));
+
+    //       }
+    // }
+    
+    // END OF TESTING CODE
+   
+    validTargets.clear();
+    //MIKE VALIDTE IF THIS IS HOW WE ARE SUPPOSED TO GET BALL DETECTIONS, I THINK IT IS BUT IM NOT 100% SURE  
     List<PhotonPipelineResult> BallCamResultList = FindMeBallsCam.getAllUnreadResults();
     if (!BallCamResultList.isEmpty()){
+      
+      for (PhotonPipelineResult result : BallCamResultList){
+        if (result.hasTargets()){
+          Pose2d currentPose = swerveDrive.getPose();
+          for (PhotonTrackedTarget photonTrackedTarget : result.getTargets()){
+            if (photonTrackedTarget.getDetectedObjectConfidence() > 0.6){
+              Pose2d estimatedPose = currentPose.transformBy(new Transform2d(ballDistancTreeMap.get(photonTrackedTarget.getArea())*Math.cos(Units.degreesToRadians(-1*photonTrackedTarget.getYaw())),ballDistancTreeMap.get(photonTrackedTarget.getArea())*Math.sin(Units.degreesToRadians(-1*photonTrackedTarget.getYaw())),new Rotation2d().kZero));
+              validTargets.add(estimatedPose);
      
       PhotonPipelineResult result = BallCamResultList.get(BallCamResultList.size()-1);
         double numberOfTargets = result.getTargets().size();
@@ -295,9 +370,34 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
 
             }
           }
+          }
         }
       }
+
+      DogLog.log("BallAssist/Active",       follower.isActive());
+      DogLog.log("BallAssist/Target",       follower.getTargetPose());
+      DogLog.log("BallAssist/Corridor",     follower.getCorridorPoses());
+      DogLog.log("BallAssist/Balls",        follower.getCapturedBallPoses());
+      DogLog.log("BallAssist/Remaining",    follower.getRemainingBalls());
+      DogLog.log("BallAssist/Score",        follower.getPathScore());
     }
+
+  public void EnableBallAssist(){
+    follower.enable();
+  }
+  public void DisableBallAssist(){
+    follower.disable();
+  }
+  public boolean isBallAssistEnabled(){
+    return follower.isActive();
+  }
+
+  public BallAssistFollower GetBallFollower(){
+    return follower;
+  }
+  public BallPathCalculator GetBallPathCalculator(){
+    return calc;
+  }
   private void ProcessVision4920()
   {
     
@@ -414,6 +514,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
       UpdateDataHighway();
       double HubX = 1;
       double HubY = 1;
+
       
       
   }
@@ -968,6 +1069,31 @@ DisableCornerAim();
     swerveDrive.driveFieldOriented(velocity);
   }
 
+  public ChassisSpeeds BallAssistController(ChassisSpeeds v){
+
+    if (isBallAssistEnabled() && !AutoAimEnabled)
+    {
+        var targets = GetBallPathCalculator().calculate(getPose(), validTargets);
+        if (targets.ballCount() > 0 && targets.isValid()) {
+          return GetBallFollower().update(
+          getPose(),
+          validTargets,
+          GetBallPathCalculator(),
+          -driverXbox.getLeftY(),    // forward = along path, back = reverse
+          -driverXbox.getRightX()     // free rotation to aim intake
+          );
+        } 
+        else
+        {
+            return v;
+        }
+    }
+    else
+      {
+        return v;
+      }
+  }
+
   public ChassisSpeeds AutoAimVelocityPIDCalculation(ChassisSpeeds v){
 
     if (AutoAimEnabled)
@@ -996,37 +1122,8 @@ DisableCornerAim();
       
        ChassisSpeeds v = velocity.get();
        v = AutoAimVelocityPIDCalculation(v);
-      
-    
-  
-  
-   
+       v = BallAssistController(v);
 
-  // if (DepotAimEnabled)
-  //   {
-  //     PID_DepotAim.setSetpoint(DepotAngle);
-  //     PID_DepotAim.setTolerance(3);
-  //     PID_DepotAim.enableContinuousInput(-180, 180);
-  //     v.omegaRadiansPerSecond = PID_DepotAim.calculate(getPose().getRotation().getDegrees());
-  //     v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
-  //   }
-      
-  //     DogLog.log("Fieldinfo/DepotAimAngle", DepotAngle);
-
-     
-    
-  
-
-  // if (OutpostAimEnabled)
-  //   {
-  //     PID_OutpostAim.setSetpoint(OutpostAngle);
-  //     PID_OutpostAim.setTolerance(3);
-  //     PID_OutpostAim.enableContinuousInput(-180, 180);
-  //     v.omegaRadiansPerSecond = PID_OutpostAim.calculate(getPose().getRotation().getDegrees());
-  //     v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
-  //   }
-      
-      DogLog.log("AutoAim/OutpostAimAngle", OutpostAngle);
 
       swerveDrive.driveFieldOriented(v);
     });
