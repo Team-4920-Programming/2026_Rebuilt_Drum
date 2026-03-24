@@ -23,7 +23,7 @@ public class CmdT_TrackBallDrive extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_swerve.GetBallFollower().toggle();;
+    m_swerve.GetBallFollower().toggle();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
