@@ -69,6 +69,7 @@ import org.json.simple.parser.ParseException;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
 
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -268,15 +269,30 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     List validTargets = new ArrayList(100);
     List<PhotonPipelineResult> BallCamResultList = FindMeBallsCam.getAllUnreadResults();
     if (!BallCamResultList.isEmpty()){
+     
       PhotonPipelineResult result = BallCamResultList.get(BallCamResultList.size()-1);
         double numberOfTargets = result.getTargets().size();
-        if (!result.hasTargets()){
+         DogLog.log ("Data/FuelTracking/NumberofFuel",numberOfTargets);
+        if (result.hasTargets()){
+          int ctr = 0;
           for (PhotonTrackedTarget photonTrackedTarget : result.getTargets()){
             if (photonTrackedTarget.getDetectedObjectConfidence() > 0.6){
-              Transform3d test = new Transform3d().kZero;
-              test = photonTrackedTarget.getBestCameraToTarget();
-              String id = String.format("Data/FuelTracking/Transform3D_%d",photonTrackedTarget.getFiducialId());
-              DogLog.log(id, test);
+              double x = 0;
+              double y =0;
+              double yaw = photonTrackedTarget.getYaw();
+              double pitch = photonTrackedTarget.getPitch();
+              double area = photonTrackedTarget.getArea();
+              double skew = photonTrackedTarget.getSkew();
+              Transform3d pose = photonTrackedTarget.getAlternateCameraToTarget();
+              List<TargetCorner> corners = photonTrackedTarget.getDetectedCorners();
+              //x = photonTrackedTarget.getDetectedCorners().get(1).x;
+              //y = photonTrackedTarget.getDetectedCorners().get(1).y;
+              ctr++;
+              String id = String.format("Data/FuelTracking/Transform3D_%d",ctr);
+              DogLog.log(id + " corners", corners.size());
+              DogLog.log(id + " yaw", yaw);
+              DogLog.log(id + " pitch", pitch);
+
             }
           }
         }
@@ -313,7 +329,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
             FrontCamVisionTimestamp = visionEst.get().timestampSeconds;
             DogLog.log("SwerveSS/Vision/FrontCameraPose", FrontCameraPose3d);
             DogLog.log("SwerveSS/Vision/FrontTimeStamp",FrontCamVisionTimestamp);
-            // VisionReading(FrontCamPose, FrontCamVisionTimestamp, FrontCamera.confidenceCalculator(visionEst.get()));
+             VisionReading(FrontCamPose, FrontCamVisionTimestamp, FrontCamera.confidenceCalculator(visionEst.get()));
         }
     
     }

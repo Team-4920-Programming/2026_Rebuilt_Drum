@@ -78,7 +78,7 @@ public class ShooterSubsystem extends SubsystemBase {
   double FeederSpeed = 0.8;
   double m_shooterSpeed = 2000.0;
   double HoodSpeed = 0.3;
-  double shooterTolerance = 80;
+  double shooterTolerance = 50;
   double m_hoodAngle = 0;
   double hoodOutput = 0;
 
