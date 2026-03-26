@@ -224,7 +224,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
             stateStdDevs,
             visionStdDevs);
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
-    swerveDrive.setCosineCompensator(false);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
+    swerveDrive.setCosineCompensator(true);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
     swerveDrive.setAngularVelocityCompensation(true,
                                                true,
                                                0.1); //Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
@@ -582,8 +582,9 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
         DepotAngle = Math.atan2(getPose().getY() - BlueDepotCorner.getY(), getPose().getX() - BlueDepotCorner.getX());
         DepotAngle = Units.radiansToDegrees(DepotAngle);
         DHOut_HubDistance = Hub2Robot.getTranslation().getNorm();
-        AutoAimAngle = Math.atan2(getPose().getY() - BlueHubPose.getY(), getPose().getX() - BlueHubPose.getX());
-        AutoAimAngle = Units.radiansToDegrees(AutoAimAngle);
+        // AutoAimAngle = Math.atan2(getPose().getY() - BlueHubPose.getY(), getPose().getX() - BlueHubPose.getX());
+        AutoAimAngle = Math.atan2(BlueHubPose.getY() - getPose().getY(), BlueHubPose.getX() - getPose().getX());
+        AutoAimAngle = Units.radiansToDegrees(AutoAimAngle)+8;
         DHOut_HubDistance = Math.sqrt(Math.pow(getPose().getY() - BlueHubPose.getY(),2) + Math.pow(getPose().getX() - BlueHubPose.getX(),2));
         DHOut_CornerDistance = Math.min(OutpostCornerDist, DepotCornerDist);
         DHOut_AngleToHub = Math.abs (AutoAimAngle - getPose().getRotation().getDegrees());
@@ -798,6 +799,9 @@ public void AutoAim(){
   else{
     targetAngle = Units.radiansToDegrees(Math.atan2(DHIn_aimTarget.getY() - getPose().getY(), DHIn_aimTarget.getX() - getPose().getX()));
   }
+  targetAngle = targetAngle +7;
+  if (targetAngle > 180)
+    targetAngle = targetAngle -360;
   PID_AutoAim.setSetpoint(targetAngle);
   DHOut_Aimed = PID_AutoAim.atSetpoint();
   PID_AutoAim.calculate(getPose().getRotation().getDegrees());
@@ -1388,8 +1392,14 @@ DisableCornerAim();
   }
   Rotation2d GetGyroAngle()
 {
+  //gyro appears to be 6 degrees off center
   if (swerveDrive != null)
-  return Rotation2d.fromDegrees(swerveDrive.getYaw().getDegrees());
+  {
+    double fixedrot = swerveDrive.getYaw().getDegrees()+0;
+    if (fixedrot >180)
+    fixedrot = fixedrot -360; 
+  return Rotation2d.fromDegrees(fixedrot);
+  }
   else
   return Rotation2d.fromDegrees(0);
 

@@ -15,12 +15,15 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 //import frc.robot.subsystems.Shooter.ShooterYAMS_SubSystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem.TipperState;
+import frc.robot.Constants.Tipper;
+import frc.robot.commands.shooter.tele.CmdT_ReverseFeeder;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CmdT_AutoShoot extends Command {
   ShooterSubsystem m_shooter;
   SwerveSubsystem m_swerve;
   IntakeSubsystem m_intake;
+  boolean TipperUp = false;
   /** Creates a new CmdT_ShootTillEmpty. */
   public CmdT_AutoShoot(ShooterSubsystem m_ShooterSubsystem, SwerveSubsystem m_SwerveSubsystem, IntakeSubsystem m_IntakeSubsystem) {
     //addRequirements(m_ShooterSubsystem);
@@ -39,12 +42,27 @@ public class CmdT_AutoShoot extends Command {
   @Override
   public void execute() {
    m_shooter.EnableShooter();
+   
    //m_swerve.EnableAutoLock();
-
+    if (!m_shooter.isShooterAtSpeed())
+    {
+      m_shooter.reverseFeeder();
+    }
    if (m_shooter.isShooterAtSpeed() && m_swerve.robotIsAimed()){
-    m_intake.SetTipperState(TipperState.SHOOTING);
-    m_intake.SetIntakeSpeed(1);
-    m_shooter.SetFeederSpeed(-1.0);
+    //m_shooter.reverseFeeder();
+    if (TipperUp && m_intake.TipperAtSetpoint())
+    {
+      m_intake.SetTipperState(TipperState.INTAKING);
+      TipperUp = false;
+    }
+    else if (!TipperUp && m_intake.TipperAtSetpoint())
+    {
+      m_intake.SetTipperState(TipperState.SHOOTING);
+      TipperUp = true;
+    }
+  
+    m_intake.SetIntakeSpeed(-1);
+    m_shooter.SetFeederSpeed(-0.8);
     m_shooter.SetRollerSpeed(-1.0);
    }
    }

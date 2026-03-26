@@ -245,7 +245,7 @@ public class RobotContainer
        // driverXbox.leftBumper().onTrue(new CmdT_DisableAutoAim(drivebase));
        driverXbox.leftTrigger().whileTrue(new CmdT_RampUpShooter(Shooter));
         driverXbox.rightTrigger().whileTrue(new CmdT_AutoShoot(Shooter, drivebase, Intake));
-        driverXbox.leftBumper().whileTrue(new CmdT_AutoAimTest(Shooter, drivebase, Intake));
+        //driverXbox.leftBumper().whileTrue(new CmdT_AutoAimTest(Shooter, drivebase, Intake));
         driverXbox.povUp().whileTrue(new CmdT_Manual_HoodUp(Shooter));
         driverXbox.povDown().whileTrue(new CmdT_Manual_HoodDown(Shooter));
         driverXbox.povLeft().whileTrue(new CmdT_Manual_SlowDownShooter(Shooter));
@@ -258,7 +258,7 @@ public class RobotContainer
          // This ensures accidental activation is avoided during matches
          //driverXbox.x().onTrue(drivebase.getPreMatchCalibrationCommand());
 
-        driverXbox.back().whileTrue(new CmdT_TrackBallDrive(drivebase));
+        driverXbox.leftBumper().whileTrue(new CmdT_TrackBallDrive(drivebase));
 //       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
 //       driverXbox.leftBumper().onTrue(Commands.none());
 //       driverXbox.rightBumper().onTrue(Commands.none());

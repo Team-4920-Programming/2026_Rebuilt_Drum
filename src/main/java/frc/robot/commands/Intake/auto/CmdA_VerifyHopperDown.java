@@ -39,6 +39,6 @@ Intake.SetTipperState(TipperState.INTAKING);
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Intake.getTipperAngle() < 3;
+    return Intake.getTipperAngle() < 5;
   }
 }

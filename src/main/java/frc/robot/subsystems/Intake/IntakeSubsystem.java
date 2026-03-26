@@ -15,10 +15,12 @@ import dev.doglog.DogLog;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -36,6 +38,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 //import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -44,7 +47,7 @@ public class IntakeSubsystem extends SubsystemBase {
   
   public enum TipperState{
     TUCKED(90.0),
-    SHOOTING(12.0),
+    SHOOTING(12),//12
     INTAKING(0);
 
     private final double angle;
@@ -64,13 +67,15 @@ public class IntakeSubsystem extends SubsystemBase {
   TipperState DHOut_tipperState = TipperState.INTAKING;
   boolean tipperOverride = false;
   //Motors
-  SparkFlex intakeMotor1 = new SparkFlex(Constants.Can_Intake1, MotorType.kBrushless);
-  SparkFlex intakeMotor2 = new SparkFlex(Constants.Can_Intake2, MotorType.kBrushless);
+  TalonFX intakeMotor1 = new TalonFX(Constants.Can_Intake1);
+  TalonFX intakeMotor2 = new TalonFX(Constants.Can_Intake2);
+ 
+ 
   SparkFlex tipperMotor = new SparkFlex(Constants.Can_Tipper, MotorType.kBrushless);
   RelativeEncoder tipperRelativeEncoder = tipperMotor.getEncoder();
 
-  SparkFlexConfig Intake1Config = new SparkFlexConfig();
-  SparkFlexConfig Intake2Config = new SparkFlexConfig();
+  //SparkFlexConfig Intake1Config = new SparkFlexConfig();
+  //SparkFlexConfig Intake2Config = new SparkFlexConfig();
   SparkFlexConfig TipperConfig = new SparkFlexConfig();
 
   //Absolute Enocders
@@ -98,18 +103,24 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
+    var intake1Config = new TalonFXConfiguration();
+
+    intake1Config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
+    intake1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+    intakeMotor1.setNeutralMode(NeutralModeValue.Coast);
+    intakeMotor1.getConfigurator().apply(intake1Config);
+
     
-        
-    Intake1Config.inverted(true);
-    Intake1Config.idleMode(IdleMode.kBrake);
-    Intake1Config.smartCurrentLimit(40);
-    intakeMotor1.configure(Intake1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    
-    
+    var intake2Config = new TalonFXConfiguration();
+    intake2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+ 
     // Intake2Config.inverted(true);
-    Intake2Config.idleMode(IdleMode.kBrake);
-    Intake2Config.follow(intakeMotor1,true);
-    intakeMotor2.configure(Intake2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+     intakeMotor2.setNeutralMode(NeutralModeValue.Coast);
+    intakeMotor2.setControl(new Follower(intakeMotor1.getDeviceID(), MotorAlignmentValue.Opposed));
+    intakeMotor2.getConfigurator().apply(intake2Config);
+
+
 
     TipperConfig.idleMode(IdleMode.kBrake);
     TipperConfig.smartCurrentLimit(40);
@@ -161,6 +172,9 @@ public double getTipperAngle() {
   public void SetTipperState(TipperState state){
     DHOut_tipperState = state;
   }
+  public boolean TipperAtSetpoint(){
+    return tipperPID.atSetpoint();
+  }
   
   private void TuneTipperPID(){
     // tipperPID.setP(IntakeAngKP.getAsDouble());
@@ -195,7 +209,7 @@ public double getTipperAngle() {
     if (!EliminateBacklash) tipperMotor.set(tipperOutput);
 
     if (Intake){
-      SetIntakeSpeed(1);
+      SetIntakeSpeed(-1);
     }
     else if (!Intake){
       SetIntakeSpeed(0);
@@ -219,6 +233,9 @@ public double getTipperAngle() {
   private void updateLogs(){
     DogLog.log("Intake/TipperAngle", getTipperAngle());
     DogLog.log("Intake/TipperCurrent", tipperMotor.getOutputCurrent());
+    DogLog.log("Intake/Intake1Current", intakeMotor1.getStatorCurrent().getValueAsDouble());
+    DogLog.log("Intake/Intake2Current", intakeMotor2.getStatorCurrent().getValueAsDouble());
+   
     DogLog.log("Intake/TipperPIDOutput", tipperOutput);
     DogLog.log("Intake/TipperPIDSetpoint",tipperPID.getSetpoint());
     DogLog.log("Intake/TipperPIDAtSetpoint",tipperPID.atSetpoint());

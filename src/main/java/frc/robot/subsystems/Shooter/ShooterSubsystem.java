@@ -74,8 +74,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
 
   //Other Speeds
-  double RollerSpeed = -0.8;
-  double FeederSpeed = 0.8;
+  double RollerSpeed = -0.6;// was .8
+  double FeederSpeed = 0.6;//was .8 
   double m_shooterSpeed = 2000.0;
   double HoodSpeed = 0.3;
   double shooterTolerance = 50;
@@ -155,6 +155,9 @@ public class ShooterSubsystem extends SubsystemBase {
     //hoodencoderConfig.zeroOffset(0.111133136);
     hoodConfig.apply(hoodencoderConfig);
     hoodMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
+    var FeederConfig = new TalonFXConfiguration();
+    
   }
 
 public void SOTFCalc(){
@@ -217,6 +220,9 @@ public void SOTFCalc(){
   public void SetFeederSpeed (double speed)
   {
     feederMotor.set(speed);
+  }
+  public void reverseFeeder (){
+    feederMotor.set(0.1);
   }
 
   public void EnableShooter(){
@@ -384,6 +390,7 @@ else {
     DogLog.log("Shooter/HoodAngle",getHoodAngle());
     DogLog.log("Shooter/HoodSetpoint",hoodPID.getSetpoint());
     DogLog.log("Shooter/HoodAtSetpoint",hoodPID.atSetpoint());
+    DogLog.log("Shooter/FeederSpeed",feederMotor.getVelocity().getValueAsDouble()*60);
   }
 
   private void updateShotParamsFromCalculations(){
