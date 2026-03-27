@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Intake.auto;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem.TipperState;
@@ -27,6 +28,7 @@ public class CmdA_VerifyHopperDown extends Command {
   @Override
   public void execute() {
 Intake.SetTipperState(TipperState.INTAKING);
+    DogLog.log("Auto/Verifyting Down", true);
       
     }
 
@@ -34,6 +36,7 @@ Intake.SetTipperState(TipperState.INTAKING);
   @Override
   public void end(boolean interrupted) {
     // Intake.StopIntake();
+        DogLog.log("Auto/Verifyting Down", false);
   }
 
   // Returns true when the command should end.
