@@ -65,7 +65,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   TipperState DHOut_tipperState = TipperState.INTAKING;
-  boolean tipperOverride = false;
+  boolean DHOut_tipperOverride = false;
   //Motors
   TalonFX intakeMotor1 = new TalonFX(Constants.Can_Intake1);
   TalonFX intakeMotor2 = new TalonFX(Constants.Can_Intake2);
@@ -126,6 +126,7 @@ public class IntakeSubsystem extends SubsystemBase {
     TipperConfig.smartCurrentLimit(40);
     TipperConfig.disableFollowerMode();
     TipperConfig.inverted(true);
+    TipperConfig.openLoopRampRate(0.1);
     tipperMotor.configure(TipperConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // DetachedEncoderConfig dec = new DetachedEncoderConfig();
@@ -160,14 +161,18 @@ public double getTipperAngle() {
     Intake = false;
   }
 
+
+
   public void SetIntakeSpeed(double Speed){
     intakeMotor1.set(Speed);
   }
   public void SetTipperSpeed(double Speed){
-    tipperMotor.set(Speed);
+    if (DHOut_tipperOverride){
+      tipperOutput = Speed;
+    }
   }
   public void OverrideTipperPID(boolean b){
-    tipperOverride = b;
+    DHOut_tipperOverride = b;
   }
   public void SetTipperState(TipperState state){
     DHOut_tipperState = state;
@@ -187,7 +192,7 @@ public double getTipperAngle() {
   }
 
   private void ProcessTipperState(){
-    if (!tipperOverride){
+    if (!DHOut_tipperOverride){
       tipperPID.setSetpoint(DHOut_tipperState.getAngle());
     }
   }
@@ -205,9 +210,14 @@ public double getTipperAngle() {
   @Override
   public void periodic() {
 
-    tipperOutput = tipperPID.calculate(getTipperAngle());
-    if (!EliminateBacklash) tipperMotor.set(tipperOutput);
-
+    if (!DHOut_tipperOverride){
+       tipperOutput = tipperPID.calculate(getTipperAngle());
+       tipperMotor.set(tipperOutput);
+    }
+    else
+    {
+      tipperMotor.set(tipperOutput);
+    }
     if (Intake){
       SetIntakeSpeed(-1);
     }
@@ -240,7 +250,7 @@ public double getTipperAngle() {
     DogLog.log("Intake/TipperPIDSetpoint",tipperPID.getSetpoint());
     DogLog.log("Intake/TipperPIDAtSetpoint",tipperPID.atSetpoint());
     DogLog.log("Intake/TipperState", DHOut_tipperState);
-    DogLog.log("Intake/TipperOverride", tipperOverride);
+    DogLog.log("Intake/TipperOverride", DHOut_tipperOverride);
     DogLog.log("Intake/TipperRelativeEnc", tipperRelativeEncoder.getPosition());
     DogLog.log("Intake/TipperAbsEnc", tipperMotorEnc);
   }
