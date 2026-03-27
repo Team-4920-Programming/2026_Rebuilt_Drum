@@ -11,10 +11,10 @@ import frc.robot.subsystems.Intake.IntakeSubsystem;
 public class CmdA_RunIntake extends Command {
   /** Creates a new CmdT_RunIntake. */
     IntakeSubsystem Intake;
-  double ReqSpeed = 0;
-  public CmdA_RunIntake(IntakeSubsystem IntakeSS, double IntakeSpeed) {
+  
+  public CmdA_RunIntake(IntakeSubsystem IntakeSS) {
     // Use addRequirements() here to declare subsystem dependencies.
-    ReqSpeed = IntakeSpeed;
+    
     Intake = IntakeSS;
   }
 
@@ -25,13 +25,14 @@ public class CmdA_RunIntake extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Intake.SetIntakeSpeed(ReqSpeed);
-  }
+
+      Intake.RunIntake();
+    }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    //Intake.SetIntakeSpeed(0);
+    // Intake.StopIntake();
   }
 
   // Returns true when the command should end.

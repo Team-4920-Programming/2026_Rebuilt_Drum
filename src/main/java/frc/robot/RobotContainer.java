@@ -32,21 +32,28 @@ import frc.robot.subsystems.Shooter.*;
 import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.Climber.*;
 import frc.robot.subsystems.DataHighway.*;
+import frc.robot.subsystems.DataHighway.DataHighway.MatchPhase;
 import frc.robot.commands.shooter.auto.CmdA_ShootTillEmpty;
 import frc.robot.commands.shooter.tele.*;
+import frc.robot.commands.Climber.tele.CmdT_Climb;
+import frc.robot.commands.Climber.tele.CmdT_ClimberUp;
 import frc.robot.commands.Drive.CmdT_DepotAutoAim;
 import frc.robot.commands.Drive.CmdT_DisableAutoAim;
 import frc.robot.commands.Drive.CmdT_EnableAutoAim;
 import frc.robot.commands.Drive.CmdT_EnableAutoLock;
 import frc.robot.commands.Drive.CmdT_EnableCornerAim;
 import frc.robot.commands.Drive.CmdT_OutpostAutoAim;
+import frc.robot.commands.Drive.CmdT_TrackBallDrive;
+import frc.robot.commands.Drive.auto.CmdA_AutoAimRobot;
 // import frc.robot.commands.shooter.Auto.*;
 // import frc.robot.commands.Climber.Auto.*;
 // import frc.robot.commands.Climber.Tele.*;
 // import frc.robot.commands.Intake.Auto.*;
 import frc.robot.commands.Intake.Tele.*;
 import frc.robot.commands.Intake.auto.CmdA_RunIntake;
-import frc.robot.commands.Intake.Tele.CmdT_RunIntake;
+import frc.robot.commands.Intake.auto.CmdA_StopIntake;
+import frc.robot.commands.Intake.auto.CmdA_VerifyHopperDown;
+
 import static edu.wpi.first.units.Units.RPM;
 
 import java.io.File;
@@ -140,10 +147,13 @@ public class RobotContainer
     DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
     DogLog.setPdh(new PowerDistribution());
 
-    NamedCommands.registerCommand("CmdA_ShootTillEmpty", new CmdA_ShootTillEmpty (Shooter).withTimeout(5));
-    NamedCommands.registerCommand("CmdA_RunIntake", new CmdA_RunIntake (Intake, 1));
-    NamedCommands.registerCommand("CmdA_StopIntake", new CmdA_RunIntake (Intake, 0));
-
+    NamedCommands.registerCommand("CmdA_ShootTillEmpty", new CmdT_AutoShoot (Shooter, drivebase, Intake).withTimeout(5));
+    NamedCommands.registerCommand("CmdA_RunIntake", new CmdA_RunIntake (Intake));
+    NamedCommands.registerCommand("CmdA_StopIntake", new CmdA_StopIntake (Intake));
+    NamedCommands.registerCommand("CmdA_AutoAimRobot", new CmdA_AutoAimRobot (drivebase).withTimeout(5));
+    NamedCommands.registerCommand("CmdA_EnableShooter", new CmdT_EnableShooter(Shooter));
+    NamedCommands.registerCommand("CmdA_DisableShooter", new CmdT_DisableShooter(Shooter));
+    NamedCommands.registerCommand("CmdA_VerifyHopperDown", new CmdA_VerifyHopperDown(Intake));
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -162,7 +172,7 @@ public class RobotContainer
    */
   private void configureBindings()
   {
-    Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
+    Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
     Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
     Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
     Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(
@@ -217,26 +227,38 @@ public class RobotContainer
 //       //driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 //       driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 //       driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-         driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+        driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
          //driverXbox.a().whileTrue(new DriveToTargetV0_1(drivebase));
         driverXbox.a().whileTrue(new CmdT_ShootTillEmpty(Shooter));
 
         //driverXbox.a().whileTrue(Shooter.setVelocity(RPM.of(5000)));
        // driverXbox.a().onFalse(Shooter.setVelocity(RPM.of(0)));
-        driverXbox.x().whileTrue(new CmdT_SetIntakeAngle(Intake, 70));
-        driverXbox.x().whileFalse(new CmdT_SetIntakeAngle(Intake, 5));
-        driverXbox.y().whileTrue(new CmdT_RunIntake(Intake));
-       // driverXbox.rightBumper().onTrue(new CmdT_EnableAutoAim(drivebase));
-       // driverXbox.leftBumper().onTrue(new CmdT_DisableAutoAim(drivebase));
-        driverXbox.rightTrigger().whileTrue(new CmdT_AutoShoot(Shooter, drivebase));
         
+       // driverXbox.x().whileTrue(new CmdT_SetIntakeAngle(Intake, 70));
+        // driverXbox.x().whileFalse(new CmdT_SetIntakeAngle(Intake, 5));
+        // driverXbox.x().whileTrue(new CmdT_TipperUp(Intake));
+        // driverXbox.b().whileTrue(new CmdT_TipperDown(Intake));
+          driverXbox.x().whileTrue(new CmdT_TipperShooting(Intake));
+          driverXbox.b().whileTrue(new CmdT_TipperIntaking(Intake));
+          driverXbox.y().whileTrue(new CmdT_RunIntake(Intake));
+       driverXbox.rightBumper().whileTrue(new CmdT_TipperTucked(Intake));
+       // driverXbox.leftBumper().onTrue(new CmdT_DisableAutoAim(drivebase));
+       driverXbox.leftTrigger().whileTrue(new CmdT_RampUpShooter(Shooter));
+        driverXbox.rightTrigger().whileTrue(new CmdT_AutoShoot(Shooter, drivebase, Intake));
+        //driverXbox.leftBumper().whileTrue(new CmdT_AutoAimTest(Shooter, drivebase, Intake));
+        driverXbox.povUp().whileTrue(new CmdT_Manual_HoodUp(Shooter));
+        driverXbox.povDown().whileTrue(new CmdT_Manual_HoodDown(Shooter));
+        driverXbox.povLeft().whileTrue(new CmdT_Manual_SlowDownShooter(Shooter));
+        driverXbox.povRight().whileTrue(new CmdT_Manual_SpeedUpShooter(Shooter));
+        // driverXbox.povUp().whileTrue(new CmdT_Climb(Climber));
+        // driverXbox.povDown().whileTrue(new CmdT_ClimberUp(Climber));
         // driverXbox.rightTrigger().whileTrue(new CmdT_OutpostAutoAim(drivebase));
        // driverXbox.leftTrigger().whileTrue(new CmdT_DepotAutoAim(drivebase));
          // Pre-match calibration routine - Back + Start buttons together
          // This ensures accidental activation is avoided during matches
          //driverXbox.x().onTrue(drivebase.getPreMatchCalibrationCommand());
 
-
+        driverXbox.leftBumper().whileTrue(new CmdT_TrackBallDrive(drivebase));
 //       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
 //       driverXbox.leftBumper().onTrue(Commands.none());
 //       driverXbox.rightBumper().onTrue(Commands.none());
@@ -262,5 +284,19 @@ public class RobotContainer
   public void setMotorBrake(boolean brake)
   {
     drivebase.setMotorBrake(brake);
+  }
+
+  public void startMatchTimer(){
+    DH.DH_matchTimer.start();
+  }
+  public void stopMatchTimer(){
+    DH.DH_matchTimer.stop();
+  }
+  public void resetMatchTimer(){
+    DH.DH_matchTimer.reset();
+  }
+
+  public boolean hasMatchTimerStarted(){
+    return DH.DH_matchTimer.isRunning();
   }
 }

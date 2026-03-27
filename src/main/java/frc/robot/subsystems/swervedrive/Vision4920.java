@@ -140,7 +140,7 @@ import dev.doglog.DogLog;
                 // Decrease std devs if multiple targets are visible
                 if (numTags > 1) estStdDevs = kMultiTagStdDevs;
                 // Increase std devs based on (average) distance
-                if (numTags == 1 && avgDist > 4)
+                if (numTags == 1 && avgDist > 3)
                     estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
                 else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
                 curStdDevs = estStdDevs;
@@ -205,11 +205,11 @@ import dev.doglog.DogLog;
 
         // Distance penalty: increased confidence at closer range, penalty only at far range
         double distanceFactor = 1.0;
-        if (smallestDistance > 5.0) {
+        if (smallestDistance > 3.0) {
             // Only penalize if beyond 5 meters
             distanceFactor = 1.0 + ((smallestDistance - 5.0) * 0.5); // Gradual penalty
             DogLog.log("Vision/Confidence/DistancePenalty", true);
-        } else if (smallestDistance < 2.5) {
+        } else if (smallestDistance < 1.5) {
             // Reward for close, high-quality measurements
             distanceFactor = 0.7; // 30% confidence boost
             DogLog.log("Vision/Confidence/DistanceBoost", true);

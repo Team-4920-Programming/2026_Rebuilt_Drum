@@ -17,7 +17,7 @@ public class CmdT_ShootTillEmpty extends Command {
   ShooterSubsystem m_shooter;
   /** Creates a new CmdT_ShootTillEmpty. */
   public CmdT_ShootTillEmpty(ShooterSubsystem m_ShooterSubsystem) {
-    addRequirements(m_ShooterSubsystem);
+    //addRequirements(m_ShooterSubsystem);
     m_shooter = m_ShooterSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -33,25 +33,24 @@ public class CmdT_ShootTillEmpty extends Command {
     //DoubleSubscriber FeederSpeed = DogLog.tunable("Shooter/FeederSpeed", 1.0);
     //DoubleSubscriber AugerSpeed = DogLog.tunable("Shooter/AugerSpeed",0.75);
 
-    double ShooterSpeed = 5000;
-    double FeederSpeed = 1;
-    double RollerSpeed = 1;
+    // double ShooterSpeed = 5000;
+    // double FeederSpeed = 1;
+    // double RollerSpeed = 1;
     //m_shooter.setVelocity(RPM.of(3000));
-    m_shooter.SetShooterSpeed(ShooterSpeed);
+    
     //double CurrentShooter1Vel = m_shooter.getVelocity().magnitude();
 
     //m_shooter.SetShooterSpeed(ShooterSpeed.get());
-    if (true)
-    {
-      m_shooter.SetFeederSpeed(FeederSpeed);
-      m_shooter.SetRollerSpeed(RollerSpeed);
-    }
+    
+      m_shooter.SetFeederSpeed(-0.8);
+      m_shooter.SetRollerSpeed(-0.8);
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter.SetShooterSpeed( 0);
+    
     //m_shooter.setVelocity(RPM.of(0));
     m_shooter.SetFeederSpeed(0);
     m_shooter.SetRollerSpeed(0);

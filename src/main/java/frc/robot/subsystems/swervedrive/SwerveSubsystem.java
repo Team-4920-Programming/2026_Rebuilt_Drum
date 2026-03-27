@@ -25,37 +25,57 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.DataHighway.ShooterLookupTable;
+import frc.robot.subsystems.swervedrive.BallPathCalculator.PathResult;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
+import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
+
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -90,20 +110,22 @@ public class SwerveSubsystem extends SubsystemBase
   private       Vision4920      FrontCamera;
   public Pose3d FrontCameraPose3d = new Pose3d();
 
- // private       Vision4920      RightCamera;
-  //public Pose3d RightCameraPose3d = new Pose3d();
+ private       Vision4920      RightCamera;
+  public Pose3d RightCameraPose3d = new Pose3d();
   
-  //private       Vision4920      LeftCamera;
- // public Pose3d LeftCameraPose3d = new Pose3d();
+  private       Vision4920      LeftCamera;
+ public Pose3d LeftCameraPose3d = new Pose3d();
 
   private       Vision4920      RearCamera;
   public Pose3d RearCameraPose3d = new Pose3d();
 
+  private PhotonCamera FindMeBallsCam;
 // Datahighway variables
 //Outputs from this Subsystem
   public boolean DHOut_InNeutralZone = false;
   public boolean DHOut_InAllianceZone = false;
   public boolean DHOut_InBumpZone = false;
+  public boolean DHOut_InOpposingZone = false;
   public double DHOut_HubDistance = 0.0;
   public double DHOut_CornerDistance = 0.0;
   public boolean DHOut_Aimed = false;
@@ -113,19 +135,37 @@ public class SwerveSubsystem extends SubsystemBase
   public double DHOut_HubPoseX= 0;
   public double DHOut_HubPoseY= 0;
   public double DHIn_reqRobotAngle =0;
+  public double DHIn_ShotDistance = 0;
+  public Pose2d DHIn_aimTarget = new Pose2d(0,0, new Rotation2d().fromDegrees(0));
+  private double targetAngle = 0.0;
+  public Pose2d DHOUT_RobotPose = new Pose2d(0,0, new Rotation2d().fromDegrees(0));
+  public ShooterLookupTable DHIn_ShooterLookupTable;
   // public double DHOut_robotY = getPose().getY();
   // public double DHOut_robotX = getPose().getX();
+  private InterpolatingDoubleTreeMap ballDistancTreeMap = new InterpolatingDoubleTreeMap();
   
-  
-
+  public Rotation2d DHIn_SOTFTargetAngle = Rotation2d.kZero;
+  public boolean DHIn_SOTF = false;
   public double DHOut_robotY = 0;
   public double DHOut_robotX = 0;
 //variables
   private boolean AutoAimEnabled = false;
   private Pose2d AutoAimTarget = new Pose2d();
   private double AutoAimAngle = 0;
+
+  public List<Pose2d> validTargets = new ArrayList<>(100) ;
   
-  
+  private final BallPathCalculator calc = new BallPathCalculator()
+    .withCorridorWidth(0.5842)      // your intake width in meters
+    .withSweepResolution(2.0)    // degrees per step
+    .withMaxLookahead(2.5);      // meters
+
+    private final BallAssistFollower follower = new BallAssistFollower()
+    .withMaxSpeed(4.5)
+    .withLateralKp(2.0)
+    .withHysteresis(0.25)
+    .withMinCommitDistance(1.0).withHeadingKp(3.0).withMaxDriverTrim(5.0);
+
 
   private boolean DepotAimEnabled = false;
   private Pose2d DepotAimTarget = new Pose2d();
@@ -137,7 +177,7 @@ public class SwerveSubsystem extends SubsystemBase
   //private double OutpostAimAngle = 0;
   public double OutpostAngle = 0;
   
-  
+  CommandXboxController driverXbox = new CommandXboxController(0);
   private PIDController PID_AutoAim = new PIDController(0.1, 0, 0);
   private PIDController PID_DepotAim = new PIDController(0.1, 0, 0);
 private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
@@ -149,9 +189,12 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
    */
   public SwerveSubsystem(File directory)
   {
-    boolean blueAlliance = false;
-    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
-                                                                      Meter.of(4)),
+    boolean blueAlliance = true;
+    PID_AutoAim.setSetpoint(targetAngle);
+    PID_AutoAim.setTolerance(2);
+    PID_AutoAim.enableContinuousInput(-180, 180);
+    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(0.442),  
+                                                                      Meter.of(0.652)),
                                                     Rotation2d.fromDegrees(0))
                                        : new Pose2d(new Translation2d(Meter.of(16),
                                                                       Meter.of(4)),
@@ -160,6 +203,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     var stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
     var visionStdDevs = VecBuilder.fill(1.0, 0.25, 0.2);
+    FindMeBallsCam = new PhotonCamera("FindMeBalls");
 
 
     try
@@ -180,7 +224,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
             stateStdDevs,
             visionStdDevs);
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
-    swerveDrive.setCosineCompensator(false);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
+    swerveDrive.setCosineCompensator(true);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
     swerveDrive.setAngularVelocityCompensation(true,
                                                true,
                                                0.1); //Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
@@ -194,7 +238,8 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
       swerveDrive.stopOdometryThread();
     }
     setupPathPlanner();
-    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
+    BallDistanceMapSetup();
+    // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
   }
 
   /**
@@ -230,25 +275,147 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
   public void setupPhotonVision()
   {
     //vision = new Vision(swerveDrive::getPose, swerveDrive.field);
-    FrontCamera = new Vision4920(Constants.Vision4920.kFrontCam, Constants.Vision4920.ROBOT_TO_CAMERA_Front);
-    // RightCamera = new Vision4920(Constants.Vision4920.kRightCam, Constants.Vision4920.kRobotToRightCam );
-    // LeftCamera = new Vision4920(Constants.Vision4920.kLeftCam, Constants.Vision4920.kRobotToLeftCam );
-    RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.ROBOT_TO_CAMERA_Rear );
+    FrontCamera = new Vision4920(Constants.Vision4920.kFrontCam, Constants.Vision4920.kRobotToFrontCam);
+    RightCamera = new Vision4920(Constants.Vision4920.kRightCam, Constants.Vision4920.kRobotToRightCam );
+    LeftCamera = new Vision4920(Constants.Vision4920.kLeftCam, Constants.Vision4920.kRobotToLeftCam );
+    // RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.ROBOT_TO_CAMERA_Rear );
 
+
+  }
+
+  private void BallDistanceMapSetup(){
+
+    ballDistancTreeMap.put(7.8, Units.inchesToMeters(22.0));
+    ballDistancTreeMap.put(3.0, Units.inchesToMeters(33.0));
+    ballDistancTreeMap.put(1.5, Units.inchesToMeters(48.0));
+    ballDistancTreeMap.put(0.88, Units.inchesToMeters(63.0));
+    ballDistancTreeMap.put(0.6, Units.inchesToMeters(77.6));
+    ballDistancTreeMap.put(0.4, Units.inchesToMeters(91.4));
+  }
+  private boolean ballssimulated = false;
+
+  private void ObjectDetectionProcess(){
+
+    //TESTING CODE TO SIMULATE BALL DETECTION, LEAVE COMMENTED
+    
+    // Pose2d currentPose = swerveDrive.getPose();
+    // Pose2d estimatedPose = currentPose.transformBy(new Transform2d(ballDistancTreeMap.get(1.0)*Math.cos(Units.degreesToRadians(10.0)),ballDistancTreeMap.get(1.0)*Math.sin(Units.degreesToRadians(10.0)),new Rotation2d().kZero));
+    // DogLog.log("BallTracking/TestBallDistanceX", ballDistancTreeMap.get(1.0)*Math.cos(Units.degreesToRadians(10.0)));
+    // DogLog.log("BallTracking/TestBallDistanceY", ballDistancTreeMap.get(1.0)*Math.sin(Units.degreesToRadians(10.0)));
+    // DogLog.log("BallTracking/TestBallDistance", ballDistancTreeMap.get(1.0));
+    // DogLog.log("BallTracking/TestBallPose", estimatedPose);
+    // Random rand = new Random();
+
+    // if (!ballssimulated){
+    //   Pose2d[] vt = new Pose2d[400];
+    //   ballssimulated = true;
+    //   for (int i = 0 ; i < 400 ; i ++){
+    //     double distance = rand.nextDouble() * 15.0;
+    //     double angle = (rand.nextDouble() - 0.5) * 180;
+    //     estimatedPose = currentPose.transformBy(new Transform2d(ballDistancTreeMap.get(distance)*Math.cos(Units.degreesToRadians(angle)),ballDistancTreeMap.get(distance)*Math.sin(Units.degreesToRadians(angle)),new Rotation2d().kZero));  
+    //     validTargets.add(estimatedPose);
+    //     vt[i] = estimatedPose;
+    //   } 
+    //   DogLog.log("BallTracking/vt",vt);
+    // PathResult result = calc.calculate(getPose(), validTargets);
+     //   if (result.isValid()) {
+    //       // DogLog.log("BallAssist/Path",        result.getTrajectory().forEach(state -> new Pose2d(state.poseMeters.getTranslation(), state.poseMeters.getRotation())));
+    //       DogLog.log("BallAssist/CapturedBalls",  result.getBallPoses());
+    //       DogLog.log("BallAssist/Corridor",       result.getCorridorPoses());
+    //       DogLog.log("BallAssist/AllBalls",        result.getAllBallPoses(validTargets));
+    //       DogLog.log("BallAssist/Score",           result.score);
+    //       DogLog.log("BallAssist/BallCount",       result.ballCount());
+    //       DogLog.log("BallAssist/RelHeadingDeg",   Math.toDegrees(result.relativeHeading));
+
+    //       }
+    // }
+    
+    // END OF TESTING CODE
+   
+    validTargets.clear();
+    //MIKE VALIDTE IF THIS IS HOW WE ARE SUPPOSED TO GET BALL DETECTIONS, I THINK IT IS BUT IM NOT 100% SURE  
+    List<PhotonPipelineResult> BallCamResultList = FindMeBallsCam.getAllUnreadResults();
+    if (!BallCamResultList.isEmpty()){
+      
+      for (PhotonPipelineResult result : BallCamResultList){
+        if (result.hasTargets()){
+          Pose2d currentPose = swerveDrive.getPose();
+          for (PhotonTrackedTarget photonTrackedTarget : result.getTargets()){
+            if (photonTrackedTarget.getDetectedObjectConfidence() > 0.6){
+              Pose2d estimatedPose = currentPose.transformBy(new Transform2d(ballDistancTreeMap.get(photonTrackedTarget.getArea())*Math.cos(Units.degreesToRadians(-1*photonTrackedTarget.getYaw())),ballDistancTreeMap.get(photonTrackedTarget.getArea())*Math.sin(Units.degreesToRadians(-1*photonTrackedTarget.getYaw())),new Rotation2d().kZero));
+              validTargets.add(estimatedPose);
+     
+      //PhotonPipelineResult result = BallCamResultList.get(BallCamResultList.size()-1);
+        // double numberOfTargets = result.getTargets().size();
+        //  DogLog.log ("Data/FuelTracking/NumberofFuel",numberOfTargets);
+        // if (result.hasTargets()){
+        //   int ctr = 0;
+        //   for (PhotonTrackedTarget photonTrackedTarget : result.getTargets()){
+        //     if (photonTrackedTarget.getDetectedObjectConfidence() > 0.6){
+        //       double x = 0;
+        //       double y =0;
+        //       double yaw = photonTrackedTarget.getYaw();
+        //       double pitch = photonTrackedTarget.getPitch();
+        //       double area = photonTrackedTarget.getArea();
+        //       double skew = photonTrackedTarget.getSkew();
+        //       Transform3d pose = photonTrackedTarget.getAlternateCameraToTarget();
+        //       List<TargetCorner> corners = photonTrackedTarget.getDetectedCorners();
+        //       //x = photonTrackedTarget.getDetectedCorners().get(1).x;
+        //       //y = photonTrackedTarget.getDetectedCorners().get(1).y;
+        //       ctr++;
+        //       String id = String.format("Data/FuelTracking/Transform3D_%d",ctr);
+        //       DogLog.log(id + " corners", corners.size());
+        //       DogLog.log(id + " yaw", yaw);
+        //       DogLog.log(id + " pitch", pitch);
+
+        //     }
+        //   }
+        //   }
+        }
+      
+
+      DogLog.log("BallAssist/Active",       follower.isActive());
+      DogLog.log("BallAssist/Target",       follower.getTargetPose());
+      DogLog.log("BallAssist/Corridor",     follower.getCorridorPoses());
+      DogLog.log("BallAssist/Balls",        follower.getCapturedBallPoses());
+      DogLog.log("BallAssist/Remaining",    follower.getRemainingBalls());
+      DogLog.log("BallAssist/Score",        follower.getPathScore());
+    }
+  }
+  else {}
+  }
+  }
+}
+  public void EnableBallAssist(){
+    follower.enable();
+  }
+  public void DisableBallAssist(){
+    follower.disable();
+  }
+  public boolean isBallAssistEnabled(){
+    return follower.isActive();
+  }
+
+  public BallAssistFollower GetBallFollower(){
+    return follower;
+  }
+  public BallPathCalculator GetBallPathCalculator(){
+    return calc;
   }
   private void ProcessVision4920()
   {
+    
+    ObjectDetectionProcess();
     //Process Vision
     Pose2d FrontCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
     double FrontCamVisionTimestamp;
-    // Pose2d RightCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
-    // double RightCamVisionTimestamp;
-    // Pose2d LeftCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
-    // double LeftCamVisionTimestamp;
-    Pose2d RearCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
-    double RearCamVisionTimestamp;
-    
-    
+    Pose2d RightCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+    double RightCamVisionTimestamp;
+    Pose2d LeftCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+    double LeftCamVisionTimestamp;
+    // Pose2d RearCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+    // double RearCamVisionTimestamp;
+
     //System.out.println("driver statio"+DriverStation.isDSAttached());
     //System.out.println("CeneterCAm"+(CenterCamera != null));
 
@@ -266,62 +433,62 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
             FrontCamVisionTimestamp = visionEst.get().timestampSeconds;
             DogLog.log("SwerveSS/Vision/FrontCameraPose", FrontCameraPose3d);
             DogLog.log("SwerveSS/Vision/FrontTimeStamp",FrontCamVisionTimestamp);
-            VisionReading(FrontCamPose, FrontCamVisionTimestamp, FrontCamera.confidenceCalculator(visionEst.get()));
+             VisionReading(FrontCamPose, FrontCamVisionTimestamp, FrontCamera.confidenceCalculator(visionEst.get()));
         }
     
     }
   
-    // if ( DriverStation.isDSAttached() && RightCamera != null)
-    // {
-    //    var visionEst = RightCamera.getEstimatedGlobalPose();
-    //    DogLog.log("SwerveSS/Vision/RightCameraPresent", RightCamera.isConnected());
-       
-    //     if (visionEst.isPresent()){
-    //         RightCamPose = visionEst.get().estimatedPose.toPose2d();
-    //         RightCameraPose3d = visionEst.get().estimatedPose;
-  
-            
-    //         RightCamVisionTimestamp = visionEst.get().timestampSeconds;
-    //         DogLog.log("SwerveSS/Vision/RightCameraPose", RightCameraPose3d);
-    //         DogLog.log("SwerveSS/Vision/RightTimeStamp",RightCamVisionTimestamp);
-    //         VisionReading(RightCamPose, RightCamVisionTimestamp, RightCamera.confidenceCalculator(visionEst.get()));
-    //     }
-    
-    // }
-    // if ( DriverStation.isDSAttached() && LeftCamera != null)
-    // {
-    //    var visionEst = LeftCamera.getEstimatedGlobalPose();
-    //    DogLog.log("SwerveSS/Vision/LeftCameraPresent", LeftCamera.isConnected());
-       
-    //     if (visionEst.isPresent()){
-    //         LeftCamPose = visionEst.get().estimatedPose.toPose2d();
-    //         LeftCameraPose3d = visionEst.get().estimatedPose;
-  
-            
-    //         LeftCamVisionTimestamp = visionEst.get().timestampSeconds;
-    //         DogLog.log("SwerveSS/Vision/LeftCameraPose", LeftCameraPose3d);
-    //         DogLog.log("SwerveSS/Vision/LeftTimeStamp", LeftCamVisionTimestamp);
-    //         VisionReading(LeftCamPose, LeftCamVisionTimestamp, LeftCamera.confidenceCalculator(visionEst.get()));
-    //     }
-    
-    // }
-    if ( DriverStation.isDSAttached() && RearCamera != null)
+    if ( DriverStation.isDSAttached() && RightCamera != null)
     {
-       var visionEst = RearCamera.getEstimatedGlobalPose();
-       DogLog.log("SwerveSS/Vision/RearCameraPresent", RearCamera.isConnected());
+       var visionEst = RightCamera.getEstimatedGlobalPose();
+       DogLog.log("SwerveSS/Vision/RightCameraPresent", RightCamera.isConnected());
        
         if (visionEst.isPresent()){
-            RearCamPose = visionEst.get().estimatedPose.toPose2d();
-            RearCameraPose3d = visionEst.get().estimatedPose;
+            RightCamPose = visionEst.get().estimatedPose.toPose2d();
+            RightCameraPose3d = visionEst.get().estimatedPose;
   
             
-            RearCamVisionTimestamp = visionEst.get().timestampSeconds;
-            DogLog.log("SwerveSS/Vision/RearCameraPose", RearCameraPose3d);
-            DogLog.log("SwerveSS/Vision/RearTimeStamp", RearCamVisionTimestamp);
-            VisionReading(RearCamPose, RearCamVisionTimestamp, RearCamera.confidenceCalculator(visionEst.get()));
+            RightCamVisionTimestamp = visionEst.get().timestampSeconds;
+            DogLog.log("SwerveSS/Vision/RightCameraPose", RightCameraPose3d);
+            DogLog.log("SwerveSS/Vision/RightTimeStamp",RightCamVisionTimestamp);
+            VisionReading(RightCamPose, RightCamVisionTimestamp, RightCamera.confidenceCalculator(visionEst.get()));
         }
     
     }
+    if ( DriverStation.isDSAttached() && LeftCamera != null)
+    {
+       var visionEst = LeftCamera.getEstimatedGlobalPose();
+       DogLog.log("SwerveSS/Vision/LeftCameraPresent", LeftCamera.isConnected());
+       
+        if (visionEst.isPresent()){
+            LeftCamPose = visionEst.get().estimatedPose.toPose2d();
+            LeftCameraPose3d = visionEst.get().estimatedPose;
+  
+            
+            LeftCamVisionTimestamp = visionEst.get().timestampSeconds;
+            DogLog.log("SwerveSS/Vision/LeftCameraPose", LeftCameraPose3d);
+            DogLog.log("SwerveSS/Vision/LeftTimeStamp", LeftCamVisionTimestamp);
+            VisionReading(LeftCamPose, LeftCamVisionTimestamp, LeftCamera.confidenceCalculator(visionEst.get()));
+        }
+    
+    }
+    // if ( DriverStation.isDSAttached() && RearCamera != null)
+    // {
+    //    var visionEst = RearCamera.getEstimatedGlobalPose();
+    //    DogLog.log("SwerveSS/Vision/RearCameraPresent", RearCamera.isConnected());
+       
+    //     if (visionEst.isPresent()){
+    //         RearCamPose = visionEst.get().estimatedPose.toPose2d();
+    //         RearCameraPose3d = visionEst.get().estimatedPose;
+  
+            
+    //         RearCamVisionTimestamp = visionEst.get().timestampSeconds;
+    //         DogLog.log("SwerveSS/Vision/RearCameraPose", RearCameraPose3d);
+    //         DogLog.log("SwerveSS/Vision/RearTimeStamp", RearCamVisionTimestamp);
+    //         VisionReading(RearCamPose, RearCamVisionTimestamp, RearCamera.confidenceCalculator(visionEst.get()));
+    //     }
+    
+    // }
   
   }
   public void VisionReading(Pose2d visionPose,double Timestamp, Matrix<N3, N1> visionMeasurementStdDevs)
@@ -339,9 +506,11 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     {
       ProcessVision4920();
       swerveDrive.updateOdometry();
-  
       //postTrajectory(PathPlannerLogging.logActivePath(null););
     }
+
+    AutoAim();
+
       poseEstimator.update(GetGyroAngle(), getModulePositions());
       DogLog.log("SwerveSS/Pose/Pose4920", poseEstimator.getEstimatedPosition());
       DogLog.log("SwerveSS/Pose/YASGLRobotPose", swerveDrive.getPose());
@@ -349,24 +518,27 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
       UpdateDataHighway();
       double HubX = 1;
       double HubY = 1;
+
       
       
   }
   public void UpdateDataHighway()
   {
-   AprilTagFieldLayout fieldLayout = AprilTagFields.k2026RebuiltWelded.loadAprilTagLayoutField();
+    AprilTagFieldLayout fieldLayout = AprilTagFields.k2026RebuiltWelded.loadAprilTagLayoutField();
 
-    DHOut_InAllianceZone = false;
-    DHOut_InNeutralZone = false;
-    DHOut_InBumpZone = false;
+      DHOut_InAllianceZone = false;
+      DHOut_InNeutralZone = false;
+      DHOut_InBumpZone = false;
+      DHOUT_RobotPose = getPose();
       Pose2d BlueHubPose = new Pose2d(4.626,4.0,new Rotation2d().fromDegrees(0));
       Pose2d RedHubPose = new Pose2d(11.9,4.0, new Rotation2d().fromDegrees(0));
       Pose2d BlueOutpostCorner = new Pose2d(1,1,new Rotation2d().fromDegrees(0));
       Pose2d BlueDepotCorner = new Pose2d(1,fieldLayout.getFieldWidth() -1, new Rotation2d().fromDegrees(0));
       Pose2d RedOutpostCorner = new Pose2d(fieldLayout.getFieldLength() -1, fieldLayout.getFieldWidth() -1, new Rotation2d().fromDegrees(0));
       Pose2d RedDepotCorner = new Pose2d(fieldLayout.getFieldLength() -1, 1, new Rotation2d().fromDegrees(0));
-  double OutpostCornerDist = 0;
-  double DepotCornerDist  =0;
+      double OutpostCornerDist = 0;
+      double DepotCornerDist  =0;
+      
   
       if (isRedAlliance())
       {
@@ -390,13 +562,13 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
         DHOut_AngleToDepot = Math.abs (DepotAngle - getPose().getRotation().getDegrees());
         DHOut_HubPoseX = 11.9 - getPose().getX();
         DHOut_HubPoseY = 4 - getPose().getY();
-        DogLog.log("Fieldinfo/Hub2Robot",Hub2Robot);
-        DogLog.log("Fieldinfo/HubPose",BlueHubPose);
-        DogLog.log("Fieldinfo/HubDistance",DHOut_HubDistance);
-        DogLog.log("Fieldinfo/DepotCornerDist",DepotCornerDist);
-        DogLog.log("Fieldinfo/OutpostCornerDist",OutpostCornerDist);
-        DogLog.log("Fieldinfo/DepotCornerAngle",DepotAngle);
-        DogLog.log("Fieldinfo/OutpostCornerAngle",OutpostAngle);
+        DogLog.log("AutoAim/Hub2Robot",Hub2Robot);
+        DogLog.log("AutoAim/HubPose",BlueHubPose);
+        DogLog.log("AutoAim/HubDistance",DHOut_HubDistance);
+        DogLog.log("AutoAim/DepotCornerDist",DepotCornerDist);
+        DogLog.log("AutoAim/OutpostCornerDist",OutpostCornerDist);
+        DogLog.log("AutoAim/DepotCornerAngle",DepotAngle);
+        DogLog.log("AutoAim/OutpostCornerAngle",OutpostAngle);
       }
       else
       {
@@ -410,8 +582,9 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
         DepotAngle = Math.atan2(getPose().getY() - BlueDepotCorner.getY(), getPose().getX() - BlueDepotCorner.getX());
         DepotAngle = Units.radiansToDegrees(DepotAngle);
         DHOut_HubDistance = Hub2Robot.getTranslation().getNorm();
-        AutoAimAngle = Math.atan2(getPose().getY() - BlueHubPose.getY(), getPose().getX() - BlueHubPose.getX());
-        AutoAimAngle = Units.radiansToDegrees(AutoAimAngle);
+        // AutoAimAngle = Math.atan2(getPose().getY() - BlueHubPose.getY(), getPose().getX() - BlueHubPose.getX());
+        AutoAimAngle = Math.atan2(BlueHubPose.getY() - getPose().getY(), BlueHubPose.getX() - getPose().getX());
+        AutoAimAngle = Units.radiansToDegrees(AutoAimAngle)+8;
         DHOut_HubDistance = Math.sqrt(Math.pow(getPose().getY() - BlueHubPose.getY(),2) + Math.pow(getPose().getX() - BlueHubPose.getX(),2));
         DHOut_CornerDistance = Math.min(OutpostCornerDist, DepotCornerDist);
         DHOut_AngleToHub = Math.abs (AutoAimAngle - getPose().getRotation().getDegrees());
@@ -419,13 +592,13 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
         DHOut_AngleToDepot = Math.abs (DepotAngle - getPose().getRotation().getDegrees());
         DHOut_HubPoseX = 4.626 - getPose().getX();
         DHOut_HubPoseY = 4 - getPose().getY();
-        DogLog.log("Fieldinfo/Hub2Robot",Hub2Robot);
-        DogLog.log("Fieldinfo/HubPose",BlueHubPose);
-        DogLog.log("Fieldinfo/HubDistance",DHOut_HubDistance);
-        DogLog.log("Fieldinfo/DepotCornerDist",DepotCornerDist);
-        DogLog.log("Fieldinfo/OutpostCornerDist",OutpostCornerDist);
-        DogLog.log("Fieldinfo/DepotCornerAngle",DepotAngle);
-        DogLog.log("Fieldinfo/OutpostCornerAngle",OutpostAngle);
+        DogLog.log("AutoAim/Hub2Robot",Hub2Robot);
+        DogLog.log("AutoAim/HubPose",BlueHubPose);
+        DogLog.log("AutoAim/HubDistance",DHOut_HubDistance);
+        DogLog.log("AutoAim/DepotCornerDist",DepotCornerDist);
+        DogLog.log("AutoAim/OutpostCornerDist",OutpostCornerDist);
+        DogLog.log("AutoAim/DepotCornerAngle",DepotAngle);
+        DogLog.log("AutoAim/OutpostCornerAngle",OutpostAngle);
       }
 
 
@@ -442,18 +615,30 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
       {
          DHOut_InAllianceZone = true;
       }
+      if (getPose().getX() < fieldLayout.getTagPose(26).get().getX()){
+          DHOut_InOpposingZone = true;
+      }
+        
   
     }
     else
     {
-      if (getPose().getX() < fieldLayout.getTagPose(26).get().getX())
+      if (getPose().getX() < fieldLayout.getTagPose(26).get().getX()){
         DHOut_InAllianceZone = true;
+      }
+if (getPose().getX() > fieldLayout.getTagPose(9).get().getX() )
+      {
+         DHOut_InOpposingZone = true;
+      }
+
     }
+
+
 
    
     //Set Variables from Datahighway
-DogLog.log("Fieldinfo/Inalliancezone",DHOut_InAllianceZone);
-DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
+DogLog.log("AutoAim/Inalliancezone",DHOut_InAllianceZone);
+DogLog.log("AutoAim/Inneutralzone",DHOut_InNeutralZone);
     //Set Variable to DataHighway
   }
   @Override
@@ -487,7 +672,7 @@ DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
           (speedsRobotRelative, moduleFeedForwards) -> {
             if (enableFeedforward)
             {
-              swerveDrive.drive(
+              this.AutoDrive(
                   speedsRobotRelative,
                   swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
                   moduleFeedForwards.linearForces()
@@ -502,7 +687,7 @@ DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
               // PPHolonomicController is the built in path following controller for holonomic drive trains
               new PIDConstants(5.0, 0.0, 0.0),
               // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0)
+              new PIDConstants(5.0,0.0,0.0)
               // Rotation PID constants
           ),
           config,
@@ -532,6 +717,15 @@ DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
     //Preload PathPlanner Path finding
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
     PathfindingCommand.warmupCommand().schedule();
+  }
+
+  public void AutoDrive(ChassisSpeeds robotRelativeVelocity, SwerveModuleState[] states, Force[] feedforwardForces){
+
+       swerveDrive.drive(
+                  AutoAimVelocityPIDCalculation(robotRelativeVelocity),
+                  states,
+                  feedforwardForces);
+    
   }
 
   /**
@@ -565,6 +759,9 @@ DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
   {
     return AutoAimEnabled;
   }
+  public boolean robotIsAimed(){
+    return DHOut_Aimed;
+  }
   public void EnableOutpostAim()
   {
     OutpostAimEnabled = true;
@@ -589,6 +786,31 @@ DogLog.log("Fieldinfo/Inneutralzone",DHOut_InNeutralZone);
   {
     return DepotAimEnabled;
   }
+  //DepotAngle = Math.atan2(getPose().getY() - BlueDepotCorner.getY(), getPose().getX() - BlueDepotCorner.getX());
+   //     DepotAngle = Units.radiansToDegrees(DepotAngle);
+
+public void AutoAim(){
+
+  
+  if (DHIn_SOTF){
+    targetAngle = DHIn_SOTFTargetAngle.getDegrees();
+    DogLog.log("AutoAim/SOTFTargetAngle",DHIn_SOTFTargetAngle.getDegrees()); 
+  }
+  else{
+    targetAngle = Units.radiansToDegrees(Math.atan2(DHIn_aimTarget.getY() - getPose().getY(), DHIn_aimTarget.getX() - getPose().getX()));
+  }
+  targetAngle = targetAngle +7;
+  if (targetAngle > 180)
+    targetAngle = targetAngle -360;
+  PID_AutoAim.setSetpoint(targetAngle);
+  DHOut_Aimed = PID_AutoAim.atSetpoint();
+  PID_AutoAim.calculate(getPose().getRotation().getDegrees());
+  DogLog.log("AutoAim/AutoAimAngle", targetAngle);
+  DogLog.log("AutoAim/AutoAimError", PID_AutoAim.getError());
+  DogLog.log("AutoAim/AutoAimSetpoint", PID_AutoAim.getSetpoint());
+  DogLog.log("AutoAim/StationaryCalculatedTargetAngle", Units.radiansToDegrees(Math.atan2(DHIn_aimTarget.getY() - getPose().getY(), DHIn_aimTarget.getX() - getPose().getX())));
+
+}
 
   public void EnableCornerAim(){
     if (isRedAlliance()){
@@ -855,6 +1077,47 @@ DisableCornerAim();
     swerveDrive.driveFieldOriented(velocity);
   }
 
+  public ChassisSpeeds BallAssistController(ChassisSpeeds v){
+
+    if (isBallAssistEnabled() && !AutoAimEnabled)
+    {
+        var targets = GetBallPathCalculator().calculate(getPose(), validTargets);
+        if (targets.ballCount() > 0 && targets.isValid()) {
+          return GetBallFollower().update(
+          getPose(),
+          validTargets,
+          GetBallPathCalculator(),
+          -driverXbox.getLeftY(),    // forward = along path, back = reverse
+          -driverXbox.getRightX()     // free rotation to aim intake
+          );
+        } 
+        else
+        {
+            return v;
+        }
+    }
+    else
+      {
+        return v;
+      }
+  }
+
+  public ChassisSpeeds AutoAimVelocityPIDCalculation(ChassisSpeeds v){
+
+    if (AutoAimEnabled)
+    {
+      //PID_AutoAim.setSetpoint(AutoAimAngle);
+      
+      v.omegaRadiansPerSecond = PID_AutoAim.calculate(getPose().getRotation().getDegrees());
+      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4,4);
+      DogLog.log("AutoAim/AutoAimRotVel", v.omegaRadiansPerSecond);
+      
+    }
+
+      return v;
+
+  }
+
   /**
    * Drive the robot given a chassis field oriented velocity.
    *
@@ -863,52 +1126,12 @@ DisableCornerAim();
   public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity)
   {
     return run(() -> {
-      ChassisSpeeds v = velocity.get();
-    if (AutoAimEnabled)
-    {
-      //PID_AutoAim.setSetpoint(AutoAimAngle);
-      PID_AutoAim.setSetpoint(DHIn_reqRobotAngle);
-      PID_AutoAim.setTolerance(2);
-      PID_AutoAim.enableContinuousInput(-180, 180);
-      v.omegaRadiansPerSecond = PID_AutoAim.calculate(getPose().getRotation().getDegrees());
-      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4,4);
-      DHOut_Aimed = PID_AutoAim.atSetpoint();
-    }
-      DogLog.log("Fieldinfo/AutoAimRotVel", v.omegaRadiansPerSecond);
-      DogLog.log("Fieldinfo/AutoAimAngle", AutoAimAngle);
       
-
       
-    ;
-  
-  
-   
+       ChassisSpeeds v = velocity.get();
+       v = AutoAimVelocityPIDCalculation(v);
+       v = BallAssistController(v);
 
-  if (DepotAimEnabled)
-    {
-      PID_DepotAim.setSetpoint(DepotAngle);
-      PID_DepotAim.setTolerance(3);
-      PID_DepotAim.enableContinuousInput(-180, 180);
-      v.omegaRadiansPerSecond = PID_DepotAim.calculate(getPose().getRotation().getDegrees());
-      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
-    }
-      
-      DogLog.log("Fieldinfo/DepotAimAngle", DepotAngle);
-
-     
-    ;
-  
-
-  if (OutpostAimEnabled)
-    {
-      PID_OutpostAim.setSetpoint(OutpostAngle);
-      PID_OutpostAim.setTolerance(3);
-      PID_OutpostAim.enableContinuousInput(-180, 180);
-      v.omegaRadiansPerSecond = PID_OutpostAim.calculate(getPose().getRotation().getDegrees());
-      v.omegaRadiansPerSecond = MathUtil.clamp(v.omegaRadiansPerSecond, -4, 4);
-    }
-      
-      DogLog.log("Fieldinfo/OutpostAimAngle", OutpostAngle);
 
       swerveDrive.driveFieldOriented(v);
     });
@@ -949,7 +1172,7 @@ DisableCornerAim();
   public void resetOdometry(Pose2d initialHolonomicPose)
   {
     swerveDrive.resetOdometry(initialHolonomicPose);
-    poseEstimator.resetPose(initialHolonomicPose);
+    // poseEstimator.resetPose(initialHolonomicPose);
   }
 
   /**
@@ -1169,8 +1392,14 @@ DisableCornerAim();
   }
   Rotation2d GetGyroAngle()
 {
+  //gyro appears to be 6 degrees off center
   if (swerveDrive != null)
-  return Rotation2d.fromDegrees(swerveDrive.getYaw().getDegrees());
+  {
+    double fixedrot = swerveDrive.getYaw().getDegrees()+0;
+    if (fixedrot >180)
+    fixedrot = fixedrot -360; 
+  return Rotation2d.fromDegrees(fixedrot);
+  }
   else
   return Rotation2d.fromDegrees(0);
 

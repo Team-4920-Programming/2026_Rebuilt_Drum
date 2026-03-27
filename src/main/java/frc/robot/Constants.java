@@ -64,6 +64,7 @@ public final class Constants
   public static int Can_Pigeon = 18;
   public static int Can_Mitrocandria = 19;
   public static int Can_Climber = 20;
+  public static int Can_TipperAbsEncoder = 21;
 
   public static final class DrivebaseConstants
   {
@@ -93,33 +94,35 @@ public static final class DriveConstants {
     public static final double TURN_CONSTANT    = 6;
   }
   public static class Vision4920 {
-    public static final String kFrontCam = "FrontCam";  //Intake Camera
-    public static final String kRearCam = "RearCam"; //Shooter Camera
-    public static final String kLeftCam = "LeftCam";  //Climber Camera
-    public static final String kRightCam = "RightCam"; //Right Camera
+    
+    public static final String kFrontCam = "Front";  //Intake Camera
+    // public static final String kRearCam = "RearCam"; //Shooter Camera
+    public static final String kLeftCam = "Left";  //Climber Camera
+    public static final String kRightCam = "Right"; //Right Camera
     // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
 
-
+    
     // positive x to the left, positive up
     public static final Transform3d kRobotToFrontCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(0.5), Units.inchesToMeters(-7.5), Units.inchesToMeters(-32.25)), //0,-7.5,32
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(13), Units.degreesToRadians(0))); //
+            new Transform3d(new Translation3d(Units.inchesToMeters(-12.75), Units.inchesToMeters(-7.5), Units.inchesToMeters(20.5)), //0,-7.5,32
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-11), Units.degreesToRadians(0))); //
 
     public static final Transform3d kRobotToRightCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(-9.5), Units.inchesToMeters(19)), 
-            new Rotation3d(Units.degreesToRadians(1), Units.degreesToRadians(7), Units.degreesToRadians(4))); //
+            new Transform3d(new Translation3d(Units.inchesToMeters(0.125), Units.inchesToMeters(-13), Units.inchesToMeters(17.25)), 
+            new Rotation3d(Units.degreesToRadians(-1.0), Units.degreesToRadians(-10.75), Units.degreesToRadians(-88.75))); //
 
     public static final Transform3d kRobotToLeftCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(-3.25), Units.inchesToMeters(-10.75), Units.inchesToMeters(38.25)), 
-            new Rotation3d(0, Units.degreesToRadians(309), Units.degreesToRadians(180))); //
-  public static final Transform3d kRobotToRearCam =
-            new Transform3d(new Translation3d(Units.inchesToMeters(-.5), Units.inchesToMeters(2), Units.inchesToMeters(-32.25)), 
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-13), Units.degreesToRadians(180))); // 0.48     0,-10,180
+            new Transform3d(new Translation3d(Units.inchesToMeters(0.25), Units.inchesToMeters(13), Units.inchesToMeters(16.55)), 
+
+            new Rotation3d(Units.degreesToRadians(-0.25), Units.degreesToRadians(-7.7), Units.degreesToRadians(91.25))); //
+  // public static final Transform3d kRobotToRearCam =
+  //           new Transform3d(new Translation3d(Units.inchesToMeters(-.5), Units.inchesToMeters(2), Units.inchesToMeters(-32.25)), 
+  //           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-13), Units.degreesToRadians(180))); // 0.48     0,-10,180
   
-  public static final Transform3d ROBOT_TO_CAMERA_Front = kRobotToFrontCam.inverse();
-  public static final Transform3d ROBOT_TO_CAMERA_Rear = kRobotToRearCam.inverse();
-  public static final Transform3d ROBOT_TO_CAMERA_Right = kRobotToRightCam .inverse();
-  public static final Transform3d ROBOT_TO_CAMERA_Left = kRobotToLeftCam.inverse();
+  // public static final Transform3d ROBOT_TO_CAMERA_Front = kRobotToFrontCam.inverse();
+  // public static final Transform3d ROBOT_TO_CAMERA_Rear = kRobotToRearCam.inverse();
+  // public static final Transform3d ROBOT_TO_CAMERA_Right = kRobotToRightCam .inverse();
+  // public static final Transform3d ROBOT_TO_CAMERA_Left = kRobotToLeftCam.inverse();
   
     
     //public static final AprilTagFieldLayout kTagLayout = new AprilTagFieldLayout(atag.getTags(), 17.548, 8.052);  
@@ -181,5 +184,20 @@ public static final class DriveConstants {
             .1, // y
             .1);
 
+
+
 }
+
+    public static class Tipper{
+      public static final double TipperKp = 0.016;
+      public static final double TipperKi = 0.0;
+      public static final double TipperKd = 0.0;
+
+    }
+     public static class Hood{
+      public static final double HoodKp = 0.05;
+      public static final double HoodKi = 0.0;
+      public static final double HoodKd = 0.0;
+
+    }
 }
