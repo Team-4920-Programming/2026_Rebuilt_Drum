@@ -122,7 +122,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
 
 
-    TipperConfig.idleMode(IdleMode.kBrake);
+    TipperConfig.idleMode(IdleMode.kCoast);
     TipperConfig.smartCurrentLimit(40);
     TipperConfig.disableFollowerMode();
     TipperConfig.inverted(true);
@@ -138,6 +138,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
 //    tipAbsoluteEncoder.configure(dec, ResetMode.kNoResetSafeParameters);
 tipperPID.enableContinuousInput(-180, 180);
+tipperPID.setTolerance(3);
 tipperPID.setSetpoint(getTipperAngle());
    }      
 
@@ -224,7 +225,7 @@ public double getTipperAngle() {
     else if (!Intake){
       SetIntakeSpeed(0);
     }
-      ProcessTipperState();
+   
       // TuneTipperPID();
       updateLogs();
 // if (tipperPID.getSetpoint() > 5.0){

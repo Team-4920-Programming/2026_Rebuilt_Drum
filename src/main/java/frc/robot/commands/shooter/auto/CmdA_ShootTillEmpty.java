@@ -10,56 +10,81 @@ import dev.doglog.DogLog;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter.ShooterSubsystem;
-//import frc.robot.subsystems.Shooter.ShooterYAMS_SubSystem;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+
+import frc.robot.subsystems.Intake.IntakeSubsystem.TipperState;
+import frc.robot.Constants.Tipper;
+import frc.robot.commands.shooter.tele.CmdT_ReverseFeeder;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CmdA_ShootTillEmpty extends Command {
-  ShooterSubsystem m_shooter;
+    ShooterSubsystem m_shooter;
+  SwerveSubsystem m_swerve;
+  IntakeSubsystem m_intake;
+  boolean TipperUp = false;
   /** Creates a new CmdT_ShootTillEmpty. */
-  public CmdA_ShootTillEmpty(ShooterSubsystem m_ShooterSubsystem) {
-    addRequirements(m_ShooterSubsystem);
+  public CmdA_ShootTillEmpty(ShooterSubsystem m_ShooterSubsystem, SwerveSubsystem m_SwerveSubsystem, IntakeSubsystem m_IntakeSubsystem) {
+    //addRequirements(m_ShooterSubsystem);
     m_shooter = m_ShooterSubsystem;
+   m_swerve = m_SwerveSubsystem;
+   m_intake = m_IntakeSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //DoubleSubscriber ShooterSpeed = DogLog.tunable("Shooter/ShooterSpeed", 5000.0,"rpm");
-    //DoubleSubscriber FeederSpeed = DogLog.tunable("Shooter/FeederSpeed", 1.0);
-    //DoubleSubscriber AugerSpeed = DogLog.tunable("Shooter/AugerSpeed",0.75);
-
-    double ShooterSpeed = 5000;
-    double FeederSpeed = 1;
-    double RollerSpeed = .5;
-    //m_shooter.setVelocity(RPM.of(3000));
-    m_shooter.SetShooterSpeed(ShooterSpeed);
-    //double CurrentShooter1Vel = m_shooter.getVelocity().magnitude();
-
-    //m_shooter.SetShooterSpeed(ShooterSpeed.get());
-    if (true)
+      m_shooter.EnableShooter();
+   
+   //m_swerve.EnableAutoLock();
+    if (!m_shooter.isShooterAtSpeed())
     {
-      m_shooter.SetFeederSpeed(FeederSpeed);
-      m_shooter.SetRollerSpeed(RollerSpeed);
+      m_shooter.reverseFeeder();
     }
-  }
+   if (m_shooter.isShooterAtSpeed() && m_swerve.robotIsAimed()){
+    //m_shooter.reverseFeeder();
+    if (TipperUp && m_intake.TipperAtSetpoint())
+    {
+      m_intake.SetTipperState(TipperState.INTAKING);
+      TipperUp = false;
+    }
+    else if (!TipperUp && m_intake.TipperAtSetpoint())
+    {
+      m_intake.SetTipperState(TipperState.SHOOTING);
+      TipperUp = true;
+    }
+  
+    m_intake.SetIntakeSpeed(-1);
+    m_shooter.SetFeederSpeed(-0.8);
+    m_shooter.SetRollerSpeed(-1.0);
+   }
+   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter.SetShooterSpeed( 0);
-    //m_shooter.setVelocity(RPM.of(0));
-    m_shooter.SetFeederSpeed(0);
-    m_shooter.SetRollerSpeed(0);
-  }
+  //   m_shooter.SetShooterSpeeds( 0);
+  //   //m_shooter.setVelocity(RPM.of(0));
+  m_shooter.SetFeederSpeed(0);
+  m_shooter.SetRollerSpeed(0);
+  m_intake.SetIntakeSpeed(0);
+  m_intake.SetTipperState(TipperState.INTAKING);
+  m_swerve.DisableAutoAim();
+  m_shooter.DisableShooter();
+  
+   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    
     return false;
   }
 }
