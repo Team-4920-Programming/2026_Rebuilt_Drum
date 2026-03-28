@@ -498,6 +498,21 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
   // poseEstimator.addVisionMeasurement(visionPose, Timestamp);
     }  
 
+  private double calculateTargetVector(){
+        double TargetVectorX = DHIn_aimTarget.getX() - getPose().getX();
+        double TargetVectorY = DHIn_aimTarget.getY() - getPose().getY();
+        double targetAngle = Math.atan2(TargetVectorY,TargetVectorX);
+        Pose2d finaltarget = new Pose2d(DHIn_aimTarget.getX(),DHIn_aimTarget.getY(),new Rotation2d(TargetVectorX, TargetVectorY));
+        DogLog.log("AutoAim2/FinalTarget", finaltarget);
+        double target = finaltarget.getRotation().minus(getPose().getRotation()).getDegrees();
+        DogLog.log("AutoAim2/SwerveGoalAngleDegrees", Units.radiansToDegrees(targetAngle));
+        DogLog.log("AutoAim2/SwerveGoalUsingPoseDegrees", target);
+        double targetDistance = finaltarget.getTranslation().getDistance(getPose().getTranslation());
+        DogLog.log("AutoAim2/targetDistance", targetDistance );
+        // return Units.radiansToDegrees(targetAngle); 
+        return target;
+    }
+
   
   @Override
   public void periodic()
@@ -512,6 +527,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     }
 
     AutoAim();
+    calculateTargetVector();
       robotSpeeds = getRobotVelocity();
       
       poseEstimator.update(GetGyroAngle(), getModulePositions());
