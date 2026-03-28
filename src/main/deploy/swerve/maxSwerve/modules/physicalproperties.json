@@ -11,10 +11,11 @@
     }
   },
   "rampRate": {
-    "drive": 0.75,
-    "angle": 0.5
+    "drive": 0.25,
+    "angle": 0.25
   },
   "optimalVoltage": 12,
-  "robotMass": 83,
-  "wheelGripCoefficientOfFriction": 1.1
+  "robotMass": 140.0,
+  "wheelGripCoefficientOfFriction": 1.1,
+  "currentLimit": {"drive": 60, "angle": 20}
 }
