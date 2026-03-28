@@ -41,6 +41,6 @@ public class CmdA_HopperDownStart extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(m_intake.getTipperAngle() - TipperState.INTAKING.getAngle()) <= 10.0;
+    return Math.abs(m_intake.getTipperAngle() - TipperState.INTAKING.getAngle()) <= 15.0;
   }
 }

@@ -149,6 +149,7 @@ public class DataHighway extends SubsystemBase {
   double DH_HubPoseX =0;
   double DH_HubPoseY =0;
   double DH_reqRobotAngle =0;
+  double DH_nextPhaseCountDown = 0;
   boolean DH_isHubActive = true;
   double DH_AngleToOutpost = 0;
   double DH_AngleToDepot = 0;
@@ -307,24 +308,31 @@ else if (DH_InOpposingZone){
   private void processMatchPhase(){
     if (DH_matchTime > ShiftSchedule.AUTO_END.getValue()){
       currentMatchPhase = MatchPhase.AUTO;
+      DH_nextPhaseCountDown = DH_matchTime - ShiftSchedule.AUTO_END.getValue();
     }
     else if (DH_matchTime > ShiftSchedule.TRANSITION_END.getValue()){
       currentMatchPhase = MatchPhase.TRANSITION;
+      DH_nextPhaseCountDown = DH_matchTime - ShiftSchedule.TRANSITION_END.getValue();
     }
     else if (DH_matchTime > ShiftSchedule.SHIFTA_1_END.getValue()){
       currentMatchPhase =MatchPhase.SHIFT_A;
+      DH_nextPhaseCountDown = DH_matchTime - ShiftSchedule.SHIFTA_1_END.getValue();
     }
     else if (DH_matchTime > ShiftSchedule.SHIFTB_1_END.getValue()){
       currentMatchPhase =MatchPhase.SHIFT_B;
+      DH_nextPhaseCountDown = DH_matchTime - ShiftSchedule.SHIFTB_1_END.getValue();
     }
     else if (DH_matchTime > ShiftSchedule.SHIFTA_2_END.getValue()){
       currentMatchPhase =MatchPhase.SHIFT_A;
+      DH_nextPhaseCountDown = DH_matchTime - ShiftSchedule.SHIFTA_2_END.getValue();
     }
     else if (DH_matchTime > ShiftSchedule.SHIFTB_2_END.getValue()){
       currentMatchPhase =MatchPhase.SHIFT_B;
+      DH_nextPhaseCountDown = DH_matchTime - ShiftSchedule.SHIFTB_2_END.getValue();
     }
     else if (DH_matchTime > ShiftSchedule.END.getValue()){
       currentMatchPhase =MatchPhase.ENDGAME;
+      DH_nextPhaseCountDown = DH_matchTime - ShiftSchedule.END.getValue();
     }
   }
 
@@ -341,6 +349,7 @@ else if (DH_InOpposingZone){
         {
           case 'B' :
             DogLog.log("Data/GameDataStatus", "Game Data Received");
+            DogLog.log("Data/GameDataReceived",true);
             if (allianceColor == AllianceColor.BLUE){
               assignedShift = AssignedShift.B;
             }
@@ -351,6 +360,7 @@ else if (DH_InOpposingZone){
             break;
           case 'R' :
             DogLog.log("Data/GameDataStatus", "Game Data Received");
+            DogLog.log("Data/GameDataReceived",true);
             if (allianceColor == AllianceColor.RED){
               assignedShift = AssignedShift.B;
             }
@@ -361,10 +371,12 @@ else if (DH_InOpposingZone){
             break;
           default :
             DogLog.log("Data/GameDataStatus", "Game Data Corrupt");
+            DogLog.log("Data/GameDataReceived",false);
             break;
         }
       } else {
         DogLog.log("Data/GameDataStatus", "Game Data Not Received");
+        DogLog.log("Data/GameDataReceived",false);
       }
     }
   }
@@ -413,6 +425,11 @@ else if (DH_InOpposingZone){
   {
     DogLog.forceNt.log("ForcedNT/Match/MatchTime",DriverStation.getMatchTime(),"sec");
     DogLog.forceNt.log("ForcedNT/Match/GameDateMsg",DriverStation.getGameSpecificMessage());
+    DogLog.log("Data/hubActive",DH_isHubActive);
+    DogLog.log("Data/AssignedShift", assignedShift.toString());
+    DogLog.log("Data/matchTimeRemaining", DH_matchTime);
+    DogLog.log("Data/NextPhaseCountdown", DH_nextPhaseCountDown);
+
     
     Optional<Alliance> ally = DriverStation.getAlliance();
     if (ally.isPresent()) {

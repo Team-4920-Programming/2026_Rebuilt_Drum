@@ -152,7 +152,7 @@ public class SwerveSubsystem extends SubsystemBase
   private boolean AutoAimEnabled = false;
   private Pose2d AutoAimTarget = new Pose2d();
   private double AutoAimAngle = 0;
-
+  private ChassisSpeeds robotSpeeds;
   public List<Pose2d> validTargets = new ArrayList<>(100) ;
   
   private final BallPathCalculator calc = new BallPathCalculator()
@@ -497,6 +497,8 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
   //    poseEstimator.addVisionMeasurement(visionPose, Timestamp, visionMeasurementStdDevs);
   // poseEstimator.addVisionMeasurement(visionPose, Timestamp);
     }  
+
+  
   @Override
   public void periodic()
   {
@@ -510,12 +512,14 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     }
 
     AutoAim();
-
+      robotSpeeds = getRobotVelocity();
+      
       poseEstimator.update(GetGyroAngle(), getModulePositions());
       DogLog.log("SwerveSS/Pose/Pose4920", poseEstimator.getEstimatedPosition());
       DogLog.log("SwerveSS/Pose/YASGLRobotPose", swerveDrive.getPose());
-      DogLog.log("SwerveSS/RobotVelocity",getRobotVelocity());
+      DogLog.log("SwerveSS/RobotVelocity",robotSpeeds);
       DogLog.log("SwerveSS/FieldVelocity",getFieldVelocity());
+      DogLog.log("SwerveSS/CurrentRobotSpeed", Math.sqrt((robotSpeeds.vxMetersPerSecond*robotSpeeds.vxMetersPerSecond) + (robotSpeeds.vyMetersPerSecond * robotSpeeds.vyMetersPerSecond)));
  
       UpdateDataHighway();
       double HubX = 1;
