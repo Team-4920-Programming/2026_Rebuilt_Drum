@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -72,6 +73,7 @@ public class RobotContainer
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandJoystick toggleSwitchJoystick = new CommandJoystick(2);
 
  
   // The robot's subsystems and commands are defined here...
@@ -263,6 +265,8 @@ public class RobotContainer
          // This ensures accidental activation is avoided during matches
          //driverXbox.x().onTrue(drivebase.getPreMatchCalibrationCommand());
         driverXbox.leftBumper().whileTrue(new CmdT_TrackBallDrive(drivebase));
+        toggleSwitchJoystick.button(4).whileTrue(new CmdT_EnableSOTF(Shooter));
+        toggleSwitchJoystick.button(4).whileFalse(new CmdT_DisableSOTF(Shooter));
 //       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
 //       driverXbox.leftBumper().onTrue(Commands.none());
 //       driverXbox.rightBumper().onTrue(Commands.none());

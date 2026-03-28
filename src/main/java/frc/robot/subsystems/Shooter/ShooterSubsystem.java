@@ -393,6 +393,10 @@ else {
     DogLog.log("Shooter/FeederSpeed",feederMotor.getVelocity().getValueAsDouble()*60);
   }
 
+  public void ToggleSOTF(boolean b){
+    DHOut_SOTF = b;
+  }
+
   private void updateShotParamsFromCalculations(){
 
     if (DHIn_ShooterLookupTable != null){
