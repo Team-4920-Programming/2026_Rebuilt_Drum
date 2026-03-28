@@ -33,7 +33,7 @@ public final class Constants
   public static final double ROBOT_MASS = (140) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED  = Units.feetToMeters(18.0); //was 14.5
+  public static final double MAX_SPEED  = Units.feetToMeters(15.0); //was 14.5
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
 //  public static final class AutonConstants
@@ -105,7 +105,7 @@ public static final class DriveConstants {
     // positive x to the left, positive up
     public static final Transform3d kRobotToFrontCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(-12.0), Units.inchesToMeters(-7.75), Units.inchesToMeters(19.75)), //0,-7.5,32
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-11), Units.degreesToRadians(0))); //
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-12), Units.degreesToRadians(0))); //
 
     public static final Transform3d kRobotToRightCam =
             new Transform3d(new Translation3d(Units.inchesToMeters(0.125), Units.inchesToMeters(-13), Units.inchesToMeters(17.25)), 

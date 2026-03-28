@@ -24,7 +24,7 @@ public class CmdT_AutoShoot extends Command {
   ShooterSubsystem m_shooter;
   SwerveSubsystem m_swerve;
   IntakeSubsystem m_intake;
-  boolean TipperUp = true;
+  boolean ShootStart = false;;
   Timer delay = new Timer();
   
   /** Creates a new CmdT_ShootTillEmpty. */
@@ -42,6 +42,7 @@ public class CmdT_AutoShoot extends Command {
     m_swerve.EnableAutoAim();
     m_intake.OverrideTipperPID(true);
     m_intake.SetTipperSpeed(0);
+    ShootStart = false;
   }
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -72,17 +73,17 @@ public class CmdT_AutoShoot extends Command {
 
       DogLog.log("Intake/Debug", m_intake.getTipperAngle() - TipperState.TUCKED.getAngle());
       if (delay.hasElapsed(0.5)){
-      
-        if ((Math.abs(m_intake.getTipperAngle() - 25.0) <= 5.0 && TipperUp) || (Math.abs(m_intake.getTipperAngle() - TipperState.INTAKING.getAngle()) <= 5.0 && !TipperUp))
-        {
-          TipperUp = !TipperUp;
-        }
-
-        if (TipperUp){
+        if (!ShootStart){
           m_intake.SetTipperSpeed(0.5);
+          ShootStart = true;
         }
-        else{
+        
+        if (m_intake.getTipperAngle() >= 30.0 && m_intake.getTipperSpeed() > 0)
+        {
           m_intake.SetTipperSpeed(-0.4);
+        }
+        else if (m_intake.getTipperAngle() <= 10.0 && m_intake.getTipperSpeed() < 0){
+          m_intake.SetTipperSpeed(0.5);
         }
     }
       

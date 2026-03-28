@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.491952567408885,
-        "y": 2.7800732304378086
+        "x": 3.09275434483049,
+        "y": 2.7799745610482853
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.448952567408885,
-        "y": 2.7800732304378086
+        "x": 4.04975434483049,
+        "y": 2.7799745610482853
       },
       "isLocked": false,
       "linkedName": "Barrie - 1 - 2 End"
@@ -46,8 +46,8 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5303593556381709,
-      "rotationDegrees": 48.00000000000001
+      "waypointRelativePos": 0.53,
+      "rotationDegrees": 39.0
     },
     {
       "waypointRelativePos": 0.9665427509293503,
@@ -72,10 +72,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
+    "maxVelocity": 4.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 360.0,
+    "maxAngularAcceleration": 270.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
@@ -87,7 +87,7 @@
   "folder": "Moley - Barrie",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 47.80245151986677
+    "rotation": 38.95590783775885
   },
   "useDefaultConstraints": true
 }

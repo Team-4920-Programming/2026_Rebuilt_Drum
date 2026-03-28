@@ -815,7 +815,7 @@ public void AutoAim(){
   DogLog.log("AutoAim/AutoAimError", PID_AutoAim.getError());
   DogLog.log("AutoAim/AutoAimSetpoint", PID_AutoAim.getSetpoint());
   DogLog.log("AutoAim/StationaryCalculatedTargetAngle", Units.radiansToDegrees(Math.atan2(DHIn_aimTarget.getY() - getPose().getY(), DHIn_aimTarget.getX() - getPose().getX())));
-
+  DogLog.log("AutoAim/IsAutoAim", isAutoAim());
 }
 
   public void EnableCornerAim(){

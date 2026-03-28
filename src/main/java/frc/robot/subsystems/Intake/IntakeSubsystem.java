@@ -38,8 +38,12 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 //import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RuntimeType;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -70,7 +74,7 @@ public class IntakeSubsystem extends SubsystemBase {
   TalonFX intakeMotor1 = new TalonFX(Constants.Can_Intake1);
   TalonFX intakeMotor2 = new TalonFX(Constants.Can_Intake2);
  
- 
+ CommandXboxController driverXbox = new CommandXboxController(0);
   SparkFlex tipperMotor = new SparkFlex(Constants.Can_Tipper, MotorType.kBrushless);
   RelativeEncoder tipperRelativeEncoder = tipperMotor.getEncoder();
 
@@ -106,13 +110,13 @@ public class IntakeSubsystem extends SubsystemBase {
     var intake1Config = new TalonFXConfiguration();
 
     intake1Config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-    intake1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+    intake1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80));
     intakeMotor1.setNeutralMode(NeutralModeValue.Coast);
     intakeMotor1.getConfigurator().apply(intake1Config);
 
     
     var intake2Config = new TalonFXConfiguration();
-    intake2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+    intake2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80));
  
     // Intake2Config.inverted(true);
 
@@ -181,6 +185,10 @@ public double getTipperAngle() {
   public boolean TipperAtSetpoint(){
     return tipperPID.atSetpoint();
   }
+
+  public double getTipperSpeed(){
+    return tipperMotor.get();
+  }
   
   private void TuneTipperPID(){
     // tipperPID.setP(IntakeAngKP.getAsDouble());
@@ -221,9 +229,11 @@ public double getTipperAngle() {
     }
     if (Intake){
       SetIntakeSpeed(-1);
+      driverXbox.setRumble(RumbleType.kBothRumble, 0.5);
     }
     else if (!Intake){
       SetIntakeSpeed(0);
+      driverXbox.setRumble(RumbleType.kBothRumble, 0.0);
     }
    
       // TuneTipperPID();

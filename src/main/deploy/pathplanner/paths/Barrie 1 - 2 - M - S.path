@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.491952567408885,
-        "y": 2.7800732304378086
+        "x": 3.09275434483049,
+        "y": 2.7799745610482853
       },
       "prevControl": {
-        "x": 3.741952567408885,
-        "y": 2.7800732304378086
+        "x": 3.34275434483049,
+        "y": 2.7799745610482853
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,23 +31,23 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.5,
-      "rotationDegrees": 45.0
+      "rotationDegrees": 39.0
     }
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
+    "maxVelocity": 4.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 360.0,
+    "maxAngularAcceleration": 270.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 47.80245151986677
+    "rotation": 38.95590783775885
   },
   "reversed": false,
   "folder": "Moley - Barrie",
