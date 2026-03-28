@@ -7,6 +7,7 @@ package frc.robot.commands.shooter.tele;
 import static edu.wpi.first.units.Units.RPM;
 
 import dev.doglog.DogLog;
+import dev.doglog.internal.tunable.Tunable;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,7 +24,7 @@ public class CmdT_AutoShoot extends Command {
   ShooterSubsystem m_shooter;
   SwerveSubsystem m_swerve;
   IntakeSubsystem m_intake;
-  boolean TipperUp = false;
+  boolean TipperUp = true;
   Timer delay = new Timer();
   
   /** Creates a new CmdT_ShootTillEmpty. */
@@ -48,11 +49,11 @@ public class CmdT_AutoShoot extends Command {
    m_shooter.EnableShooter();
    
    //m_swerve.EnableAutoLock();
-    if (!m_shooter.isShooterAtSpeed())
-    {
-      m_shooter.reverseFeeder();
-    }
-    if (m_shooter.isShooterAtSpeed() && m_swerve.robotIsAimed()){
+    // if (!m_shooter.isShooterAtSpeed())
+    // {
+    //   m_shooter.reverseFeeder();
+    // }
+    if (m_shooter.isShooterAtSpeed()){ //&& m_swerve.robotIsAimed()){
   //   if (TipperUp && m_intake.TipperAtSetpoint())
   //   {
   //     m_intake.SetTipperState(TipperState.INTAKING);
@@ -69,17 +70,21 @@ public class CmdT_AutoShoot extends Command {
       m_shooter.SetRollerSpeed(-1.0);
       delay.start();
 
-      if (!TipperUp && delay.hasElapsed(0.5))
-      {
-        m_intake.SetTipperSpeed(1.0);
-        TipperUp = true;
-      }
-      else if (TipperUp && delay.hasElapsed(1.0))
-      {
-        m_intake.SetTipperSpeed(-1.0);
-        TipperUp = false;
-        delay.restart();
-      }
+      DogLog.log("Intake/Debug", m_intake.getTipperAngle() - TipperState.TUCKED.getAngle());
+      if (delay.hasElapsed(0.5)){
+      
+        if ((Math.abs(m_intake.getTipperAngle() - 25.0) <= 5.0 && TipperUp) || (Math.abs(m_intake.getTipperAngle() - TipperState.INTAKING.getAngle()) <= 5.0 && !TipperUp))
+        {
+          TipperUp = !TipperUp;
+        }
+
+        if (TipperUp){
+          m_intake.SetTipperSpeed(0.5);
+        }
+        else{
+          m_intake.SetTipperSpeed(-0.4);
+        }
+    }
       
    }
    }
@@ -92,6 +97,7 @@ public class CmdT_AutoShoot extends Command {
     m_shooter.SetFeederSpeed(0);
     m_shooter.SetRollerSpeed(0);
     m_intake.SetIntakeSpeed(0);
+    m_intake.SetTipperSpeed(0);
     m_intake.OverrideTipperPID(false);
     m_intake.SetTipperState(TipperState.INTAKING);
     m_swerve.DisableAutoAim();

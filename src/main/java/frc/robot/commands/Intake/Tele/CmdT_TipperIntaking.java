@@ -15,6 +15,7 @@ public class CmdT_TipperIntaking extends Command {
   double ReqAngle = 0;
   public CmdT_TipperIntaking(IntakeSubsystem IntakeSS) {
     Intake = IntakeSS;
+    addRequirements(Intake);
     // ReqAngle = Angle;
 
 

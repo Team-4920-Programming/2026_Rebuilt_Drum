@@ -134,12 +134,12 @@ public class ShooterSubsystem extends SubsystemBase {
     shooter1Config.Slot0.kV = 0.12; // Example Velocity Feedforward V/rps
     shooter1Config.Slot0.kA = 0.0;
     shooter1Config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-    shooter1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+    shooter1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80));
     shooterMotor1.setNeutralMode(NeutralModeValue.Coast);
     shooterMotor1.getConfigurator().apply(shooter1Config);
 
     var shooter2Config = new TalonFXConfiguration();
-    shooter2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+    shooter2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80));
 
     shooterMotor2.setNeutralMode(NeutralModeValue.Coast);
     shooterMotor2.setControl(new Follower(shooterMotor1.getDeviceID(), MotorAlignmentValue.Opposed));

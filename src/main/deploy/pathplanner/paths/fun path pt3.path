@@ -3,45 +3,61 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.998,
-        "y": 3.149
+        "x": 1.987,
+        "y": 1.839
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.062981455064193,
-        "y": 1.0138231098430808
+        "x": 1.7575664250397793,
+        "y": 2.4289569769745696
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.2219686162624805,
-        "y": 0.858559201141228
+        "x": 1.6915180722891563,
+        "y": 4.996638554216868
       },
       "prevControl": {
-        "x": 7.959495480373105,
-        "y": 1.038213180860483
+        "x": 1.975638554216867,
+        "y": 4.789012048192771
       },
       "nextControl": {
-        "x": 6.212753209700427,
-        "y": 0.612724679029958
+        "x": 1.3756125796383432,
+        "y": 5.227492568077078
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.874579172610556,
-        "y": 0.832681883024252
+        "x": 0.5768915662650604,
+        "y": 4.942
       },
       "prevControl": {
-        "x": 4.000242510699001,
-        "y": 0.49627674750356615
+        "x": 0.7735903614457835,
+        "y": 4.690662650602408
+      },
+      "nextControl": {
+        "x": 0.38019277108433736,
+        "y": 5.193337349397592
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.4020481927710843,
+        "y": 6.908987951807229
+      },
+      "prevControl": {
+        "x": 0.30369879518072274,
+        "y": 6.012915662650604
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Auto 1 Path 2 end"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -58,13 +74,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 57.264773727892454
+    "rotation": 91.33221985386967
   },
   "reversed": false,
-  "folder": "New Folder",
+  "folder": "New New Folder",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 91.1457628381751
+    "rotation": 37.39189059421251
   },
   "useDefaultConstraints": true
 }

@@ -210,7 +210,7 @@ public double getTipperAngle() {
 
   @Override
   public void periodic() {
-
+    ProcessTipperState();
     if (!DHOut_tipperOverride){
        tipperOutput = tipperPID.calculate(getTipperAngle());
        tipperMotor.set(tipperOutput);

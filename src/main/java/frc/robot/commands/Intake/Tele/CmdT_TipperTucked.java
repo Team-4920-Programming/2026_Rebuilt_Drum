@@ -15,6 +15,8 @@ public class CmdT_TipperTucked extends Command {
   IntakeSubsystem Intake;
   public CmdT_TipperTucked(IntakeSubsystem intake) {
     Intake = intake;
+        addRequirements(Intake);
+
     // ReqAngle = Angle;
 
 

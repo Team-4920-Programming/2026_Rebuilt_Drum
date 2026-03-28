@@ -250,6 +250,8 @@ public class RobotContainer
         driverXbox.povDown().whileTrue(new CmdT_Manual_HoodDown(Shooter));
         driverXbox.povLeft().whileTrue(new CmdT_Manual_SlowDownShooter(Shooter));
         driverXbox.povRight().whileTrue(new CmdT_Manual_SpeedUpShooter(Shooter));
+
+
         // driverXbox.povUp().whileTrue(new CmdT_Climb(Climber));
         // driverXbox.povDown().whileTrue(new CmdT_ClimberUp(Climber));
         // driverXbox.rightTrigger().whileTrue(new CmdT_OutpostAutoAim(drivebase));
@@ -257,7 +259,6 @@ public class RobotContainer
          // Pre-match calibration routine - Back + Start buttons together
          // This ensures accidental activation is avoided during matches
          //driverXbox.x().onTrue(drivebase.getPreMatchCalibrationCommand());
-
         driverXbox.leftBumper().whileTrue(new CmdT_TrackBallDrive(drivebase));
 //       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
 //       driverXbox.leftBumper().onTrue(Commands.none());

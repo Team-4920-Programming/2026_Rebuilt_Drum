@@ -16,6 +16,8 @@ public class CmdT_TipperShooting extends Command {
   public CmdT_TipperShooting(IntakeSubsystem IntakeSS) {
     Intake = IntakeSS;
     // ReqAngle = Angle;
+        addRequirements(Intake);
+
 
 
     // Use addRequirements() here to declare subsystem dependencies.
