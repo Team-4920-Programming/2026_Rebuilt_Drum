@@ -387,13 +387,13 @@ else if (DH_InOpposingZone){
   }
 
   private void manualAssignShift(){
-    if (!gameDataUpdated){
+    if (!gameDataUpdated && DriverStation.isTeleopEnabled()){
       if (OperatorJoystick.button(1).getAsBoolean()){
-        assignedShift = AssignedShift.A;
+        assignedShift = AssignedShift.B;
         gameDataUpdated = true;
       }
       if (OperatorJoystick.button(4).getAsBoolean()){
-        assignedShift= AssignedShift.B;
+        assignedShift= AssignedShift.A;
         gameDataUpdated = true;
       }
   }

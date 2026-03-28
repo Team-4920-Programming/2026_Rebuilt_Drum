@@ -71,18 +71,18 @@ public class CmdT_AutoShoot extends Command {
       m_shooter.SetRollerSpeed(-1.0);
       delay.start();
 
-      DogLog.log("Intake/Debug", m_intake.getTipperAngle() - TipperState.TUCKED.getAngle());
+      // DogLog.log("Intake/Debug", m_intake.getTipperAngle() - TipperState.TUCKED.getAngle());
       if (delay.hasElapsed(0.5)){
         if (!ShootStart){
           m_intake.SetTipperSpeed(0.5);
           ShootStart = true;
         }
         
-        if (m_intake.getTipperAngle() >= 30.0 && m_intake.getTipperSpeed() > 0)
+        if (m_intake.getTipperAngle() >= 30.0 && m_intake.getTipperPIDOutput() > 0)
         {
           m_intake.SetTipperSpeed(-0.4);
         }
-        else if (m_intake.getTipperAngle() <= 10.0 && m_intake.getTipperSpeed() < 0){
+        else if (m_intake.getTipperAngle() <= 10.0 && m_intake.getTipperPIDOutput() < 0){
           m_intake.SetTipperSpeed(0.5);
         }
     }

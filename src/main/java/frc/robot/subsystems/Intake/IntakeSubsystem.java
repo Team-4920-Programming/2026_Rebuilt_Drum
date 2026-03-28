@@ -166,6 +166,10 @@ public double getTipperAngle() {
     Intake = false;
   }
 
+  public double getTipperPIDOutput(){
+    return tipperOutput;
+  }
+
 
 
   public void SetIntakeSpeed(double Speed){
@@ -229,7 +233,7 @@ public double getTipperAngle() {
     }
     if (Intake){
       SetIntakeSpeed(-1);
-      driverXbox.setRumble(RumbleType.kBothRumble, 0.5);
+      driverXbox.setRumble(RumbleType.kBothRumble, 0.75);
     }
     else if (!Intake){
       SetIntakeSpeed(0);
