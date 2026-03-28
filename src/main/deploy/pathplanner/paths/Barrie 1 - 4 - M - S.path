@@ -3,48 +3,53 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.998,
-        "y": 3.149
+        "x": 5.851333333333335,
+        "y": 4.709435897435898
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.062981455064193,
-        "y": 1.0138231098430808
+        "x": 5.851333333333335,
+        "y": 4.459435897435898
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Barrie - 1 - 3 End"
     },
     {
       "anchor": {
-        "x": 7.2219686162624805,
-        "y": 0.858559201141228
+        "x": 5.708257401404444,
+        "y": 2.7800732304378086
       },
       "prevControl": {
-        "x": 7.959495480373105,
-        "y": 1.038213180860483
+        "x": 5.958257401404444,
+        "y": 2.7800732304378086
       },
       "nextControl": {
-        "x": 6.212753209700427,
-        "y": 0.612724679029958
+        "x": 5.458257401404444,
+        "y": 2.7800732304378086
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.874579172610556,
-        "y": 0.832681883024252
+        "x": 3.491952567408885,
+        "y": 2.7800732304378086
       },
       "prevControl": {
-        "x": 4.000242510699001,
-        "y": 0.4962767475035661
+        "x": 3.741952567408885,
+        "y": 2.7800732304378086
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Auto 1 Path 2 end"
+      "linkedName": "Barrie - 1 - 2 End"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 48.00000000000001
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -58,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 57.264773727892454
+    "rotation": 47.80245151986677
   },
   "reversed": false,
-  "folder": "New Folder",
+  "folder": "Moley - Barrie",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 91.1457628381751
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

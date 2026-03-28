@@ -4,10 +4,13 @@
   "holonomicMode": true,
   "pathFolders": [
     "New Folder",
-    "New New Folder"
+    "New New Folder",
+    "Moley - Barrie"
   ],
-  "autoFolders": [],
-  "defaultMaxVel": 4.0,
+  "autoFolders": [
+    "Moley - Barrie"
+  ],
+  "defaultMaxVel": 5.0,
   "defaultMaxAccel": 4.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 360.0,
@@ -17,7 +20,7 @@
   "robotTrackwidth": 0.546,
   "driveWheelRadius": 0.0367,
   "driveGearing": 5.08,
-  "maxDriveSpeed": 4.0,
+  "maxDriveSpeed": 5.0,
   "driveMotorType": "vortex",
   "driveCurrentLimit": 60.0,
   "wheelCOF": 1.0,

@@ -514,6 +514,8 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
       poseEstimator.update(GetGyroAngle(), getModulePositions());
       DogLog.log("SwerveSS/Pose/Pose4920", poseEstimator.getEstimatedPosition());
       DogLog.log("SwerveSS/Pose/YASGLRobotPose", swerveDrive.getPose());
+      DogLog.log("SwerveSS/RobotVelocity",getRobotVelocity());
+      DogLog.log("SwerveSS/FieldVelocity",getFieldVelocity());
  
       UpdateDataHighway();
       double HubX = 1;
