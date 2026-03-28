@@ -633,11 +633,11 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
 
     if (isRedAlliance())
     {
-       if (getPose().getX() > fieldLayout.getTagPose(9).get().getX() )
+       if (getPose().getX() > (fieldLayout.getTagPose(9).get().getX() - 0.3 ))
       {
          DHOut_InAllianceZone = true;
       }
-      if (getPose().getX() < fieldLayout.getTagPose(26).get().getX()){
+      if (getPose().getX() < (fieldLayout.getTagPose(26).get().getX() + 0.3)){
           DHOut_InOpposingZone = true;
       }
         
@@ -832,6 +832,7 @@ public void AutoAim(){
   DogLog.log("AutoAim/AutoAimSetpoint", PID_AutoAim.getSetpoint());
   DogLog.log("AutoAim/StationaryCalculatedTargetAngle", Units.radiansToDegrees(Math.atan2(DHIn_aimTarget.getY() - getPose().getY(), DHIn_aimTarget.getX() - getPose().getX())));
   DogLog.log("AutoAim/IsAutoAim", isAutoAim());
+
 }
 
   public void EnableCornerAim(){

@@ -65,7 +65,6 @@ public class CmdT_AutoShoot extends Command {
   //     m_intake.SetTipperState(TipperState.SHOOTING);
   //     TipperUp = true;
   //   }
-  
       m_intake.SetIntakeSpeed(-1);
       m_shooter.SetFeederSpeed(-0.8);
       m_shooter.SetRollerSpeed(-1.0);
@@ -82,8 +81,8 @@ public class CmdT_AutoShoot extends Command {
         {
           m_intake.SetTipperSpeed(-0.4);
         }
-        else if (m_intake.getTipperAngle() <= 10.0 && m_intake.getTipperPIDOutput() < 0){
-          m_intake.SetTipperSpeed(0.5);
+        else if (m_intake.getTipperAngle() <= 5.0 && m_intake.getTipperPIDOutput() < 0){
+          m_intake.SetTipperSpeed(0.4);
         }
     }
       
