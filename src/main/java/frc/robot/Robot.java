@@ -105,7 +105,7 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit()
   {
-    m_robotContainer.resetMatchTimer();
+    
     m_robotContainer.setMotorBrake(true);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -122,9 +122,9 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousPeriodic()
   {
-    if (!m_robotContainer.hasMatchTimerStarted()){
-      m_robotContainer.startMatchTimer();
-    }
+    // if (!m_robotContainer.hasMatchTimerStarted()){
+    //   m_robotContainer.startMatchTimer();
+    // }
   }
 
   @Override
@@ -141,6 +141,8 @@ public class Robot extends TimedRobot
     {
       CommandScheduler.getInstance().cancelAll();
     }
+
+    m_robotContainer.resetMatchTimer();
   }
 
   /**

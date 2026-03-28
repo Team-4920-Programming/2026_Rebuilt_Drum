@@ -216,7 +216,7 @@ else if (DH_InOpposingZone){
 
   private void updateMatchTime(){
     if (DH_matchTimer.isRunning()){
-      DH_matchTime = 160.0 - DH_matchTimer.get();
+      DH_matchTime = 140.0 - DH_matchTimer.get();
     }
   }
 
@@ -443,10 +443,10 @@ else if (DH_InOpposingZone){
   {
     DogLog.forceNt.log("ForcedNT/Match/MatchTime",DriverStation.getMatchTime(),"sec");
     DogLog.forceNt.log("ForcedNT/Match/GameDateMsg",DriverStation.getGameSpecificMessage());
-    DogLog.log("Data/hubActive",DH_isHubActive);
-    DogLog.log("Data/AssignedShift", assignedShift.toString());
-    DogLog.log("Data/matchTimeRemaining", DH_matchTime);
-    DogLog.log("Data/NextPhaseCountdown", DH_nextPhaseCountDown);
+    DogLog.forceNt.log("Data/hubActive",DH_isHubActive);
+    DogLog.forceNt.log("Data/AssignedShift", assignedShift.toString());
+    DogLog.forceNt.log("Data/matchTimeRemaining", DH_matchTime);
+    DogLog.forceNt.log("Data/NextPhaseCountdown", DH_nextPhaseCountDown);
 
     
     Optional<Alliance> ally = DriverStation.getAlliance();

@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.874589743595173,
-        "y": 5.837320512820751
+        "x": 6.109243937232525,
+        "y": 6.034022824536376
       },
       "isLocked": false,
       "linkedName": "Barrie - 2 - 3 End"
     },
     {
       "anchor": {
-        "x": 4.621298145506419,
-        "y": 7.431398002853067
+        "x": 4.647175463623395,
+        "y": 7.573723252496434
       },
       "prevControl": {
-        "x": 6.621271847537278,
-        "y": 7.421141727458035
+        "x": 6.647149165654254,
+        "y": 7.563466977101402
       },
       "nextControl": {
-        "x": 2.6213244434755594,
-        "y": 7.441654278248097
+        "x": 2.6472017615925356,
+        "y": 7.583979527891464
       },
       "isLocked": false,
       "linkedName": null
@@ -59,9 +59,9 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.5,
-    "maxAcceleration": 4.0,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 270.0,
+    "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },

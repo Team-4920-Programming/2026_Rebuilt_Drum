@@ -178,7 +178,7 @@ public class SwerveSubsystem extends SubsystemBase
   public double OutpostAngle = 0;
   
   CommandXboxController driverXbox = new CommandXboxController(0);
-  private PIDController PID_AutoAim = new PIDController(0.1, 0, 0);
+  private PIDController PID_AutoAim = new PIDController(0.12, 0, 0);
   private PIDController PID_DepotAim = new PIDController(0.1, 0, 0);
 private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
   private final SwerveDrivePoseEstimator poseEstimator;
@@ -485,7 +485,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
             RearCamVisionTimestamp = visionEst.get().timestampSeconds;
             DogLog.log("SwerveSS/Vision/RearCameraPose", RearCameraPose3d);
             DogLog.log("SwerveSS/Vision/RearTimeStamp", RearCamVisionTimestamp);
-            // VisionReading(RearCamPose, RearCamVisionTimestamp, RearCamera.confidenceCalculator(visionEst.get()));
+            VisionReading(RearCamPose, RearCamVisionTimestamp, RearCamera.confidenceCalculator(visionEst.get()));
         }
     
     }
