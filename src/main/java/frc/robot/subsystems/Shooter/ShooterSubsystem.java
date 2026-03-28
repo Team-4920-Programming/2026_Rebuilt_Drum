@@ -106,7 +106,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public boolean DHIn_AutoShoot = false;
   public double AngleToHub =0;
   public boolean DHIn_Aimed = false;
-
+  private double shooterCoastSpeed = 1500;
   public boolean DHIn_InAllianceZone = false;
   public boolean DHIn_InNeutralZone = false;
   public double DHIn_AngleToOutpost = 0;
@@ -459,7 +459,7 @@ else {
     if (shooterEnabled)
     shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(m_shooterSpeed / 60.0));
   else
-    shooterMotor1.set(0.0);
+    shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(shooterCoastSpeed / 60.0));
   }
 
   public void ChangeShooterSpeed(double delta){

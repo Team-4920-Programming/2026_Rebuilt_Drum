@@ -102,7 +102,7 @@ public class CmdT_AutoShoot extends Command {
     m_intake.OverrideTipperPID(false);
     m_intake.SetTipperState(TipperState.INTAKING);
     m_swerve.DisableAutoAim();
-    // m_shooter.DisableShooter();
+    m_shooter.DisableShooter();
    }
 
   // Returns true when the command should end.

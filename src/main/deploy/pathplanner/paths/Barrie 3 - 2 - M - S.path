@@ -1,0 +1,73 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.18943840399825,
+        "y": 2.7800732304378086
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.027888730385163,
+        "y": 2.462952924393724
+      },
+      "isLocked": false,
+      "linkedName": "Barrie - 3 - 1 End"
+    },
+    {
+      "anchor": {
+        "x": 3.09275434483049,
+        "y": 2.7799745610482853
+      },
+      "prevControl": {
+        "x": 3.63796005706134,
+        "y": 2.3465049928673327
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Barrie - 3 - 2 End"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.3475479744136454,
+      "rotationDegrees": 39.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.25,
+      "maxWaypointRelativePos": 0.75,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 180.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 180.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 38.95590783775885
+  },
+  "reversed": false,
+  "folder": "Moley - Barrie",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": true
+}

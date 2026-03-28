@@ -110,13 +110,13 @@ public class IntakeSubsystem extends SubsystemBase {
     var intake1Config = new TalonFXConfiguration();
 
     intake1Config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-    intake1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80));
+    intake1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(50));
     intakeMotor1.setNeutralMode(NeutralModeValue.Coast);
     intakeMotor1.getConfigurator().apply(intake1Config);
 
     
     var intake2Config = new TalonFXConfiguration();
-    intake2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80));
+    intake2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(50));
  
     // Intake2Config.inverted(true);
 
