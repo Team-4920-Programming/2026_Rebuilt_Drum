@@ -23,10 +23,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.ADXL345_I2C.AllAxes;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Shooter.*;
 import frc.robot.subsystems.swervedrive.*;
 import frc.robot.subsystems.Climber.*;
@@ -162,8 +165,9 @@ public class DataHighway extends SubsystemBase {
   List<Pose2d> passTargetList = new ArrayList<>();
   Pose2d DH_HubPose = new Pose2d().kZero;
   ShooterLookupTable DH_ShooterLookupTable = new ShooterLookupTable();
-  private Pose2d DH_passingTargetPose = new Pose2d().kZero;;
-  private Pose2d aimTarget = new Pose2d().kZero;;
+  private Pose2d DH_passingTargetPose = new Pose2d().kZero;
+  private Pose2d aimTarget = new Pose2d().kZero;
+  CommandJoystick OperatorJoystick = new CommandJoystick(1);
   /** Creates a new DataHighway. */
     public DataHighway(SwerveSubsystem SwerveSS, ShooterSubsystem ShooterSS, ClimberSubsystem ClimberSS, IntakeSubsystem IntakeSS) {
       SS_Shooter = ShooterSS;
@@ -379,6 +383,19 @@ else if (DH_InOpposingZone){
         DogLog.log("Data/GameDataReceived",false);
       }
     }
+  }
+
+  private void manualAssignShift(){
+    if (!gameDataUpdated){
+      if (OperatorJoystick.button(1).getAsBoolean()){
+        assignedShift= AssignedShift.A;
+        gameDataUpdated = true;
+      }
+      if (OperatorJoystick.button(4).getAsBoolean()){
+        assignedShift= AssignedShift.B;
+        gameDataUpdated = true;
+      }
+  }
   }
 
   private void updateActiveHub(){
