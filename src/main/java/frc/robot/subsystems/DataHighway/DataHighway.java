@@ -195,6 +195,7 @@ public class DataHighway extends SubsystemBase {
     calculateShotDistance();
     calculatePassingDistance();
     updateLogs();
+    manualAssignShift();
     DH_safeToShoot = CalculateSafeToShoot();
     // This method will be called once per scheduler run
 
@@ -388,7 +389,7 @@ else if (DH_InOpposingZone){
   private void manualAssignShift(){
     if (!gameDataUpdated){
       if (OperatorJoystick.button(1).getAsBoolean()){
-        assignedShift= AssignedShift.A;
+        assignedShift = AssignedShift.A;
         gameDataUpdated = true;
       }
       if (OperatorJoystick.button(4).getAsBoolean()){

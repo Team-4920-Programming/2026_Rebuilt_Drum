@@ -278,7 +278,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     FrontCamera = new Vision4920(Constants.Vision4920.kFrontCam, Constants.Vision4920.kRobotToFrontCam);
     RightCamera = new Vision4920(Constants.Vision4920.kRightCam, Constants.Vision4920.kRobotToRightCam );
     LeftCamera = new Vision4920(Constants.Vision4920.kLeftCam, Constants.Vision4920.kRobotToLeftCam );
-    // RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.ROBOT_TO_CAMERA_Rear );
+    RearCamera = new Vision4920(Constants.Vision4920.kRearCam, Constants.Vision4920.kRobotToRearCam );
 
 
   }
@@ -413,8 +413,8 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     double RightCamVisionTimestamp;
     Pose2d LeftCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
     double LeftCamVisionTimestamp;
-    // Pose2d RearCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
-    // double RearCamVisionTimestamp;
+    Pose2d RearCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
+    double RearCamVisionTimestamp;
 
     //System.out.println("driver statio"+DriverStation.isDSAttached());
     //System.out.println("CeneterCAm"+(CenterCamera != null));
@@ -472,23 +472,23 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
         }
     
     }
-    // if ( DriverStation.isDSAttached() && RearCamera != null)
-    // {
-    //    var visionEst = RearCamera.getEstimatedGlobalPose();
-    //    DogLog.log("SwerveSS/Vision/RearCameraPresent", RearCamera.isConnected());
+    if ( DriverStation.isDSAttached() && RearCamera != null)
+    {
+       var visionEst = RearCamera.getEstimatedGlobalPose();
+       DogLog.log("SwerveSS/Vision/RearCameraPresent", RearCamera.isConnected());
        
-    //     if (visionEst.isPresent()){
-    //         RearCamPose = visionEst.get().estimatedPose.toPose2d();
-    //         RearCameraPose3d = visionEst.get().estimatedPose;
+        if (visionEst.isPresent()){
+            RearCamPose = visionEst.get().estimatedPose.toPose2d();
+            RearCameraPose3d = visionEst.get().estimatedPose;
   
             
-    //         RearCamVisionTimestamp = visionEst.get().timestampSeconds;
-    //         DogLog.log("SwerveSS/Vision/RearCameraPose", RearCameraPose3d);
-    //         DogLog.log("SwerveSS/Vision/RearTimeStamp", RearCamVisionTimestamp);
-    //         VisionReading(RearCamPose, RearCamVisionTimestamp, RearCamera.confidenceCalculator(visionEst.get()));
-    //     }
+            RearCamVisionTimestamp = visionEst.get().timestampSeconds;
+            DogLog.log("SwerveSS/Vision/RearCameraPose", RearCameraPose3d);
+            DogLog.log("SwerveSS/Vision/RearTimeStamp", RearCamVisionTimestamp);
+            // VisionReading(RearCamPose, RearCamVisionTimestamp, RearCamera.confidenceCalculator(visionEst.get()));
+        }
     
-    // }
+    }
   
   }
   public void VisionReading(Pose2d visionPose,double Timestamp, Matrix<N3, N1> visionMeasurementStdDevs)

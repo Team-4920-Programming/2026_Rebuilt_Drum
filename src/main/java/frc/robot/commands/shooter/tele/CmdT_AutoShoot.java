@@ -54,7 +54,7 @@ public class CmdT_AutoShoot extends Command {
     // {
     //   m_shooter.reverseFeeder();
     // }
-    if (m_shooter.isShooterAtSpeed()){ //&& m_swerve.robotIsAimed()){
+    if (m_shooter.isShooterAtSpeed() && m_swerve.robotIsAimed()){
   //   if (TipperUp && m_intake.TipperAtSetpoint())
   //   {
   //     m_intake.SetTipperState(TipperState.INTAKING);
