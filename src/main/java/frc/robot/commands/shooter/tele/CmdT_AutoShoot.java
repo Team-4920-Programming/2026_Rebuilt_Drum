@@ -40,7 +40,7 @@ public class CmdT_AutoShoot extends Command {
   @Override
   public void initialize() {
     m_swerve.EnableAutoAim();
-    m_intake.OverrideTipperPID(true);
+    // m_intake.OverrideTipperPID(true);
     m_intake.SetTipperSpeed(0);
     ShootStart = false;
   }
@@ -77,23 +77,24 @@ public class CmdT_AutoShoot extends Command {
       m_intake.SetIntakeSpeed(-1);
       m_shooter.SetFeederSpeed(-0.8);
       m_shooter.SetRollerSpeed(-1.0);
-      delay.start();
+          m_intake.SetTipperState(TipperState.SHOOTING);
+      // delay.start();
 
       // DogLog.log("Intake/Debug", m_intake.getTipperAngle() - TipperState.TUCKED.getAngle());
-      if (delay.hasElapsed(0.5)){
-        if (!ShootStart){
-          m_intake.SetTipperSpeed(0.5);
-          ShootStart = true;
-        }
+    //   if (delay.hasElapsed(0.5)){
+    //     if (!ShootStart){
+    //       m_intake.SetTipperSpeed(0.5);
+    //       ShootStart = true;
+    //     }
         
-        if (m_intake.getTipperAngle() >= 20.0 && m_intake.getTipperPIDOutput() > 0)
-        {
-          m_intake.SetTipperSpeed(-0.4);
-        }
-        else if (m_intake.getTipperAngle() <= 5.0 && m_intake.getTipperPIDOutput() < 0){
-          m_intake.SetTipperSpeed(0.4);
-        }
-    }
+    //     if (m_intake.getTipperAngle() >= 20.0 && m_intake.getTipperPIDOutput() > 0)
+    //     {
+    //       m_intake.SetTipperSpeed(-0.4);
+    //     }
+    //     else if (m_intake.getTipperAngle() <= 5.0 && m_intake.getTipperPIDOutput() < 0){
+    //       m_intake.SetTipperSpeed(0.4);
+    //     }
+    // }
       
    }
    }
