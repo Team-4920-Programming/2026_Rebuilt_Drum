@@ -38,6 +38,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 //import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RuntimeType;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -231,11 +232,11 @@ public double getTipperAngle() {
     {
       tipperMotor.set(tipperOutput);
     }
-    if (Intake){
+    if (Intake && DriverStation.isTeleopEnabled()){
       SetIntakeSpeed(-1);
-      driverXbox.setRumble(RumbleType.kBothRumble, 0.75);
+      driverXbox.setRumble(RumbleType.kBothRumble, 1.0);
     }
-    else if (!Intake){
+    else{
       SetIntakeSpeed(0);
       driverXbox.setRumble(RumbleType.kBothRumble, 0.0);
     }

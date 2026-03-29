@@ -391,6 +391,7 @@ else {
     DogLog.log("Shooter/HoodSetpoint",hoodPID.getSetpoint());
     DogLog.log("Shooter/HoodAtSetpoint",hoodPID.atSetpoint());
     DogLog.log("Shooter/FeederSpeed",feederMotor.getVelocity().getValueAsDouble()*60);
+    DogLog.log("Shooter/SOTF", DHOut_SOTF);
   }
 
   public void ToggleSOTF(boolean b){

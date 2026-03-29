@@ -35,6 +35,7 @@ import frc.robot.subsystems.Climber.*;
 import frc.robot.subsystems.DataHighway.*;
 import frc.robot.subsystems.DataHighway.DataHighway.MatchPhase;
 import frc.robot.commands.shooter.auto.CmdA_ShootTillEmpty;
+import frc.robot.commands.shooter.auto.CmdA_Snowblower;
 import frc.robot.commands.shooter.tele.*;
 import frc.robot.commands.Climber.tele.CmdT_Climb;
 import frc.robot.commands.Climber.tele.CmdT_ClimberUp;
@@ -159,6 +160,7 @@ public class RobotContainer
     NamedCommands.registerCommand("CmdA_DisableShooter", new CmdT_DisableShooter(Shooter));
     NamedCommands.registerCommand("CmdA_VerifyHopperDown", new CmdA_VerifyHopperDown(Intake));
     NamedCommands.registerCommand("CmdA_HopperDownStart", new CmdA_HopperDownStart(Intake));
+    NamedCommands.registerCommand("CmdA_Snowblower", new CmdA_Snowblower(Intake, Shooter, drivebase));
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);

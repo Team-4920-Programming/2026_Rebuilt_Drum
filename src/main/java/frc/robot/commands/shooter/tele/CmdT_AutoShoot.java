@@ -54,7 +54,16 @@ public class CmdT_AutoShoot extends Command {
     // {
     //   m_shooter.reverseFeeder();
     // }
-    if (m_shooter.isShooterAtSpeed() && m_swerve.robotIsAimed() && Math.abs(m_swerve.getRobotVelocity().omegaRadiansPerSecond) <= 0.5){
+
+    if (m_swerve.robotIsAimed() && Math.abs(m_swerve.getRobotVelocity().omegaRadiansPerSecond) <= 0.5){
+      if (m_swerve.DHOut_InAllianceZone && !m_swerve.DHIn_SOTF)
+      {
+        m_swerve.LockSwerves();
+      }
+      else{
+        m_swerve.UnlockSwerves();
+      }
+      if (m_shooter.isShooterAtSpeed()){
   //   if (TipperUp && m_intake.TipperAtSetpoint())
   //   {
   //     m_intake.SetTipperState(TipperState.INTAKING);
@@ -88,6 +97,7 @@ public class CmdT_AutoShoot extends Command {
       
    }
    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -102,6 +112,7 @@ public class CmdT_AutoShoot extends Command {
     m_intake.SetTipperState(TipperState.INTAKING);
     m_swerve.DisableAutoAim();
     m_shooter.DisableShooter();
+    m_swerve.UnlockSwerves();
    }
 
   // Returns true when the command should end.

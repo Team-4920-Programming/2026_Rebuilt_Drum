@@ -1,0 +1,76 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Barrie 7 - 1 - O - M Snowblow"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_HopperDownStart"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_Snowblower"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_RunIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Barrie 7 - 2 - M - S"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_AutoAimRobot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CmdA_ShootTillEmpty"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Moley - Barrie",
+  "choreoAuto": false
+}

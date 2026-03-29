@@ -1,0 +1,100 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.213784104389087,
+        "y": 0.39301304863582454
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.999810201658118,
+        "y": 0.5328825622828344
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.208550566233361,
+        "y": 0.9202135231369266
+      },
+      "prevControl": {
+        "x": 8.085240849652896,
+        "y": 0.7027400447611816
+      },
+      "nextControl": {
+        "x": 8.409869513639137,
+        "y": 1.2752669039198452
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.208550566233361,
+        "y": 3.7606405694002722
+      },
+      "prevControl": {
+        "x": 8.208550566233361,
+        "y": 3.5106405694002722
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Barrie - 7 - 1 End"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.82,
+      "rotationDegrees": -135.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.1590413943354734,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 4.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 360.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [
+    {
+      "fieldPosition": {
+        "x": 2.412,
+        "y": 6.2
+      },
+      "rotationOffset": 0.0,
+      "minWaypointRelativePos": 0.7334083239595108,
+      "maxWaypointRelativePos": 2.0,
+      "name": "Point Towards Zone"
+    }
+  ],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 180.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 157.0685046758335
+  },
+  "reversed": false,
+  "folder": "Moley - Barrie",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

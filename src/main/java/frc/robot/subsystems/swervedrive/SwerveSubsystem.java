@@ -135,6 +135,9 @@ public class SwerveSubsystem extends SubsystemBase
   public double DHOut_HubPoseX= 0;
   public double DHOut_HubPoseY= 0;
   public double DHIn_reqRobotAngle =0;
+  private boolean SwerveLocked = false;
+  public Pose2d DHIn_passingBallLandingPose = new Pose2d().kZero;
+  public boolean DHIn_passingAimed = false;
   public double DHIn_ShotDistance = 0;
   public Pose2d DHIn_aimTarget = new Pose2d(0,0, new Rotation2d().fromDegrees(0));
   private double targetAngle = 0.0;
@@ -536,13 +539,24 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
       DogLog.log("SwerveSS/RobotVelocity",robotSpeeds);
       DogLog.log("SwerveSS/FieldVelocity",getFieldVelocity());
       DogLog.log("SwerveSS/CurrentRobotSpeed", Math.sqrt((robotSpeeds.vxMetersPerSecond*robotSpeeds.vxMetersPerSecond) + (robotSpeeds.vyMetersPerSecond * robotSpeeds.vyMetersPerSecond)));
- 
+      DogLog.log("SwerveSS/SwerveLocked", SwerveLocked);
       UpdateDataHighway();
       double HubX = 1;
       double HubY = 1;
 
+      if (SwerveLocked){
+        this.lock();
+      }
+
       
       
+  }
+
+  public void LockSwerves(){
+    SwerveLocked = true;
+  }
+  public void UnlockSwerves(){
+    SwerveLocked = false;
   }
   public void UpdateDataHighway()
   {
@@ -645,10 +659,10 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
     }
     else
     {
-      if (getPose().getX() < fieldLayout.getTagPose(26).get().getX()){
+      if (getPose().getX() < fieldLayout.getTagPose(26).get().getX() + 0.3){
         DHOut_InAllianceZone = true;
       }
-if (getPose().getX() > fieldLayout.getTagPose(9).get().getX() )
+if (getPose().getX() > fieldLayout.getTagPose(9).get().getX() - 0.3 )
       {
          DHOut_InOpposingZone = true;
       }
@@ -825,13 +839,21 @@ public void AutoAim(){
   if (targetAngle > 180)
     targetAngle = targetAngle -360;
   PID_AutoAim.setSetpoint(targetAngle);
-  DHOut_Aimed = PID_AutoAim.atSetpoint();
+  if (DHOut_InNeutralZone || DHOut_InOpposingZone){
+
+    DHOut_Aimed = DHIn_passingAimed;
+  }
+  else{
+    DHOut_Aimed = PID_AutoAim.atSetpoint();
+  }
+
   PID_AutoAim.calculate(getPose().getRotation().getDegrees());
   DogLog.log("AutoAim/AutoAimAngle", targetAngle);
   DogLog.log("AutoAim/AutoAimError", PID_AutoAim.getError());
   DogLog.log("AutoAim/AutoAimSetpoint", PID_AutoAim.getSetpoint());
   DogLog.log("AutoAim/StationaryCalculatedTargetAngle", Units.radiansToDegrees(Math.atan2(DHIn_aimTarget.getY() - getPose().getY(), DHIn_aimTarget.getX() - getPose().getX())));
   DogLog.log("AutoAim/IsAutoAim", isAutoAim());
+    DogLog.log("AutoAim/passingAimed", DHIn_passingAimed);
 
 }
 
@@ -1127,7 +1149,7 @@ DisableCornerAim();
 
   public ChassisSpeeds AutoAimVelocityPIDCalculation(ChassisSpeeds v){
 
-    if (AutoAimEnabled)
+    if (AutoAimEnabled && !DHOut_Aimed)
     {
       //PID_AutoAim.setSetpoint(AutoAimAngle);
       
@@ -1379,6 +1401,7 @@ DisableCornerAim();
    */
   public void lock()
   {
+    DogLog.log("SwerveSS/SwerveLocked", true);
     swerveDrive.lockPose();
   }
 

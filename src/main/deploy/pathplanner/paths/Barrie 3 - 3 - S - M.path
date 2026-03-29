@@ -8,24 +8,40 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.4013409415121245,
-        "y": 2.4111982881597713
+        "x": 2.944199288256229,
+        "y": 0.8771767497034408
       },
       "isLocked": false,
       "linkedName": "Barrie - 3 - 2 End"
     },
     {
       "anchor": {
-        "x": 5.851333333333335,
-        "y": 3.0698589743589753
+        "x": 3.6112692763938323,
+        "y": 0.5006049822064051
       },
       "prevControl": {
-        "x": 5.851333333333335,
-        "y": 2.8198589743589753
+        "x": 2.4279513310757466,
+        "y": 0.47026349642901744
       },
       "nextControl": {
+        "x": 4.0308778173191,
+        "y": 0.5113641755634637
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
         "x": 5.851333333333335,
-        "y": 3.3198589743589753
+        "y": 0.9094543297746145
+      },
+      "prevControl": {
+        "x": 5.834102195413445,
+        "y": 0.4097513300978207
+      },
+      "nextControl": {
+        "x": 5.859948902293279,
+        "y": 1.1593058296130114
       },
       "isLocked": false,
       "linkedName": null
@@ -37,20 +53,24 @@
       },
       "prevControl": {
         "x": 5.851333333333335,
-        "y": 3.9414358974358983
+        "y": 4.459435897435898
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Barrie 3 - 3 End"
+      "linkedName": "Barrie - 3 - 3 End"
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 0.53,
-      "rotationDegrees": 39.0
+      "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 0.9665427509293503,
+      "waypointRelativePos": 1.9982238010657132,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 2.2060390763765674,
       "rotationDegrees": 90.0
     }
   ],

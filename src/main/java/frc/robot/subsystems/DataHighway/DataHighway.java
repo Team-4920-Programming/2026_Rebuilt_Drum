@@ -158,10 +158,12 @@ public class DataHighway extends SubsystemBase {
   double DH_AngleToDepot = 0;
   double DH_CornerDistance = 0;
   boolean DH_SOTF = false;
+  boolean DH_passingAimed = false;
   Rotation2d DH_SOTFTargetAngle = Rotation2d.kZero;
   double DH_matchTime = 0;
   boolean DH_safeToShoot = false;
   Pose2d DH_robotPose = new Pose2d().kZero;
+  Pose2d DH_passingBallLandingPose = new Pose2d().kZero;
   List<Pose2d> passTargetList = new ArrayList<>();
   Pose2d DH_HubPose = new Pose2d().kZero;
   ShooterLookupTable DH_ShooterLookupTable = new ShooterLookupTable();
@@ -226,7 +228,33 @@ else if (DH_InOpposingZone){
   }
   private void calculatePassingDistance(){
     DH_PassingDistance = DH_robotPose.nearest(passTargetList).getTranslation().getDistance(DH_robotPose.getTranslation());
-
+    DH_passingBallLandingPose = new Pose2d(DH_robotPose.getTranslation().plus(new Translation2d (DH_PassingDistance, DH_robotPose.getRotation())), Rotation2d.kZero);
+    if (((DH_passingBallLandingPose.getY() <= passTargetList.get(0).getY() && DH_passingBallLandingPose.getY() >= passTargetList.get(1).getY()) || (DH_passingBallLandingPose.getY() <= passTargetList.get(1).getY() && DH_passingBallLandingPose.getY() >= passTargetList.get(0).getY()))){
+      if (allianceColor == AllianceColor.RED)
+      {
+        if (DH_passingBallLandingPose.getX() > (fieldLayout.getTagPose(9).get().getX()))
+        {
+          DH_passingAimed = true;
+        }
+        else{
+          DH_passingAimed = false;
+        }
+      }
+      else if (allianceColor == AllianceColor.BLUE){
+        if (DH_passingBallLandingPose.getX() < fieldLayout.getTagPose(26).get().getX()){
+          DH_passingAimed = true;
+        }
+        else{
+          DH_passingAimed = false;
+        }
+      }
+      else{
+          DH_passingAimed = false;
+        }
+    }
+    else{
+      DH_passingAimed = false;
+    }
   }
 
   private void updateLogs(){
@@ -248,6 +276,7 @@ else if (DH_InOpposingZone){
 
     DogLog.log("Data/ShotData/DistancefromHub", DH_ShotDistance);
     DogLog.log("Data/ShotData/PassingDistance", DH_PassingDistance);
+    DogLog.log("Data/ShotData/PassingBallLandingPose", DH_passingBallLandingPose);
 
     DogLog.log("Data/ShotData/RobotIsAimed", DH_Aimed);
 
@@ -508,6 +537,7 @@ else if (DH_InOpposingZone){
     SS_Shooter.DHIN_HubPose = DH_HubPose;
     SS_Swerve.DHIn_SOTFTargetAngle = DH_SOTFTargetAngle;
     SS_Swerve.DHIn_SOTF = DH_SOTF;
+    SS_Swerve.DHIn_passingAimed = DH_passingAimed;
   }
 
   
