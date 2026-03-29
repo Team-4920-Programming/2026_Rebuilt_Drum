@@ -654,6 +654,9 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
       if (getPose().getX() < (fieldLayout.getTagPose(26).get().getX() + 0.3)){
           DHOut_InOpposingZone = true;
       }
+      else{
+        DHOut_InOpposingZone = false;
+      }
         
   
     }
@@ -666,6 +669,9 @@ if (getPose().getX() > fieldLayout.getTagPose(9).get().getX() - 0.3 )
       {
          DHOut_InOpposingZone = true;
       }
+      else{
+        DHOut_InOpposingZone = false;
+      }
 
     }
 
@@ -675,6 +681,7 @@ if (getPose().getX() > fieldLayout.getTagPose(9).get().getX() - 0.3 )
     //Set Variables from Datahighway
 DogLog.log("AutoAim/Inalliancezone",DHOut_InAllianceZone);
 DogLog.log("AutoAim/Inneutralzone",DHOut_InNeutralZone);
+DogLog.log("AutoAim/InOpposingZone", DHOut_InOpposingZone);
     //Set Variable to DataHighway
   }
   @Override
@@ -835,7 +842,7 @@ public void AutoAim(){
   else{
     targetAngle = Units.radiansToDegrees(Math.atan2(DHIn_aimTarget.getY() - getPose().getY(), DHIn_aimTarget.getX() - getPose().getX()));
   }
-  targetAngle = targetAngle +7;
+  targetAngle = targetAngle +0;
   if (targetAngle > 180)
     targetAngle = targetAngle -360;
   PID_AutoAim.setSetpoint(targetAngle);

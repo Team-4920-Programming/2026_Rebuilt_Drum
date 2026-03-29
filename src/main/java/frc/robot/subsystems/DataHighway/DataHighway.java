@@ -229,7 +229,8 @@ else if (DH_InOpposingZone){
   private void calculatePassingDistance(){
     DH_PassingDistance = DH_robotPose.nearest(passTargetList).getTranslation().getDistance(DH_robotPose.getTranslation());
     DH_passingBallLandingPose = new Pose2d(DH_robotPose.getTranslation().plus(new Translation2d (DH_PassingDistance, DH_robotPose.getRotation())), Rotation2d.kZero);
-    if (((DH_passingBallLandingPose.getY() <= passTargetList.get(0).getY() && DH_passingBallLandingPose.getY() >= passTargetList.get(1).getY()) || (DH_passingBallLandingPose.getY() <= passTargetList.get(1).getY() && DH_passingBallLandingPose.getY() >= passTargetList.get(0).getY()))){
+    //if (((DH_passingBallLandingPose.getY() <= passTargetList.get(0).getY() && DH_passingBallLandingPose.getY() >= passTargetList.get(1).getY()) || (DH_passingBallLandingPose.getY() <= passTargetList.get(1).getY() && DH_passingBallLandingPose.getY() >= passTargetList.get(0).getY()))){
+    if (DH_passingBallLandingPose.getY() <= 7.5 && DH_passingBallLandingPose.getY() >= 0.5 ){
       if (allianceColor == AllianceColor.RED)
       {
         if (DH_passingBallLandingPose.getX() > (fieldLayout.getTagPose(9).get().getX()))

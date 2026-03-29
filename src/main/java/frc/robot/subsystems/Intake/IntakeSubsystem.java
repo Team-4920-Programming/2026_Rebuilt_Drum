@@ -232,12 +232,16 @@ public double getTipperAngle() {
     {
       tipperMotor.set(tipperOutput);
     }
-    if (Intake && DriverStation.isTeleopEnabled()){
+    if (Intake){
       SetIntakeSpeed(-1);
-      driverXbox.setRumble(RumbleType.kBothRumble, 1.0);
     }
     else{
       SetIntakeSpeed(0);
+    }
+    if (Intake && DriverStation.isTeleopEnabled()){
+      driverXbox.setRumble(RumbleType.kBothRumble, 1.0);
+    }
+    else{
       driverXbox.setRumble(RumbleType.kBothRumble, 0.0);
     }
    

@@ -45,7 +45,9 @@ public class ShooterLookupTable {
     shooterTable.put(2.1,new ShooterParams(2350, 4.5, 0.875));
     shooterTable.put(2.5,new ShooterParams(2400, 9.0, 0.9375));
     shooterTable.put(3.0,new ShooterParams(2500, 13.0, 0.9375));
-    shooterTable.put(3.9,new ShooterParams(2625, 22, 1.375));
+    shooterTable.put(3.6,new ShooterParams(2650, 17.0, 0.9375));
+
+    shooterTable.put(3.9,new ShooterParams(2675, 20, 1.375));
     shooterTable.put(4.9,new ShooterParams(3000, 28.0, 1.0625));
     shooterTable.put(8.7,new ShooterParams(3500, 41.0, 1.3125));
 
