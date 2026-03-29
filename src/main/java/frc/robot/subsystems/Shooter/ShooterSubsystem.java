@@ -156,8 +156,9 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodConfig.apply(hoodencoderConfig);
     hoodMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     
-    var FeederConfig = new TalonFXConfiguration();
-    
+    var RollerConfig = new TalonFXConfiguration();
+    RollerConfig.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+    rollerMotor.getConfigurator().apply(RollerConfig);
   }
 
 public void SOTFCalc(){

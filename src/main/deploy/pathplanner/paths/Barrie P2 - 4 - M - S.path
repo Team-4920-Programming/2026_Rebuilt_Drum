@@ -8,46 +8,30 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.926188870606354,
-        "y": 3.431012339663174
+        "x": 7.700699001426534,
+        "y": 5.930513552068473
       },
       "isLocked": false,
-      "linkedName": "Barrie - 3 - 3 End"
+      "linkedName": "Barrie P2 - 3 End"
     },
     {
       "anchor": {
-        "x": 4.634236804564908,
-        "y": 2.6311554921540665
+        "x": 3.0445410902659744,
+        "y": 5.242131608582019
       },
       "prevControl": {
-        "x": 5.358801711840228,
-        "y": 2.6182168330955777
-      },
-      "nextControl": {
-        "x": 4.384276654728546,
-        "y": 2.6356190662582875
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.09275434483049,
-        "y": 2.7799745610482853
-      },
-      "prevControl": {
-        "x": 3.34275434483049,
-        "y": 2.7799745610482853
+        "x": 3.922610556348074,
+        "y": 5.542353780313838
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Barrie - 3 - 2 End"
+      "linkedName": "Barrie P2 - 4 End"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5117270788912567,
-      "rotationDegrees": 39.0
+      "waypointRelativePos": 0.4349680170575687,
+      "rotationDegrees": -38.0
     }
   ],
   "constraintZones": [],
@@ -63,13 +47,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 38.95590783775885
+    "rotation": -37.900080355368345
   },
   "reversed": false,
   "folder": "Moley - Barrie",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

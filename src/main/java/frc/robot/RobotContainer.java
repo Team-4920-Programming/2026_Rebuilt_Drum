@@ -75,6 +75,8 @@ public class RobotContainer
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
   final CommandJoystick toggleSwitchJoystick = new CommandJoystick(2);
+    final CommandJoystick operatorJoystick = new CommandJoystick(1);
+
 
  
   // The robot's subsystems and commands are defined here...
@@ -269,6 +271,9 @@ public class RobotContainer
         driverXbox.leftBumper().whileTrue(new CmdT_TrackBallDrive(drivebase));
         toggleSwitchJoystick.button(4).whileTrue(new CmdT_EnableSOTF(Shooter));
         toggleSwitchJoystick.button(4).whileFalse(new CmdT_DisableSOTF(Shooter));
+        
+
+        operatorJoystick.button(3).whileTrue(new CmdT_ReverseIntake(Intake));
 //       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
 //       driverXbox.leftBumper().onTrue(Commands.none());
 //       driverXbox.rightBumper().onTrue(Commands.none());

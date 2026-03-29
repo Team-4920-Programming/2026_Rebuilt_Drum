@@ -3,32 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.5,
-        "y": 4.25
+        "x": 8.18943840399825,
+        "y": 2.7800732304378086
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.926188870606354,
-        "y": 3.431012339663174
+        "x": 7.027888730385163,
+        "y": 2.462952924393724
       },
       "isLocked": false,
-      "linkedName": "Barrie - 3 - 3 End"
-    },
-    {
-      "anchor": {
-        "x": 4.634236804564908,
-        "y": 2.6311554921540665
-      },
-      "prevControl": {
-        "x": 5.358801711840228,
-        "y": 2.6182168330955777
-      },
-      "nextControl": {
-        "x": 4.384276654728546,
-        "y": 2.6356190662582875
-      },
-      "isLocked": false,
-      "linkedName": null
+      "linkedName": "Barrie P1 - 1 End"
     },
     {
       "anchor": {
@@ -36,21 +20,35 @@
         "y": 2.7799745610482853
       },
       "prevControl": {
-        "x": 3.34275434483049,
-        "y": 2.7799745610482853
+        "x": 3.63796005706134,
+        "y": 2.3465049928673327
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Barrie - 3 - 2 End"
+      "linkedName": "Barrie P1 - 2 End"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5117270788912567,
+      "waypointRelativePos": 0.3475479744136454,
       "rotationDegrees": 39.0
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.25,
+      "maxWaypointRelativePos": 0.75,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 180.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {

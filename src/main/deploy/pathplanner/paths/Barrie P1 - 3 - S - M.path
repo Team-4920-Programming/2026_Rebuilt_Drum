@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.0445410902659744,
-        "y": 5.242131608582019
+        "x": 3.09275434483049,
+        "y": 2.7799745610482853
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.6752194543297754,
-        "y": 6.159940688018979
+        "x": 2.944199288256229,
+        "y": 0.8771767497034408
       },
       "isLocked": false,
-      "linkedName": "Barrie - 4 - 2 End"
+      "linkedName": "Barrie P1 - 2 End"
     },
     {
       "anchor": {
-        "x": 3.0445410902659744,
-        "y": 7.461803084223013
+        "x": 3.6112692763938323,
+        "y": 0.5006049822064051
       },
       "prevControl": {
-        "x": 2.7945410902659744,
-        "y": 7.461803084223013
+        "x": 2.4279513310757466,
+        "y": 0.47026349642901744
       },
       "nextControl": {
-        "x": 3.2945410902659744,
-        "y": 7.461803084223013
+        "x": 4.0308778173191,
+        "y": 0.5113641755634637
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.0,
-        "y": 7.333
+        "x": 7.5,
+        "y": 0.909
       },
       "prevControl": {
-        "x": 7.0,
-        "y": 7.583
+        "x": 7.491384431040055,
+        "y": 0.6591485001616031
       },
       "nextControl": {
-        "x": 7.0,
-        "y": 7.083
+        "x": 7.508615568959945,
+        "y": 1.158851499838397
       },
       "isLocked": false,
       "linkedName": null
@@ -53,31 +53,31 @@
       },
       "prevControl": {
         "x": 7.5,
-        "y": 5.3580000000000005
+        "y": 4.0
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Barrie - 4 - 3 End"
+      "linkedName": "Barrie P1 - 3 End"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.56,
+      "waypointRelativePos": 0.53,
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 1.5991471215351885,
+      "waypointRelativePos": 1.599147121535191,
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 2.253996447602132,
-      "rotationDegrees": -90.0
+      "waypointRelativePos": 2.2060390763765674,
+      "rotationDegrees": 90.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.2084241103848488,
+      "minWaypointRelativePos": 0.8569353667392596,
       "maxWaypointRelativePos": 2.0,
       "constraints": {
         "maxVelocity": 4.0,
@@ -101,13 +101,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": "Moley - Barrie",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -37.900080355368345
+    "rotation": 38.95590783775885
   },
   "useDefaultConstraints": true
 }

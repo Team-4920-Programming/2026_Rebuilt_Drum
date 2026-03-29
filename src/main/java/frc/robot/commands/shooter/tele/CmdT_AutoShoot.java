@@ -56,13 +56,13 @@ public class CmdT_AutoShoot extends Command {
     // }
 
     if (m_swerve.robotIsAimed() && Math.abs(m_swerve.getRobotVelocity().omegaRadiansPerSecond) <= 0.5){
-      if (m_swerve.DHOut_InAllianceZone && !m_swerve.DHIn_SOTF)
-      {
-        m_swerve.LockSwerves();
-      }
-      else{
-        m_swerve.UnlockSwerves();
-      }
+      // if (m_swerve.DHOut_InAllianceZone && !m_swerve.DHIn_SOTF)
+      // {
+      //   m_swerve.LockSwerves();
+      // }
+      // else{
+      //   m_swerve.UnlockSwerves();
+      // }
       if (m_shooter.isShooterAtSpeed()){
   //   if (TipperUp && m_intake.TipperAtSetpoint())
   //   {
@@ -76,7 +76,7 @@ public class CmdT_AutoShoot extends Command {
   //   }
       m_intake.SetIntakeSpeed(-1);
       m_shooter.SetFeederSpeed(-0.8);
-      m_shooter.SetRollerSpeed(-1.0);
+      m_shooter.SetRollerSpeed(-0.6);
       if (m_swerve.DHOut_InAllianceZone){
       m_intake.SetTipperState(TipperState.SHOOTING);
       }
