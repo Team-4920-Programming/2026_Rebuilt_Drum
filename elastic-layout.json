@@ -1,0 +1,107 @@
+{
+  "version": 1.0,
+  "grid_size": 128,
+  "tabs": [
+    {
+      "name": "Teleoperated",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "AutoChooser",
+            "x": 256.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/AutoChooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "GameDataReceived",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/Data/GameDataReceived",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "NextPhaseCountdown",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 512.0,
+            "height": 384.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/Robot/Data/NextPhaseCountdown",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 20,
+              "yellow_start_time": 30
+            }
+          },
+          {
+            "title": "hubActive",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/Data/hubActive",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "matchTimeRemaining",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 512.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/Robot/Data/matchTimeRemaining",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 20,
+              "yellow_start_time": 30
+            }
+          },
+          {
+            "title": "AssignedShift",
+            "x": 128.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Robot/Data/AssignedShift",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
