@@ -539,6 +539,7 @@ else if (DH_InOpposingZone){
     SS_Swerve.DHIn_SOTFTargetAngle = DH_SOTFTargetAngle;
     SS_Swerve.DHIn_SOTF = DH_SOTF;
     SS_Swerve.DHIn_passingAimed = DH_passingAimed;
+    SS_Shooter.DHIn_PassingDistance = DH_PassingDistance;
   }
 
   

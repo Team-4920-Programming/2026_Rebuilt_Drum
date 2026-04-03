@@ -3,12 +3,14 @@
   "robotLength": 0.7,
   "holonomicMode": true,
   "pathFolders": [
+    "Moley - Barrie",
     "New Folder",
     "New New Folder",
-    "Moley - Barrie"
+    "Windsor"
   ],
   "autoFolders": [
-    "Moley - Barrie"
+    "Moley - Barrie",
+    "Windsor"
   ],
   "defaultMaxVel": 4.5,
   "defaultMaxAccel": 3.5,

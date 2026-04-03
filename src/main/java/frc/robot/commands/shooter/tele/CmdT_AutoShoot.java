@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.RPM;
 import dev.doglog.DogLog;
 import dev.doglog.internal.tunable.Tunable;
 import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -43,6 +44,7 @@ public class CmdT_AutoShoot extends Command {
     // m_intake.OverrideTipperPID(true);
     m_intake.SetTipperSpeed(0);
     ShootStart = false;
+    delay.reset();
   }
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -75,15 +77,47 @@ public class CmdT_AutoShoot extends Command {
   //     TipperUp = true;
   //   }
       m_intake.SetIntakeSpeed(-1);
-      m_shooter.SetFeederSpeed(-0.8);
-      m_shooter.SetRollerSpeed(-0.6);
-      if (m_swerve.DHOut_InAllianceZone){
-      m_intake.SetTipperState(TipperState.SHOOTING);
-      }
-      // delay.start();
+      m_shooter.SetFeederSpeed(-1.0);
+      m_shooter.SetRollerSpeed(-1.0);
+      // if (m_swerve.DHOut_InAllianceZone){
+      // m_intake.SetTipperState(TipperState.SHOOTINGSTART);
+      // }
+
 
       // DogLog.log("Intake/Debug", m_intake.getTipperAngle() - TipperState.TUCKED.getAngle());
-    //   if (delay.hasElapsed(0.5)){
+      if (m_swerve.DHOut_InAllianceZone){
+        if (DriverStation.isTeleopEnabled()){
+        m_swerve.LockSwerves();
+        }
+        delay.start();
+        if (delay.hasElapsed(1.0) && !delay.hasElapsed(1.5)){
+                  m_intake.SetTipperState(TipperState.SHOOTINGSTART);
+        }
+        else if (delay.hasElapsed(1.5) && !delay.hasElapsed(2.25)){
+                  m_intake.SetTipperState(TipperState.INTAKING);
+        }
+        else if (delay.hasElapsed(2.25) && !delay.hasElapsed(2.75)){
+                  m_intake.SetTipperState(TipperState.SHOOTING);
+        }
+        else if (delay.hasElapsed(2.75) && !delay.hasElapsed(3.25)){
+                  m_intake.SetTipperState(TipperState.INTAKING);
+        }
+        else if (delay.hasElapsed(3.25) && !delay.hasElapsed(3.75)){
+                  m_intake.SetTipperState(TipperState.SHOOTING);
+        }
+        else if (delay.hasElapsed(3.75) && !delay.hasElapsed(4.25)){
+                  m_intake.SetTipperState(TipperState.INTAKING);
+        }
+        else if (delay.hasElapsed(4.25) && !delay.hasElapsed(4.75)){
+                  m_intake.SetTipperState(TipperState.SHOOTING);
+        }
+        else if (delay.hasElapsed(4.75)){
+                  m_intake.SetTipperState(TipperState.INTAKING);
+        }
+      }
+      else{
+        m_intake.SetTipperState(TipperState.INTAKING);
+      }
     //     if (!ShootStart){
     //       m_intake.SetTipperSpeed(0.5);
     //       ShootStart = true;
@@ -99,7 +133,7 @@ public class CmdT_AutoShoot extends Command {
     // }
       
    }
-   }
+  }
   }
 
   // Called once the command ends or is interrupted.

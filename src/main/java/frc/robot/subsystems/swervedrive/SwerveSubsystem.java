@@ -56,6 +56,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.DataHighway.DataHighway;
 import frc.robot.subsystems.DataHighway.ShooterLookupTable;
 import frc.robot.subsystems.swervedrive.BallPathCalculator.PathResult;
 
@@ -181,7 +182,7 @@ public class SwerveSubsystem extends SubsystemBase
   public double OutpostAngle = 0;
   
   CommandXboxController driverXbox = new CommandXboxController(0);
-  private PIDController PID_AutoAim = new PIDController(0.12, 0, 0);
+  private PIDController PID_AutoAim = new PIDController(0.1, 0, 0);//0.12
   private PIDController PID_DepotAim = new PIDController(0.1, 0, 0);
 private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
   private final SwerveDrivePoseEstimator poseEstimator;
@@ -851,8 +852,10 @@ public void AutoAim(){
     DHOut_Aimed = DHIn_passingAimed;
   }
   else{
-    DHOut_Aimed = PID_AutoAim.atSetpoint();
+  if (DHIn_ShooterLookupTable != null){
+    DHOut_Aimed = Math.abs(PID_AutoAim.getError()) <= DHIn_ShooterLookupTable.autoAimToleranceTable.get(DHIn_ShotDistance);
   }
+}
 
   PID_AutoAim.calculate(getPose().getRotation().getDegrees());
   DogLog.log("AutoAim/AutoAimAngle", targetAngle);

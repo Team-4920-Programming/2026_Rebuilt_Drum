@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.213784104389087,
-        "y": 0.39301304863582454
+        "x": 4.181496574352398,
+        "y": 7.684984347924335
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.999810201658118,
-        "y": 0.5328825622828344
+        "x": 4.8840933152400146,
+        "y": 7.550361488264324
       },
       "isLocked": false,
       "linkedName": null
@@ -17,15 +17,15 @@
     {
       "anchor": {
         "x": 8.208550566233361,
-        "y": 0.9202135231369266
+        "y": 6.9504594279347
       },
       "prevControl": {
-        "x": 8.085240849652896,
-        "y": 0.7027400447611816
+        "x": 8.208550566233361,
+        "y": 7.2004594279347
       },
       "nextControl": {
-        "x": 8.409869513639137,
-        "y": 1.2752669039198452
+        "x": 8.208550566233361,
+        "y": 6.7004594279347
       },
       "isLocked": false,
       "linkedName": null
@@ -33,21 +33,21 @@
     {
       "anchor": {
         "x": 8.208550566233361,
-        "y": 3.7606405694002722
+        "y": 4.222610556348074
       },
       "prevControl": {
         "x": 8.208550566233361,
-        "y": 3.5106405694002722
+        "y": 4.472610556348074
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Barrie - 7 - 1 End"
+      "linkedName": "Windsor 2 - 1 End"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.82,
-      "rotationDegrees": -135.0
+      "waypointRelativePos": 0.8203221809169627,
+      "rotationDegrees": -90.0
     }
   ],
   "constraintZones": [
@@ -56,7 +56,7 @@
       "minWaypointRelativePos": 1.1590413943354734,
       "maxWaypointRelativePos": 2.0,
       "constraints": {
-        "maxVelocity": 2.0,
+        "maxVelocity": 1.0,
         "maxAcceleration": 4.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 360.0,
@@ -65,18 +65,7 @@
       }
     }
   ],
-  "pointTowardsZones": [
-    {
-      "fieldPosition": {
-        "x": 2.412,
-        "y": 6.2
-      },
-      "rotationOffset": 0.0,
-      "minWaypointRelativePos": 0.7334083239595108,
-      "maxWaypointRelativePos": 2.0,
-      "name": "Point Towards Zone"
-    }
-  ],
+  "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.5,
@@ -87,11 +76,11 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": 157.0685046758335
+    "velocity": 0,
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Moley - Barrie",
+  "folder": "Windsor",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

@@ -52,7 +52,8 @@ public class IntakeSubsystem extends SubsystemBase {
   
   public enum TipperState{
     TUCKED(90.0),
-    SHOOTING(15),//12
+    SHOOTINGSTART(20),
+    SHOOTING(40),//12
     INTAKING(0);
 
     private final double angle;

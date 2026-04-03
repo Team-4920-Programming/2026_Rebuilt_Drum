@@ -55,6 +55,7 @@ public final class Constants
   public static int Can_BL_Angle = 9;
   public static int Can_Shooter1 = 10;
   public static int Can_Shooter2 = 11;
+  public static int Can_Shooter3 = 22;
   public static int Can_Feeder = 12;
   public static int Can_Hood = 13;
   public static int Can_Rollers = 14;
@@ -195,9 +196,9 @@ public static final class DriveConstants {
 
     }
      public static class Hood{
-      public static final double HoodKp = 0.05;
+      public static final double HoodKp = 0.04;
       public static final double HoodKi = 0.0;
-      public static final double HoodKd = 0.0;
+      public static final double HoodKd = 0.00;
 
     }
 }

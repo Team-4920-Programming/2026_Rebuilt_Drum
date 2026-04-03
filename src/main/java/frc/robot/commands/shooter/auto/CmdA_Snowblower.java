@@ -35,10 +35,7 @@ public class CmdA_Snowblower extends Command {
     m_shooter.SetRollerSpeed(-1.0);
 
     if (m_swerve.DHOut_Aimed){
-      m_shooter.SetFeederSpeed(-0.8);
-    }
-    else{
-      m_shooter.SetFeederSpeed(0);
+      m_shooter.SetFeederSpeed(-1.0);
     }
   }
 

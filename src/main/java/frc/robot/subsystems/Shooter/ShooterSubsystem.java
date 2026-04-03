@@ -42,6 +42,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -61,6 +62,7 @@ public class ShooterSubsystem extends SubsystemBase {
    //Motors
   private final TalonFX shooterMotor1 = new TalonFX(Constants.Can_Shooter1);
   private final TalonFX shooterMotor2 = new TalonFX(Constants.Can_Shooter2);
+  private final TalonFX shooterMotor3 = new TalonFX(Constants.Can_Shooter3);
   private final TalonFX feederMotor = new TalonFX(Constants.Can_Feeder);
   private final TalonFX rollerMotor = new TalonFX(Constants.Can_Rollers);
   private final SparkMax hoodMotor = new SparkMax(Constants.Can_Hood,MotorType.kBrushless);
@@ -103,6 +105,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public double calculatedShooterSpeed = 0.0;
   public double calculatedHoodAngle = 0.0;
   public double DHIn_ShotDistance = 0;
+  public double DHIn_PassingDistance = 0;
   public boolean DHIn_AutoShoot = false;
   public double AngleToHub =0;
   public boolean DHIn_Aimed = false;
@@ -128,37 +131,50 @@ public class ShooterSubsystem extends SubsystemBase {
     //Setup Motors
 
     var shooter1Config = new TalonFXConfiguration();
-    shooter1Config.Slot0.kP = 0.3; // Example P gain //0.33
+    shooter1Config.Slot0.kP = 0.42; // 0.3 
     shooter1Config.Slot0.kI = 0.0;
     shooter1Config.Slot0.kD = 0.0;
-    shooter1Config.Slot0.kV = 0.12; // Example Velocity Feedforward V/rps
-    shooter1Config.Slot0.kA = 0.0;
+    shooter1Config.Slot0.kV = 0.12; // 0.12 rps
+    shooter1Config.Slot0.kA = 0.78;
+    shooter1Config.Slot0.kS = 0.0;
     shooter1Config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-    shooter1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80));
+    shooter1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
     shooterMotor1.setNeutralMode(NeutralModeValue.Coast);
     shooterMotor1.getConfigurator().apply(shooter1Config);
 
     var shooter2Config = new TalonFXConfiguration();
-    shooter2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(80));
+    shooter2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
 
     shooterMotor2.setNeutralMode(NeutralModeValue.Coast);
     shooterMotor2.setControl(new Follower(shooterMotor1.getDeviceID(), MotorAlignmentValue.Opposed));
     shooterMotor2.getConfigurator().apply(shooter2Config);
+
+    var shooter3Config = new TalonFXConfiguration();
+    shooter3Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+
+    shooterMotor3.setNeutralMode(NeutralModeValue.Coast);
+    shooterMotor3.setControl(new Follower(shooterMotor1.getDeviceID(), MotorAlignmentValue.Aligned));
+    shooterMotor3.getConfigurator().apply(shooter3Config);
 
     SparkMaxConfig hoodConfig =  new SparkMaxConfig();
     hoodConfig.inverted(false);
     hoodConfig.smartCurrentLimit(40);
 
     AbsoluteEncoderConfig hoodencoderConfig = new AbsoluteEncoderConfig();
-    hoodencoderConfig.positionConversionFactor(180);
+    hoodencoderConfig.positionConversionFactor(360);
     hoodencoderConfig.zeroCentered(true);
     //hoodencoderConfig.zeroOffset(0.111133136);
     hoodConfig.apply(hoodencoderConfig);
+    hoodConfig.idleMode(IdleMode.kBrake);
     hoodMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     
+    hoodPID.disableContinuousInput();
+    hoodPID.setTolerance(0.5);
     var RollerConfig = new TalonFXConfiguration();
     RollerConfig.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
     rollerMotor.getConfigurator().apply(RollerConfig);
+
+
   }
 
 public void SOTFCalc(){
@@ -366,7 +382,12 @@ else {
     // ControlHood();
     // TuneHoodPID();
       hoodOutput = hoodPID.calculate(getHoodAngle(),m_hoodAngle);
+      if (hoodPID.atSetpoint())
+      {
+        hoodOutput = 0.0;
+      }
       hoodMotor.set(hoodOutput);
+
      DogLog.log("Shooter/Shooter1Current",shooterMotor1.getStatorCurrent().getValue());
      DogLog.log("Shooter/Shooter2Current",shooterMotor2.getStatorCurrent().getValue());
      //DogLog.log("Shooter/Shooter2Speed",enc_Shooter2.getVelocity(),"rpm");
@@ -382,6 +403,7 @@ else {
 
     DogLog.log("Shooter/Shooter1Amps", shooterMotor1.getStatorCurrent().getValueAsDouble());
     DogLog.log("Shooter/Shooter2Amps", shooterMotor2.getStatorCurrent().getValueAsDouble());
+    DogLog.log("Shooter/Shooter3Amps", shooterMotor3.getStatorCurrent().getValueAsDouble());
     DogLog.log("Shooter/FeederAmps", feederMotor.getStatorCurrent().getValueAsDouble());
     DogLog.log("Shooter/RollerAmps", rollerMotor.getStatorCurrent().getValueAsDouble());
     DogLog.log("Shooter/Enabled",shooterEnabled);
@@ -402,23 +424,19 @@ else {
   private void updateShotParamsFromCalculations(){
 
     if (DHIn_ShooterLookupTable != null){
-      if (DHOut_SOTF){
-        ShootOnTheFlyCalculation();
-      }
+        if (DHOut_SOTF){
+          ShootOnTheFlyCalculation();
+        }
       else{
         ShooterParams shooterCal = DHIn_ShooterLookupTable.shooterTable.get(DHIn_ShotDistance);
         m_shooterSpeed = shooterCal.rpm();
         m_hoodAngle = shooterCal.hoodAngle();
-        
-        
-
-        DogLog.log("Shooter/calculatedShooterSpeed",shooterCal.rpm());
+         DogLog.log("Shooter/calculatedShooterSpeed",shooterCal.rpm());
         DogLog.log("Shooter/calculatedHoodAngle",shooterCal.hoodAngle());
-        DogLog.log("Shooter/hoodOutput",hoodOutput);
+        
       }
     }
   }
-
 
 
   public void ShootOnTheFlyCalculation(){
@@ -452,6 +470,8 @@ else {
 
             // 7. Use table in reverse: velocity → effective distance → RPM
             double effectiveDistance = DHIn_ShooterLookupTable.inverseShooterTable.get(requiredVelocity);
+            DogLog.log("Shooter/effectiveFDistance",effectiveDistance);
+
             m_shooterSpeed = DHIn_ShooterLookupTable.shooterTable.get(effectiveDistance).rpm();
             m_hoodAngle = DHIn_ShooterLookupTable.shooterTable.get(effectiveDistance).hoodAngle();
 
@@ -486,6 +506,7 @@ else {
   }
 
   public double getHoodAngle(){
+    // return hoodEncoderFilter.calculate(hoodEncoder.getPosition());
     return hoodEncoder.getPosition();
   }
 

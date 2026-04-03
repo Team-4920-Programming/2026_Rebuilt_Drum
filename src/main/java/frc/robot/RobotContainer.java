@@ -164,7 +164,7 @@ public class RobotContainer
     NamedCommands.registerCommand("CmdA_HopperDownStart", new CmdA_HopperDownStart(Intake));
     NamedCommands.registerCommand("CmdA_Snowblower", new CmdA_Snowblower(Intake, Shooter, drivebase));
     // Configure the trigger bindings
-    configureBindings();
+    configureBindings();  
     DriverStation.silenceJoystickConnectionWarning(true);
  //   NamedCommands.registerCommand("test", Commands.print("I EXIST"));
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -238,7 +238,9 @@ public class RobotContainer
 //       driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
         driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
          //driverXbox.a().whileTrue(new DriveToTargetV0_1(drivebase));
-        driverXbox.a().whileTrue(new CmdT_ShootTillEmpty(Shooter));
+        // driverXbox.a().whileTrue(new CmdT_ShootTillEmpty(Shooter));
+              driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+
 
         //driverXbox.a().whileTrue(Shooter.setVelocity(RPM.of(5000)));
        // driverXbox.a().onFalse(Shooter.setVelocity(RPM.of(0)));
@@ -268,9 +270,9 @@ public class RobotContainer
          // Pre-match calibration routine - Back + Start buttons together
          // This ensures accidental activation is avoided during matches
          //driverXbox.x().onTrue(drivebase.getPreMatchCalibrationCommand());
-        driverXbox.leftBumper().whileTrue(new CmdT_TrackBallDrive(drivebase));
-        toggleSwitchJoystick.button(4).whileTrue(new CmdT_EnableSOTF(Shooter));
-        toggleSwitchJoystick.button(4).whileFalse(new CmdT_DisableSOTF(Shooter));
+        // driverXbox.leftBumper().whileTrue(new CmdT_TrackBallDrive(drivebase));
+        // toggleSwitchJoystick.button(4).whileTrue(new CmdT_EnableSOTF(Shooter));
+        // toggleSwitchJoystick.button(4).whileFalse(new CmdT_DisableSOTF(Shooter));
         
 
         operatorJoystick.button(3).whileTrue(new CmdT_ReverseIntake(Intake));

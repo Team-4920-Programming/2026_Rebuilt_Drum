@@ -1,0 +1,133 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.5714978601997143,
+        "y": 5.982268188302426
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.3736947218259623,
+        "y": 5.930513552068473
+      },
+      "isLocked": false,
+      "linkedName": "Windsor 3 - 1 End"
+    },
+    {
+      "anchor": {
+        "x": 1.8783024251069897,
+        "y": 4.766034236804566
+      },
+      "prevControl": {
+        "x": 1.8783024251069897,
+        "y": 5.607047075606277
+      },
+      "nextControl": {
+        "x": 1.8783024251069897,
+        "y": 3.7385847731413824
+      },
+      "isLocked": false,
+      "linkedName": "Windsor 3 - 2 End"
+    },
+    {
+      "anchor": {
+        "x": 1.6842225392296717,
+        "y": 0.6386019971469341
+      },
+      "prevControl": {
+        "x": 2.318316498877909,
+        "y": 0.6450069866383313
+      },
+      "nextControl": {
+        "x": 0.403295292439372,
+        "y": 0.6256633380884442
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.3866333808844504,
+        "y": 2.100670470756063
+      },
+      "prevControl": {
+        "x": 0.9705284101384752,
+        "y": 1.7261759970846848
+      },
+      "nextControl": {
+        "x": 1.7747931526390865,
+        "y": 2.450014265335236
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.029843081312411,
+        "y": 4.015592011412268
+      },
+      "prevControl": {
+        "x": 2.2222334165477893,
+        "y": 3.3399032631954357
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6098081023454166,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 1.6950959488272823,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 1.8507462686567342,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 3.027718550106582,
+      "rotationDegrees": 45.093725470189874
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.23160027008777,
+      "maxWaypointRelativePos": 3.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 180.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 180.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 5.3558250428552014
+  },
+  "reversed": false,
+  "folder": "Windsor",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

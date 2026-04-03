@@ -1,0 +1,73 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.18943840399825,
+        "y": 4.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.911440798858774,
+        "y": 2.7864194008559195
+      },
+      "isLocked": false,
+      "linkedName": "Windsor 1 - 1 End"
+    },
+    {
+      "anchor": {
+        "x": 3.09275434483049,
+        "y": 2.7799745610482853
+      },
+      "prevControl": {
+        "x": 3.63796005706134,
+        "y": 2.3465049928673327
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Windsor 1 - 2 End"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.3475479744136454,
+      "rotationDegrees": 39.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.45914922349762277,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 180.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 180.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 38.95590783775885
+  },
+  "reversed": false,
+  "folder": "Windsor",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": true
+}
