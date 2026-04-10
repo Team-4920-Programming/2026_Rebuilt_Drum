@@ -155,10 +155,10 @@ public class RobotContainer
     DogLog.setOptions(new DogLogOptions().withCaptureDs(true).withCaptureNt(true));
     DogLog.setPdh(new PowerDistribution());
 
-    NamedCommands.registerCommand("CmdA_ShootTillEmpty", new CmdA_AutoShoot (Shooter, drivebase, Intake).withTimeout(6));
+    NamedCommands.registerCommand("CmdA_ShootTillEmpty", new CmdA_AutoShoot (Shooter, drivebase, Intake).withTimeout(5));
     NamedCommands.registerCommand("CmdA_RunIntake", new CmdA_RunIntake (Intake));
     NamedCommands.registerCommand("CmdA_StopIntake", new CmdA_StopIntake (Intake));
-    NamedCommands.registerCommand("CmdA_AutoAimRobot", new CmdA_AutoAimRobot (drivebase).withTimeout(6));
+    NamedCommands.registerCommand("CmdA_AutoAimRobot", new CmdA_AutoAimRobot (drivebase).withTimeout(5));
     NamedCommands.registerCommand("CmdA_EnableShooter", new CmdT_EnableShooter(Shooter));
     NamedCommands.registerCommand("CmdA_DisableShooter", new CmdT_DisableShooter(Shooter));
     NamedCommands.registerCommand("CmdA_VerifyHopperDown", new CmdA_VerifyHopperDown(Intake));
