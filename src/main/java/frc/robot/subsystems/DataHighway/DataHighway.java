@@ -513,6 +513,7 @@ else if (DH_InOpposingZone){
     DH_InOpposingZone = SS_Swerve.DHOut_InOpposingZone;
     DH_SOTF = SS_Shooter.DHOut_SOTF;
     DH_SOTFTargetAngle = SS_Shooter.DHOut_SOTFTargetAngle;
+    DH_isHubActive = SS_Shooter.DHOut_isHubActive;
     
   }
   private void SetDHData()

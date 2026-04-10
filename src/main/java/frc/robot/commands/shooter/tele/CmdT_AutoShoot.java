@@ -42,6 +42,8 @@ public class CmdT_AutoShoot extends Command {
   public void initialize() {
     m_swerve.EnableAutoAim();
     // m_intake.OverrideTipperPID(true);
+    m_intake.SetTipperState(TipperState.INTAKING);
+
     m_intake.SetTipperSpeed(0);
     ShootStart = false;
     delay.reset();
@@ -116,7 +118,7 @@ public class CmdT_AutoShoot extends Command {
         }
       }
       else{
-        m_intake.SetTipperState(TipperState.INTAKING);
+        // m_intake.SetTipperState(TipperState.INTAKING);
       }
     //     if (!ShootStart){
     //       m_intake.SetTipperSpeed(0.5);

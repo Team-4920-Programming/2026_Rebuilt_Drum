@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.208550566233361,
-        "y": 4.222610556348074
+        "x": 8.192368045649072,
+        "y": 4.3908131241084165
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.846747503566333,
-        "y": 5.438844507845933
+        "x": 6.523281027104137,
+        "y": 6.163409415121254
       },
       "isLocked": false,
       "linkedName": "Windsor 2 - 1 End"
@@ -20,8 +20,8 @@
         "y": 5.242131608582019
       },
       "prevControl": {
-        "x": 3.4826961483594863,
-        "y": 5.412967189728959
+        "x": 3.8320399429386587,
+        "y": 6.0081455064194005
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,21 +34,7 @@
       "rotationDegrees": -38.0
     }
   ],
-  "constraintZones": [
-    {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.3,
-      "maxWaypointRelativePos": 0.7,
-      "constraints": {
-        "maxVelocity": 3.0,
-        "maxAcceleration": 2.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 180.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    }
-  ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {

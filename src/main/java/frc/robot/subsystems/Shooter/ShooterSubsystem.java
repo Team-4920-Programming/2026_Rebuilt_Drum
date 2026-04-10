@@ -122,6 +122,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public double DHOut_reqRobotAngle =0;
   public Rotation2d DHOut_SOTFTargetAngle = new Rotation2d().kZero;
   public boolean DHOut_SOTF = false;
+  public boolean DHOut_isHubActive = false;
   public ShooterLookupTable DHIn_ShooterLookupTable;
   public Pose2d DHIN_HubPose = new Pose2d().kZero;
   DoubleSupplier HoodKpTunable = DogLog.tunable("Shooter/HoodAngle_kp", 0.003);
@@ -158,7 +159,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     SparkMaxConfig hoodConfig =  new SparkMaxConfig();
     hoodConfig.inverted(false);
-    hoodConfig.smartCurrentLimit(40);
+    hoodConfig.smartCurrentLimit(25);
 
     AbsoluteEncoderConfig hoodencoderConfig = new AbsoluteEncoderConfig();
     hoodencoderConfig.positionConversionFactor(360);
@@ -171,7 +172,7 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodPID.disableContinuousInput();
     hoodPID.setTolerance(0.5);
     var RollerConfig = new TalonFXConfiguration();
-    RollerConfig.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+    RollerConfig.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(25));
     rollerMotor.getConfigurator().apply(RollerConfig);
 
 
@@ -428,9 +429,19 @@ else {
           ShootOnTheFlyCalculation();
         }
       else{
-        ShooterParams shooterCal = DHIn_ShooterLookupTable.shooterTable.get(DHIn_ShotDistance);
+        double modifiedDistance = DHIn_ShotDistance;
+        if (DHIn_ShotDistance >= 1.5){
+          modifiedDistance += 0.3;
+        }
+        ShooterParams shooterCal = DHIn_ShooterLookupTable.shooterTable.get(modifiedDistance);
+        if (!DHIn_InAllianceZone){
+          m_shooterSpeed = shooterCal.rpm() + 200;
+          m_hoodAngle = shooterCal.hoodAngle() + 10.0;
+        }
+        else{
         m_shooterSpeed = shooterCal.rpm();
         m_hoodAngle = shooterCal.hoodAngle();
+        }
          DogLog.log("Shooter/calculatedShooterSpeed",shooterCal.rpm());
         DogLog.log("Shooter/calculatedHoodAngle",shooterCal.hoodAngle());
         
@@ -485,7 +496,12 @@ else {
     if (shooterEnabled)
     shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(m_shooterSpeed / 60.0));
   else
+    if (DHIn_InAllianceZone && DHOut_isHubActive){
+    shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(m_shooterSpeed / 60.0));
+    }
+    else{
     shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(shooterCoastSpeed / 60.0));
+    }
   }
 
   public void ChangeShooterSpeed(double delta){
