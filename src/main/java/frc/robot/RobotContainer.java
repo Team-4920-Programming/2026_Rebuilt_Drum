@@ -34,6 +34,7 @@ import frc.robot.subsystems.Intake.*;
 import frc.robot.subsystems.Climber.*;
 import frc.robot.subsystems.DataHighway.*;
 import frc.robot.subsystems.DataHighway.DataHighway.MatchPhase;
+import frc.robot.commands.shooter.auto.CmdA_AutoShoot;
 import frc.robot.commands.shooter.auto.CmdA_ShootTillEmpty;
 import frc.robot.commands.shooter.auto.CmdA_Snowblower;
 import frc.robot.commands.shooter.tele.*;
@@ -154,7 +155,7 @@ public class RobotContainer
     DogLog.setOptions(new DogLogOptions().withCaptureDs(true).withCaptureNt(true));
     DogLog.setPdh(new PowerDistribution());
 
-    NamedCommands.registerCommand("CmdA_ShootTillEmpty", new CmdT_AutoShoot (Shooter, drivebase, Intake).withTimeout(6));
+    NamedCommands.registerCommand("CmdA_ShootTillEmpty", new CmdA_AutoShoot (Shooter, drivebase, Intake).withTimeout(6));
     NamedCommands.registerCommand("CmdA_RunIntake", new CmdA_RunIntake (Intake));
     NamedCommands.registerCommand("CmdA_StopIntake", new CmdA_StopIntake (Intake));
     NamedCommands.registerCommand("CmdA_AutoAimRobot", new CmdA_AutoAimRobot (drivebase).withTimeout(6));

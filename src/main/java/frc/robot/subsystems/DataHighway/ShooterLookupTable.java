@@ -62,8 +62,8 @@ public class ShooterLookupTable {
     shooterTable.put(5.40,new ShooterParams(3250, 45.0, 1.375));
     // shooterTable.put(8.20,new ShooterParams(4400, 44.0, 3.0));
 
-    autoAimToleranceTable.put(1.44, 10.6);
-    autoAimToleranceTable.put(2.85, 6.35);
+    autoAimToleranceTable.put(1.44, 7.5);
+    autoAimToleranceTable.put(2.85, 5.75);
     autoAimToleranceTable.put(3.85, 4.2);
 
 
