@@ -99,7 +99,7 @@ public class CmdT_AutoShoot extends Command {
                   m_intake.SetTipperState(TipperState.INTAKING);
         }
         else if (delay.hasElapsed(2.25) && !delay.hasElapsed(2.75)){
-                  m_intake.SetTipperState(TipperState.SHOOTING);
+                  m_intake.SetTipperState(TipperState.SHOOTINGSTART);
         }
         else if (delay.hasElapsed(2.75) && !delay.hasElapsed(3.25)){
                   m_intake.SetTipperState(TipperState.INTAKING);

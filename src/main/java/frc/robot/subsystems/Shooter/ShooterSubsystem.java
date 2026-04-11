@@ -125,6 +125,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public boolean DHOut_isHubActive = false;
   public ShooterLookupTable DHIn_ShooterLookupTable;
   public Pose2d DHIN_HubPose = new Pose2d().kZero;
+  public boolean shootercalcOverride = false;
   DoubleSupplier HoodKpTunable = DogLog.tunable("Shooter/HoodAngle_kp", 0.003);
   DoubleSupplier HoodKdTunable = DogLog.tunable("Shooter/HoodAngle_kd", 0.0);
   /** Creates a new ShooterSubsystem. */
@@ -429,6 +430,7 @@ else {
           ShootOnTheFlyCalculation();
         }
       else{
+        if (!shootercalcOverride){
         double modifiedDistance = DHIn_ShotDistance;
         if (DHIn_ShotDistance >= 1.5){
           modifiedDistance += 0.3;
@@ -442,9 +444,17 @@ else {
         m_shooterSpeed = shooterCal.rpm();
         m_hoodAngle = shooterCal.hoodAngle();
         }
-         DogLog.log("Shooter/calculatedShooterSpeed",shooterCal.rpm());
+        DogLog.log("Shooter/calculatedShooterSpeed",shooterCal.rpm());
         DogLog.log("Shooter/calculatedHoodAngle",shooterCal.hoodAngle());
         
+      }
+      else{
+        m_shooterSpeed = 2275;
+        m_hoodAngle = 0.0;
+        DogLog.log("Shooter/calculatedShooterSpeed",m_shooterSpeed);
+        DogLog.log("Shooter/calculatedHoodAngle",m_hoodAngle);
+      }
+        DogLog.log("Shooter/ShooterCalcOverride", shootercalcOverride);
       }
     }
   }

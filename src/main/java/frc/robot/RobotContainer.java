@@ -239,8 +239,8 @@ public class RobotContainer
 //       driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
         driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
          //driverXbox.a().whileTrue(new DriveToTargetV0_1(drivebase));
-        // driverXbox.a().whileTrue(new CmdT_ShootTillEmpty(Shooter));
-              driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+        driverXbox.a().whileTrue(new CmdT_AutoShootFromHub(Shooter, drivebase, Intake));
+          // driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
 
 
         //driverXbox.a().whileTrue(Shooter.setVelocity(RPM.of(5000)));
@@ -280,6 +280,8 @@ public class RobotContainer
         operatorJoystick.button(2).whileTrue(new CmdT_TipperShooting(Intake));
         operatorJoystick.button(5).whileTrue(new CmdT_TipperIntaking(Intake));
         operatorJoystick.button(6).whileTrue(new CmdT_FlushOutRobot(Intake,Shooter));
+        operatorJoystick.button(9).whileTrue(new CmdT_AutoShootFromHub(Shooter, drivebase, Intake));
+
           
 //       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
 //       driverXbox.leftBumper().onTrue(Commands.none());
