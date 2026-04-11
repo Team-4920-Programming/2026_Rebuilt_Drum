@@ -13,7 +13,7 @@
     "Windsor"
   ],
   "defaultMaxVel": 4.5,
-  "defaultMaxAccel": 3.5,
+  "defaultMaxAccel": 4.25,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 180.0,
   "defaultNominalVoltage": 12.0,

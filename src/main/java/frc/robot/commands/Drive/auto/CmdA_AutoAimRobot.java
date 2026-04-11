@@ -14,8 +14,9 @@ public class CmdA_AutoAimRobot extends Command {
   /** Creates a new CmdA_AutoAimRobot. */
   SwerveSubsystem m_swerve;
   public CmdA_AutoAimRobot(SwerveSubsystem swerveSubsystem) {
-    addRequirements(swerveSubsystem);
+
     m_swerve = swerveSubsystem;
+    addRequirements(swerveSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -44,6 +45,7 @@ public class CmdA_AutoAimRobot extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_swerve.robotIsAimed() && Math.abs(m_swerve.getRobotVelocity().omegaRadiansPerSecond) <= 0.25;
+    // return m_swerve.robotIsAimed() && Math.abs(m_swerve.getRobotVelocity().omegaRadiansPerSecond) <= 0.25;
+    return false;
   }
 }

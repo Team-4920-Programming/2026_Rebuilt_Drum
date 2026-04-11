@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.419771754636234,
-        "y": 2.1394864479315263
+        "x": 6.43271041369472,
+        "y": 2.320627674750357
       },
       "isLocked": false,
       "linkedName": "Windsor 1 - 1 End"
@@ -20,8 +20,8 @@
         "y": 2.7799745610482853
       },
       "prevControl": {
-        "x": 3.935549215406562,
-        "y": 2.074793152639087
+        "x": 4.077874465049928,
+        "y": 2.17830242510699
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,7 +39,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.5,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 4.25,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
