@@ -432,7 +432,7 @@ else {
       else{
         if (!shootercalcOverride){
         double modifiedDistance = DHIn_ShotDistance;
-        if (DHIn_ShotDistance >= 1.5){
+        if (DHIn_ShotDistance >= 1.6){
           modifiedDistance += 0.3;
         }
         ShooterParams shooterCal = DHIn_ShooterLookupTable.shooterTable.get(modifiedDistance);
