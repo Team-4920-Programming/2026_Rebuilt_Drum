@@ -140,19 +140,19 @@ public class ShooterSubsystem extends SubsystemBase {
     shooter1Config.Slot0.kA = 0.78;
     shooter1Config.Slot0.kS = 0.0;
     shooter1Config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-    shooter1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+    shooter1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(100));
     shooterMotor1.setNeutralMode(NeutralModeValue.Coast);
     shooterMotor1.getConfigurator().apply(shooter1Config);
 
     var shooter2Config = new TalonFXConfiguration();
-    shooter2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+    shooter2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(100));
 
     shooterMotor2.setNeutralMode(NeutralModeValue.Coast);
     shooterMotor2.setControl(new Follower(shooterMotor1.getDeviceID(), MotorAlignmentValue.Opposed));
     shooterMotor2.getConfigurator().apply(shooter2Config);
 
     var shooter3Config = new TalonFXConfiguration();
-    shooter3Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
+    shooter3Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(100));
 
     shooterMotor3.setNeutralMode(NeutralModeValue.Coast);
     shooterMotor3.setControl(new Follower(shooterMotor1.getDeviceID(), MotorAlignmentValue.Aligned));
@@ -506,12 +506,14 @@ else {
     if (shooterEnabled)
     shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(m_shooterSpeed / 60.0));
   else
-    if (DHIn_InAllianceZone && DHOut_isHubActive){
-    shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(m_shooterSpeed / 60.0));
-    }
-    else{
-    shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(shooterCoastSpeed / 60.0));
-    }
+  shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(0.0));
+    // }
+    // if (DHIn_InAllianceZone && DHOut_isHubActive){
+    // shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(m_shooterSpeed / 60.0));
+    // }
+    // else{
+    // shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(shooterCoastSpeed / 60.0));
+    // }
   }
 
   public void ChangeShooterSpeed(double delta){

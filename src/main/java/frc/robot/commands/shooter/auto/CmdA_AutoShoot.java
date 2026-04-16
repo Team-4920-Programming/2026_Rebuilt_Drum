@@ -59,7 +59,7 @@ public class CmdA_AutoShoot extends Command {
     //   m_shooter.reverseFeeder();
     // }
 
-    // if (m_swerve.robotIsAimed() && Math.abs(m_swerve.getRobotVelocity().omegaRadiansPerSecond) <= 0.5){
+    if (m_swerve.robotIsAimed() && Math.abs(m_swerve.getRobotVelocity().omegaRadiansPerSecond) <= 0.5){
       // if (m_swerve.DHOut_InAllianceZone && !m_swerve.DHIn_SOTF)
       // {
       //   m_swerve.LockSwerves();
@@ -135,7 +135,7 @@ public class CmdA_AutoShoot extends Command {
     //     }
     // }
       
-  //  }
+   }
   }
   }
 
