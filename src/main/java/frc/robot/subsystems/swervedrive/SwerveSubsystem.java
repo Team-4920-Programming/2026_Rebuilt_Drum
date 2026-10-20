@@ -6,6 +6,7 @@ package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -80,6 +81,7 @@ import org.photonvision.targeting.TargetCorner;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
+import swervelib.SwerveModule;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -241,6 +243,15 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
       // Stop the odometry thread if we are using vision that way we can synchronize updates better.
       swerveDrive.stopOdometryThread();
     }
+  
+    /*for (SwerveModule module: swerveDrive.getModules())
+    {
+      TalonFX drive = (TalonFX) module.getDriveMotor().getMotor();
+      drive.getStatorCurrent().setUpdateFrequency(50);
+      drive.getSupplyCurrent().setUpdateFrequency(50);
+
+    }*/
+
     setupPathPlanner();
     BallDistanceMapSetup();
     // RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
@@ -409,7 +420,7 @@ private PIDController PID_OutpostAim = new PIDController(0.1, 0, 0);
   private void ProcessVision4920()
   {
     
-    ObjectDetectionProcess();
+    // ObjectDetectionProcess();
     //Process Vision
     Pose2d FrontCamPose= new Pose2d(0.0 ,0.0, Rotation2d.fromDegrees(0.0));;
     double FrontCamVisionTimestamp;

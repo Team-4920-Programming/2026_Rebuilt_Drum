@@ -79,8 +79,8 @@ public class CmdT_AutoShoot extends Command {
   //     TipperUp = true;
   //   }
       m_intake.SetIntakeSpeed(-1);
-      m_shooter.SetFeederSpeed(-1.0);
-      m_shooter.SetRollerSpeed(-1.0);
+      m_shooter.SetFeederSpeed(-0.8);
+      m_shooter.SetRollerSpeed(-0.8);
       // if (m_swerve.DHOut_InAllianceZone){
       // m_intake.SetTipperState(TipperState.SHOOTINGSTART);
       // }

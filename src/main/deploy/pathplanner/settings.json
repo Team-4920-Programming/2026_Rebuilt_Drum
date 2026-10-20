@@ -1,19 +1,21 @@
 {
-  "robotWidth": 0.7,
-  "robotLength": 0.7,
+  "robotWidth": 0.9,
+  "robotLength": 1.1,
   "holonomicMode": true,
   "pathFolders": [
     "Moley - Barrie",
     "New Folder",
-    "New New Folder",
+    "Idk",
+    "Provincials",
     "Windsor"
   ],
   "autoFolders": [
     "Moley - Barrie",
+    "Provincials",
     "Windsor"
   ],
-  "defaultMaxVel": 4.5,
-  "defaultMaxAccel": 5.0,
+  "defaultMaxVel": 4.25,
+  "defaultMaxAccel": 3.5,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 180.0,
   "defaultNominalVoltage": 12.0,
@@ -24,7 +26,7 @@
   "driveGearing": 5.08,
   "maxDriveSpeed": 4.5,
   "driveMotorType": "vortex",
-  "driveCurrentLimit": 80.0,
+  "driveCurrentLimit": 60.0,
   "wheelCOF": 1.0,
   "flModuleX": 0.337,
   "flModuleY": 0.337,

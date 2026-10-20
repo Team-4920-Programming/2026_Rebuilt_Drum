@@ -20,14 +20,14 @@ public class ClimberSubsystem extends SubsystemBase {
  
  //Motors
   //SparkFlex Mtr_Climber = new SparkFlex(Constants.Can_Climber,MotorType.kBrushless);
-  SparkMax Mtr_Climber = new SparkMax(Constants.Can_Climber,MotorType.kBrushless);
+  // SparkMax Mtr_Climber = new SparkMax(Constants.Can_Climber,MotorType.kBrushless);
 
 //Motor Configs
-  SparkMaxConfig mtrCfg_Climber = new SparkMaxConfig();
-  SparkMaxConfig mtrCfg_Hools = new SparkMaxConfig();
+  // SparkMaxConfig mtrCfg_Climber = new SparkMaxConfig();
+  // SparkMaxConfig mtrCfg_Hools = new SparkMaxConfig();
 
 //Motor Encoders
-  RelativeEncoder enc_Climber = Mtr_Climber.getEncoder();
+  // RelativeEncoder enc_Climber = Mtr_Climber.getEncoder();
  // RelativeEncoder enc_Hooks = Mtr_Hooks.getEncoder();
 
   //Absolute Encoders
@@ -50,16 +50,16 @@ public class ClimberSubsystem extends SubsystemBase {
 
   public void ClimberUp()
   {
-Mtr_Climber.set(1);
+// Mtr_Climber.set(1);
   }
 
   public void Climb()
   {
-    Mtr_Climber.set(-1);
+    // Mtr_Climber.set(-1);
   }
 
   public void ClimberStop(){
-    Mtr_Climber.set(0);
+    // Mtr_Climber.set(0);
   }
 
   @Override

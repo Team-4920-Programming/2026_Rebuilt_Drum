@@ -140,24 +140,33 @@ public class ShooterSubsystem extends SubsystemBase {
     shooter1Config.Slot0.kA = 0.78;
     shooter1Config.Slot0.kS = 0.0;
     shooter1Config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-    shooter1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(100));
+    shooter1Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
     shooterMotor1.setNeutralMode(NeutralModeValue.Coast);
+    shooterMotor1.resetSignalFrequencies();
     shooterMotor1.getConfigurator().apply(shooter1Config);
-
+    shooterMotor1.getStatorCurrent().setUpdateFrequency(50);
+    shooterMotor1.getSupplyCurrent().setUpdateFrequency(50);
     var shooter2Config = new TalonFXConfiguration();
-    shooter2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(100));
+    shooter2Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
 
     shooterMotor2.setNeutralMode(NeutralModeValue.Coast);
     shooterMotor2.setControl(new Follower(shooterMotor1.getDeviceID(), MotorAlignmentValue.Opposed));
+    shooterMotor2.resetSignalFrequencies();
     shooterMotor2.getConfigurator().apply(shooter2Config);
+    
+    shooterMotor2.getStatorCurrent().setUpdateFrequency(50);
+    shooterMotor2.getSupplyCurrent().setUpdateFrequency(50);
 
     var shooter3Config = new TalonFXConfiguration();
-    shooter3Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(100));
+    shooter3Config.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40));
 
     shooterMotor3.setNeutralMode(NeutralModeValue.Coast);
     shooterMotor3.setControl(new Follower(shooterMotor1.getDeviceID(), MotorAlignmentValue.Aligned));
+    shooterMotor3.resetSignalFrequencies();
     shooterMotor3.getConfigurator().apply(shooter3Config);
 
+    shooterMotor3.getStatorCurrent().setUpdateFrequency(50);
+    shooterMotor3.getSupplyCurrent().setUpdateFrequency(50);
     SparkMaxConfig hoodConfig =  new SparkMaxConfig();
     hoodConfig.inverted(false);
     hoodConfig.smartCurrentLimit(25);
@@ -174,6 +183,12 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodPID.setTolerance(0.5);
     var RollerConfig = new TalonFXConfiguration();
     RollerConfig.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(25));
+    rollerMotor.getStatorCurrent().setUpdateFrequency(50);
+    rollerMotor.getSupplyCurrent().setUpdateFrequency(50);
+    rollerMotor.optimizeBusUtilization();
+    feederMotor.getStatorCurrent().setUpdateFrequency(50);
+    feederMotor.getSupplyCurrent().setUpdateFrequency(50);
+    feederMotor.optimizeBusUtilization();
     rollerMotor.getConfigurator().apply(RollerConfig);
 
 
@@ -432,17 +447,20 @@ else {
       else{
         if (!shootercalcOverride){
         double modifiedDistance = DHIn_ShotDistance;
-        if (DHIn_ShotDistance >= 1.6){
-          modifiedDistance += 0.3;
-        }
         ShooterParams shooterCal = DHIn_ShooterLookupTable.shooterTable.get(modifiedDistance);
         if (!DHIn_InAllianceZone){
           m_shooterSpeed = shooterCal.rpm() + 200;
-          m_hoodAngle = shooterCal.hoodAngle() + 10.0;
+          m_hoodAngle = 65.0;
+        }
+        else{
+        if (DHIn_ShotDistance >= 2.25){
+          m_shooterSpeed = shooterCal.rpm()+150;
+          m_hoodAngle = shooterCal.hoodAngle()+4.0;
         }
         else{
         m_shooterSpeed = shooterCal.rpm();
         m_hoodAngle = shooterCal.hoodAngle();
+        }
         }
         DogLog.log("Shooter/calculatedShooterSpeed",shooterCal.rpm());
         DogLog.log("Shooter/calculatedHoodAngle",shooterCal.hoodAngle());
@@ -505,15 +523,10 @@ else {
   private void ControlShooter(){
     if (shooterEnabled)
     shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(m_shooterSpeed / 60.0));
-  else
-  shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(0.0));
-    // }
-    // if (DHIn_InAllianceZone && DHOut_isHubActive){
-    // shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(m_shooterSpeed / 60.0));
-    // }
-    // else{
-    // shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(shooterCoastSpeed / 60.0));
-    // }
+    else
+    {
+      shooterMotor1.setControl(m_shooterMotorVelocityRequest.withVelocity(shooterCoastSpeed / 60.0));
+    }
   }
 
   public void ChangeShooterSpeed(double delta){
